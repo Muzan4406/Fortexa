@@ -357,6 +357,14 @@ export async function customFetch<T = unknown>(
       headers.set("authorization", `Bearer ${token}`);
     }
   }
+  
+  // For web apps, read token from localStorage if no auth getter configured
+  if (!_authTokenGetter && !headers.has("authorization")) {
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('fortexa_token') : null;
+    if (token) {
+      headers.set("authorization", `Bearer ${token}`);
+    }
+  }
 
   const requestInfo = { method, url: resolveUrl(input) };
 

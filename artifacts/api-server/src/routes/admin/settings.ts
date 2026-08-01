@@ -1,0 +1,74 @@
+import { Router, type IRouter } from "express";
+import { db, platformSettingsTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
+import { requireAdmin } from "../../lib/auth";
+import { getSettings, formatSettings } from "../../lib/settings";
+
+const router: IRouter = Router();
+
+router.get("/admin/settings", requireAdmin, async (_req, res): Promise<void> => {
+  const settings = await getSettings();
+  res.json(formatSettings(settings));
+});
+
+router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
+  const {
+    dailyRatePercent,
+    maxCapital,
+    minDeposit,
+    minWithdrawal,
+    withdrawalFeePercent,
+    gainsActive,
+  } = req.body;
+
+  const settings = await getSettings();
+  const updates: any = {};
+
+  if (dailyRatePercent !== undefined) updates.dailyRatePercent = String(dailyRatePercent);
+  if (maxCapital !== undefined) updates.maxCapital = String(maxCapital);
+  if (minDeposit !== undefined) updates.minDeposit = String(minDeposit);
+  if (minWithdrawal !== undefined) updates.minWithdrawal = String(minWithdrawal);
+  if (withdrawalFeePercent !== undefined) updates.withdrawalFeePercent = String(withdrawalFeePercent);
+  if (gainsActive !== undefined) updates.gainsActive = gainsActive;
+
+  const [updated] = await db
+    .update(platformSettingsTable)
+    .set(updates)
+    .where(eq(platformSettingsTable.id, settings.id))
+    .returning();
+
+  res.json(formatSettings(updated));
+});
+
+router.get("/admin/referral-settings", requireAdmin, async (_req, res): Promise<void> => {
+  const settings = await getSettings();
+  res.json({
+    level1Percent: parseFloat(settings.level1Percent),
+    level2Percent: parseFloat(settings.level2Percent),
+    level3Percent: parseFloat(settings.level3Percent),
+  });
+});
+
+router.put("/admin/referral-settings", requireAdmin, async (req, res): Promise<void> => {
+  const { level1Percent, level2Percent, level3Percent } = req.body;
+  const settings = await getSettings();
+  const updates: any = {};
+
+  if (level1Percent !== undefined) updates.level1Percent = String(level1Percent);
+  if (level2Percent !== undefined) updates.level2Percent = String(level2Percent);
+  if (level3Percent !== undefined) updates.level3Percent = String(level3Percent);
+
+  const [updated] = await db
+    .update(platformSettingsTable)
+    .set(updates)
+    .where(eq(platformSettingsTable.id, settings.id))
+    .returning();
+
+  res.json({
+    level1Percent: parseFloat(updated.level1Percent),
+    level2Percent: parseFloat(updated.level2Percent),
+    level3Percent: parseFloat(updated.level3Percent),
+  });
+});
+
+export default router;

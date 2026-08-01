@@ -3,20 +3,38 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Fortexa Investment Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: dashboard
+    description: Dashboard data
+  - name: deposits
+    description: Deposit operations
+  - name: withdrawals
+    description: Withdrawal operations
+  - name: transactions
+    description: Transaction history
+  - name: referrals
+    description: Referral system
+  - name: profile
+    description: User profile
+  - name: announcements
+    description: Platform announcements
+  - name: admin
+    description: Admin panel
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +42,1393 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ─── Auth ────────────────────────────────────────────────────────────────────
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Dashboard ───────────────────────────────────────────────────────────────
+
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get user dashboard summary
+      responses:
+        "200":
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /gains/snapshot:
+    get:
+      operationId: getGainsSnapshot
+      tags: [dashboard]
+      summary: Get gains snapshot for real-time client-side counter
+      responses:
+        "200":
+          description: Gains snapshot with parameters needed to compute real-time value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GainsSnapshot"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Deposits ────────────────────────────────────────────────────────────────
+
+  /deposits:
+    get:
+      operationId: getDeposits
+      tags: [deposits]
+      summary: List user deposits
+      responses:
+        "200":
+          description: List of deposits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createDeposit
+      tags: [deposits]
+      summary: Create a deposit request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DepositInput"
+      responses:
+        "201":
+          description: Deposit created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Withdrawals ─────────────────────────────────────────────────────────────
+
+  /withdrawals:
+    get:
+      operationId: getWithdrawals
+      tags: [withdrawals]
+      summary: List user withdrawals
+      responses:
+        "200":
+          description: List of withdrawals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createWithdrawal
+      tags: [withdrawals]
+      summary: Create a withdrawal request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WithdrawalInput"
+      responses:
+        "201":
+          description: Withdrawal created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Transactions ────────────────────────────────────────────────────────────
+
+  /transactions:
+    get:
+      operationId: getTransactions
+      tags: [transactions]
+      summary: Get transaction history
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [deposit, withdrawal, commission, gain]
+        - in: query
+          name: limit
+          schema:
+            type: number
+            default: 50
+        - in: query
+          name: offset
+          schema:
+            type: number
+            default: 0
+      responses:
+        "200":
+          description: Transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionList"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Referrals ───────────────────────────────────────────────────────────────
+
+  /referrals:
+    get:
+      operationId: getReferrals
+      tags: [referrals]
+      summary: Get referral info, code, and commission history
+      responses:
+        "200":
+          description: Referral data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReferralInfo"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Profile ─────────────────────────────────────────────────────────────────
+
+  /profile:
+    get:
+      operationId: getProfile
+      tags: [profile]
+      summary: Get user profile
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateProfile
+      tags: [profile]
+      summary: Update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /profile/password:
+    put:
+      operationId: updatePassword
+      tags: [profile]
+      summary: Change password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordUpdate"
+      responses:
+        "200":
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Announcements ───────────────────────────────────────────────────────────
+
+  /announcements:
+    get:
+      operationId: getAnnouncements
+      tags: [announcements]
+      summary: Get active platform announcements
+      responses:
+        "200":
+          description: Announcements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Announcement"
+
+  # ─── Admin ───────────────────────────────────────────────────────────────────
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get platform-wide statistics
+      responses:
+        "200":
+          description: Admin stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users:
+    get:
+      operationId: getAdminUsers
+      tags: [admin]
+      summary: List all users
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [active, suspended, banned]
+        - in: query
+          name: limit
+          schema:
+            type: number
+            default: 50
+        - in: query
+          name: offset
+          schema:
+            type: number
+            default: 0
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserList"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users/{id}:
+    get:
+      operationId: getAdminUser
+      tags: [admin]
+      summary: Get user details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserDetail"
+    put:
+      operationId: updateAdminUser
+      tags: [admin]
+      summary: Update user info
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUserUpdate"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserDetail"
+
+  /admin/users/{id}/suspend:
+    post:
+      operationId: suspendUser
+      tags: [admin]
+      summary: Suspend a user account
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /admin/users/{id}/ban:
+    post:
+      operationId: banUser
+      tags: [admin]
+      summary: Ban a user account
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Banned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /admin/users/{id}/reactivate:
+    post:
+      operationId: reactivateUser
+      tags: [admin]
+      summary: Reactivate a user account
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Reactivated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /admin/users/{id}/funds:
+    post:
+      operationId: adjustUserFunds
+      tags: [admin]
+      summary: Add or remove funds from a user account
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FundsAdjustment"
+      responses:
+        "200":
+          description: Funds adjusted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /admin/deposits:
+    get:
+      operationId: getAdminDeposits
+      tags: [admin]
+      summary: List all deposit requests
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+        - in: query
+          name: limit
+          schema:
+            type: number
+            default: 50
+        - in: query
+          name: offset
+          schema:
+            type: number
+            default: 0
+      responses:
+        "200":
+          description: Deposits list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTransactionList"
+    post:
+      operationId: createAdminDeposit
+      tags: [admin]
+      summary: Manually add a deposit for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManualDepositInput"
+      responses:
+        "201":
+          description: Deposit created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+
+  /admin/deposits/{id}:
+    put:
+      operationId: updateAdminDeposit
+      tags: [admin]
+      summary: Approve, reject, or modify a deposit
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionStatusUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+
+  /admin/withdrawals:
+    get:
+      operationId: getAdminWithdrawals
+      tags: [admin]
+      summary: List all withdrawal requests
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+        - in: query
+          name: limit
+          schema:
+            type: number
+            default: 50
+        - in: query
+          name: offset
+          schema:
+            type: number
+            default: 0
+      responses:
+        "200":
+          description: Withdrawals list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTransactionList"
+
+  /admin/withdrawals/{id}:
+    put:
+      operationId: updateAdminWithdrawal
+      tags: [admin]
+      summary: Approve or reject a withdrawal
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionStatusUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+
+  /admin/settings:
+    get:
+      operationId: getAdminSettings
+      tags: [admin]
+      summary: Get platform settings
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformSettings"
+    put:
+      operationId: updateAdminSettings
+      tags: [admin]
+      summary: Update platform settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlatformSettingsUpdate"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformSettings"
+
+  /admin/announcements:
+    get:
+      operationId: getAdminAnnouncements
+      tags: [admin]
+      summary: List all announcements
+      responses:
+        "200":
+          description: Announcements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Announcement"
+    post:
+      operationId: createAnnouncement
+      tags: [admin]
+      summary: Create an announcement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Announcement"
+
+  /admin/announcements/{id}:
+    put:
+      operationId: updateAnnouncement
+      tags: [admin]
+      summary: Update an announcement
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Announcement"
+    delete:
+      operationId: deleteAnnouncement
+      tags: [admin]
+      summary: Delete an announcement
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /admin/referral-settings:
+    get:
+      operationId: getAdminReferralSettings
+      tags: [admin]
+      summary: Get referral commission settings
+      responses:
+        "200":
+          description: Referral settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReferralSettings"
+    put:
+      operationId: updateAdminReferralSettings
+      tags: [admin]
+      summary: Update referral commission percentages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReferralSettingsUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReferralSettings"
+
+# ─── Schemas ─────────────────────────────────────────────────────────────────
+
 components:
   schemas:
+
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    SuccessResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: ["string", "null"]
+
+    # ── Auth ──
+
+    RegisterInput:
+      type: object
+      required: [name, phone, email, password]
+      properties:
+        name:
+          type: string
+          minLength: 2
+        phone:
+          type: string
+        email:
+          type: string
+          
+        password:
+          type: string
+          minLength: 6
+        referralCode:
+          type: ["string", "null"]
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [user, token]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+
+    User:
+      type: object
+      required: [id, name, phone, email, referralCode, investmentBalance, gainBalance, status, role, createdAt]
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        referralCode:
+          type: string
+        referredById:
+          type: ["number", "null"]
+        investmentBalance:
+          type: number
+        gainBalance:
+          type: number
+        status:
+          type: string
+          enum: [active, suspended, banned]
+        role:
+          type: string
+          enum: [user, admin]
+        createdAt:
+          type: string
+          format: date-time
+
+    # ── Dashboard ──
+
+    Dashboard:
+      type: object
+      required: [investmentBalance, gainBalance, totalDeposited, totalWithdrawn, referralEarnings, pendingWithdrawals, settings]
+      properties:
+        investmentBalance:
+          type: number
+        gainBalance:
+          type: number
+        totalDeposited:
+          type: number
+        totalWithdrawn:
+          type: number
+        referralEarnings:
+          type: number
+        pendingWithdrawals:
+          type: number
+        settings:
+          $ref: "#/components/schemas/PublicSettings"
+
+    GainsSnapshot:
+      type: object
+      required: [gainBalance, investmentBalance, dailyRatePercent, snapshotTime, gainsActive]
+      properties:
+        gainBalance:
+          type: number
+          description: Base gains balance at snapshot time
+        investmentBalance:
+          type: number
+        dailyRatePercent:
+          type: number
+          description: e.g. 3.0 for 3% per day
+        snapshotTime:
+          type: string
+          format: date-time
+          description: ISO timestamp when this snapshot was taken, for client-side interpolation
+        gainsActive:
+          type: boolean
+
+    PublicSettings:
+      type: object
+      required: [dailyRatePercent, maxCapital, minDeposit, minWithdrawal, withdrawalFeePercent, gainsActive, level1Percent, level2Percent, level3Percent]
+      properties:
+        dailyRatePercent:
+          type: number
+        maxCapital:
+          type: number
+        minDeposit:
+          type: number
+        minWithdrawal:
+          type: number
+        withdrawalFeePercent:
+          type: number
+        gainsActive:
+          type: boolean
+        level1Percent:
+          type: number
+        level2Percent:
+          type: number
+        level3Percent:
+          type: number
+
+    # ── Transactions ──
+
+    Transaction:
+      type: object
+      required: [id, userId, type, amount, fee, netAmount, status, createdAt]
+      properties:
+        id:
+          type: number
+        userId:
+          type: number
+        type:
+          type: string
+          enum: [deposit, withdrawal, commission, gain]
+        amount:
+          type: number
+        fee:
+          type: number
+        netAmount:
+          type: number
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        description:
+          type: ["string", "null"]
+        rejectionReason:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TransactionList:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+        total:
+          type: number
+
+    DepositInput:
+      type: object
+      required: [amount]
+      properties:
+        amount:
+          type: number
+          minimum: 3000
+
+    WithdrawalInput:
+      type: object
+      required: [amount]
+      properties:
+        amount:
+          type: number
+          minimum: 3000
+
+    # ── Referrals ──
+
+    ReferralInfo:
+      type: object
+      required: [referralCode, referralLink, totalCommissions, level1Count, level2Count, level3Count, commissions]
+      properties:
+        referralCode:
+          type: string
+        referralLink:
+          type: string
+        totalCommissions:
+          type: number
+        level1Count:
+          type: number
+        level2Count:
+          type: number
+        level3Count:
+          type: number
+        commissions:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommissionRecord"
+
+    CommissionRecord:
+      type: object
+      required: [id, amount, level, refereeId, refereeName, createdAt]
+      properties:
+        id:
+          type: number
+        amount:
+          type: number
+        level:
+          type: number
+        refereeId:
+          type: number
+        refereeName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    # ── Profile ──
+
+    ProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+        phone:
+          type: string
+        email:
+          type: string
+          
+
+    PasswordUpdate:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 6
+
+    # ── Announcements ──
+
+    Announcement:
+      type: object
+      required: [id, title, message, isActive, createdAt]
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        message:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    AnnouncementInput:
+      type: object
+      required: [title, message]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+        isActive:
+          type: boolean
+
+    # ── Admin ──
+
+    AdminStats:
+      type: object
+      required:
+        - totalUsers
+        - activeUsers
+        - totalInvestmentCapital
+        - totalDeposits
+        - totalWithdrawals
+        - totalGainsDistributed
+        - pendingWithdrawalsCount
+        - pendingDepositsCount
+        - totalFeeRevenue
+      properties:
+        totalUsers:
+          type: number
+        activeUsers:
+          type: number
+        totalInvestmentCapital:
+          type: number
+        totalDeposits:
+          type: number
+        totalWithdrawals:
+          type: number
+        totalGainsDistributed:
+          type: number
+        pendingWithdrawalsCount:
+          type: number
+        pendingDepositsCount:
+          type: number
+        totalFeeRevenue:
+          type: number
+
+    AdminUserList:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminUserSummary"
+        total:
+          type: number
+
+    AdminUserSummary:
+      type: object
+      required: [id, name, phone, email, investmentBalance, gainBalance, status, role, createdAt]
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        investmentBalance:
+          type: number
+        gainBalance:
+          type: number
+        status:
+          type: string
+          enum: [active, suspended, banned]
+        role:
+          type: string
+          enum: [user, admin]
+        referralCode:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    AdminUserDetail:
+      type: object
+      required: [id, name, phone, email, investmentBalance, gainBalance, status, role, referralCode, createdAt, totalDeposited, totalWithdrawn, referralEarnings]
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        investmentBalance:
+          type: number
+        gainBalance:
+          type: number
+        status:
+          type: string
+          enum: [active, suspended, banned]
+        role:
+          type: string
+          enum: [user, admin]
+        referralCode:
+          type: string
+        referredById:
+          type: ["number", "null"]
+        totalDeposited:
+          type: number
+        totalWithdrawn:
+          type: number
+        referralEarnings:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+
+    AdminUserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+
+    FundsAdjustment:
+      type: object
+      required: [type, walletType, amount]
+      properties:
+        type:
+          type: string
+          enum: [add, subtract]
+        walletType:
+          type: string
+          enum: [investment, gains]
+        amount:
+          type: number
+          minimum: 0
+        reason:
+          type: ["string", "null"]
+
+    AdminTransactionList:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminTransaction"
+        total:
+          type: number
+
+    AdminTransaction:
+      type: object
+      required: [id, userId, userName, userEmail, type, amount, fee, netAmount, status, createdAt]
+      properties:
+        id:
+          type: number
+        userId:
+          type: number
+        userName:
+          type: string
+        userEmail:
+          type: string
+        type:
+          type: string
+          enum: [deposit, withdrawal, commission, gain]
+        amount:
+          type: number
+        fee:
+          type: number
+        netAmount:
+          type: number
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        description:
+          type: ["string", "null"]
+        rejectionReason:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TransactionStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [approved, rejected]
+        amount:
+          type: ["number", "null"]
+        rejectionReason:
+          type: ["string", "null"]
+
+    ManualDepositInput:
+      type: object
+      required: [userId, amount]
+      properties:
+        userId:
+          type: number
+        amount:
+          type: number
+          minimum: 0
+        description:
+          type: ["string", "null"]
+
+    PlatformSettings:
+      type: object
+      required:
+        - dailyRatePercent
+        - maxCapital
+        - minDeposit
+        - minWithdrawal
+        - withdrawalFeePercent
+        - gainsActive
+        - level1Percent
+        - level2Percent
+        - level3Percent
+      properties:
+        dailyRatePercent:
+          type: number
+        maxCapital:
+          type: number
+        minDeposit:
+          type: number
+        minWithdrawal:
+          type: number
+        withdrawalFeePercent:
+          type: number
+        gainsActive:
+          type: boolean
+        level1Percent:
+          type: number
+        level2Percent:
+          type: number
+        level3Percent:
+          type: number
+
+    PlatformSettingsUpdate:
+      type: object
+      properties:
+        dailyRatePercent:
+          type: number
+        maxCapital:
+          type: number
+        minDeposit:
+          type: number
+        minWithdrawal:
+          type: number
+        withdrawalFeePercent:
+          type: number
+        gainsActive:
+          type: boolean
+
+    ReferralSettings:
+      type: object
+      required: [level1Percent, level2Percent, level3Percent]
+      properties:
+        level1Percent:
+          type: number
+        level2Percent:
+          type: number
+        level3Percent:
+          type: number
+
+    ReferralSettingsUpdate:
+      type: object
+      properties:
+        level1Percent:
+          type: number
+        level2Percent:
+          type: number
+        level3Percent:
+          type: number

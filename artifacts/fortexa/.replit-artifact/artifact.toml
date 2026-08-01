@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Fortexa"
+version = "1.0.0"
+id = "artifacts/fortexa"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19420
+
+[services.development]
+run = "pnpm --filter @workspace/fortexa run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/fortexa", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/fortexa/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19420"
+BASE_PATH = "/"
