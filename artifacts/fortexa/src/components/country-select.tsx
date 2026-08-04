@@ -15,7 +15,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { COUNTRIES } from '@/lib/countries';
+import { Badge } from '@/components/ui/badge';
+import { FCFA_COUNTRIES, USDT_COUNTRIES, getCurrencyForCountry } from '@/lib/countries';
 
 interface CountrySelectProps {
   value: string;
@@ -24,51 +25,89 @@ interface CountrySelectProps {
 
 export function CountrySelect({ value, onChange }: CountrySelectProps) {
   const [open, setOpen] = React.useState(false);
+  const currency = value ? getCurrencyForCountry(value) : null;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full h-12 justify-between font-normal text-left"
-          data-testid="input-country"
+    <div className="space-y-1">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full h-12 justify-between font-normal text-left"
+            data-testid="input-country"
+          >
+            <span className={cn(!value && 'text-muted-foreground')}>
+              {value || 'Sélectionnez votre pays'}
+            </span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="p-0"
+          align="start"
+          style={{ width: 'var(--radix-popover-trigger-width)' }}
         >
-          <span className={cn(!value && 'text-muted-foreground')}>
-            {value || 'Sélectionnez votre pays'}
-          </span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start" style={{ width: 'var(--radix-popover-trigger-width)' }}>
-        <Command>
-          <CommandInput placeholder="Rechercher un pays..." />
-          <CommandList>
-            <CommandEmpty>Aucun pays trouvé.</CommandEmpty>
-            <CommandGroup>
-              {COUNTRIES.map((country) => (
-                <CommandItem
-                  key={country}
-                  value={country}
-                  onSelect={(val) => {
-                    onChange(val === value ? '' : val);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      'mr-2 h-4 w-4',
-                      value === country ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
-                  {country}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+          <Command>
+            <CommandInput placeholder="Rechercher un pays..." />
+            <CommandList>
+              <CommandEmpty>Aucun pays trouvé.</CommandEmpty>
+
+              <CommandGroup heading="🌍 FCFA (XOF) — Togo, Bénin, Burkina Faso, Côte d'Ivoire…">
+                {FCFA_COUNTRIES.map((country) => (
+                  <CommandItem
+                    key={country.name}
+                    value={country.name}
+                    onSelect={(val) => {
+                      onChange(val === value ? '' : val);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4 shrink-0',
+                        value === country.name ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                    {country.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+
+              <CommandGroup heading="🌍 USDT (BEP20) — Autres pays">
+                {USDT_COUNTRIES.map((country) => (
+                  <CommandItem
+                    key={country.name}
+                    value={country.name}
+                    onSelect={(val) => {
+                      onChange(val === value ? '' : val);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4 shrink-0',
+                        value === country.name ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                    {country.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+
+      {currency && (
+        <p className="text-xs text-muted-foreground flex items-center gap-1.5 px-1">
+          <span>Devise utilisée pour vos dépôts et retraits :</span>
+          <Badge variant="secondary" className="text-xs font-semibold">
+            {currency}
+          </Badge>
+        </p>
+      )}
+    </div>
   );
 }
