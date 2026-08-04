@@ -25,9 +25,9 @@ function formatUser(u: typeof usersTable.$inferSelect) {
 }
 
 router.post("/auth/register", async (req, res): Promise<void> => {
-  const { name, phone, email, password, referralCode } = req.body;
+  const { name, phone, country, email, password, referralCode } = req.body;
 
-  if (!name || !phone || !email || !password) {
+  if (!name || !phone || !country || !email || !password) {
     res.status(400).json({ error: "Tous les champs sont requis" });
     return;
   }
@@ -56,6 +56,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
   const [user] = await db.insert(usersTable).values({
     name,
     phone,
+    country: country ?? "",
     email,
     passwordHash,
     referralCode: newCode,

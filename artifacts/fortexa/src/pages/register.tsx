@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 const registerSchema = z.object({
   name: z.string().min(2, 'Nom requis (min 2 caractères)'),
   phone: z.string().min(8, 'Numéro de téléphone invalide'),
+  country: z.string().min(2, 'Pays requis'),
   email: z.string().email('Email invalide'),
   password: z.string().min(6, 'Mot de passe requis (min 6 caractères)'),
   referralCode: z.string().optional(),
@@ -30,6 +31,7 @@ export default function RegisterPage() {
     defaultValues: {
       name: '',
       phone: '',
+      country: '',
       email: '',
       password: '',
       referralCode: '',
@@ -122,6 +124,25 @@ export default function RegisterPage() {
                         placeholder="+237 6XX XXX XXX"
                         {...field}
                         data-testid="input-phone"
+                        className="h-12"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pays</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Ex: Côte d'Ivoire, Sénégal, Togo..."
+                        {...field}
+                        data-testid="input-country"
                         className="h-12"
                       />
                     </FormControl>
