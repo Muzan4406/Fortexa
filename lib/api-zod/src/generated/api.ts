@@ -153,6 +153,12 @@ export const GetDepositsResponseItem = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "description": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "depositMethod": zod.string().nullish(),
+  "payerCountry": zod.string().nullish(),
+  "payerPhone": zod.string().nullish(),
+  "sendavapayRef": zod.string().nullish(),
+  "txid": zod.string().nullish(),
+  "screenshotPath": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })
@@ -180,8 +186,133 @@ export const CreateDepositResponse = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "description": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "depositMethod": zod.string().nullish(),
+  "payerCountry": zod.string().nullish(),
+  "payerPhone": zod.string().nullish(),
+  "sendavapayRef": zod.string().nullish(),
+  "txid": zod.string().nullish(),
+  "screenshotPath": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
+})
+
+
+/**
+ * @summary Create a Sendavapay Mobile Money payment and fetch operators
+ */
+export const initiateDepositBodyAmountMin = 3000;
+
+
+
+export const InitiateDepositBody = zod.object({
+  "amount": zod.number().min(initiateDepositBodyAmountMin),
+  "payerCountry": zod.string().describe('ISO country code: TG | BJ | BF | CI'),
+  "payerPhone": zod.string().describe('Phone number without country prefix (digits only)')
+})
+
+export const InitiateDepositResponse = zod.object({
+  "transactionId": zod.number(),
+  "reference": zod.string(),
+  "amount": zod.number(),
+  "payerCountry": zod.string(),
+  "payerPhone": zod.string(),
+  "operators": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "status": zod.string(),
+  "requiresOtp": zod.boolean().optional()
+}))
+})
+
+
+/**
+ * @summary Trigger Mobile Money push on the user's phone
+ */
+export const ConfirmDepositBody = zod.object({
+  "transactionId": zod.number(),
+  "operatorId": zod.string()
+})
+
+export const ConfirmDepositResponse = zod.object({
+  "requiresOtp": zod.boolean(),
+  "otpToken": zod.string().nullish(),
+  "requiresRedirect": zod.boolean().optional(),
+  "redirectUrl": zod.string().nullish(),
+  "reference": zod.string().optional()
+})
+
+
+/**
+ * @summary Submit OTP for Orange Money operators
+ */
+export const SubmitDepositOtpBody = zod.object({
+  "otpToken": zod.string(),
+  "otp": zod.string()
+})
+
+export const SubmitDepositOtpResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get USDT wallet address and current XOF rate
+ */
+export const GetUsdtInfoResponse = zod.object({
+  "address": zod.string().describe('BEP20 USDT wallet address'),
+  "usdtRate": zod.number().describe('How many XOF equals 1 USDT')
+})
+
+
+/**
+ * @summary Submit a USDT deposit request for admin review
+ */
+export const createUsdtDepositBodyAmountMin = 3000;
+
+
+
+export const CreateUsdtDepositBody = zod.object({
+  "amount": zod.number().min(createUsdtDepositBodyAmountMin),
+  "payerCountry": zod.string(),
+  "txid": zod.string().describe('Blockchain transaction hash'),
+  "screenshotBase64": zod.string().describe('Base64-encoded screenshot image')
+})
+
+export const CreateUsdtDepositResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "type": zod.enum(['deposit', 'withdrawal', 'commission', 'gain']),
+  "amount": zod.number(),
+  "fee": zod.number(),
+  "netAmount": zod.number(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
+  "description": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "depositMethod": zod.string().nullish(),
+  "payerCountry": zod.string().nullish(),
+  "payerPhone": zod.string().nullish(),
+  "sendavapayRef": zod.string().nullish(),
+  "txid": zod.string().nullish(),
+  "screenshotPath": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
+})
+
+
+/**
+ * @summary Poll the current status of a deposit
+ */
+export const GetDepositStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetDepositStatusResponse = zod.object({
+  "id": zod.number(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
+  "amount": zod.number(),
+  "depositMethod": zod.string().nullish(),
+  "createdAt": zod.coerce.date().optional()
 })
 
 
@@ -198,6 +329,12 @@ export const GetWithdrawalsResponseItem = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "description": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "depositMethod": zod.string().nullish(),
+  "payerCountry": zod.string().nullish(),
+  "payerPhone": zod.string().nullish(),
+  "sendavapayRef": zod.string().nullish(),
+  "txid": zod.string().nullish(),
+  "screenshotPath": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })
@@ -225,6 +362,12 @@ export const CreateWithdrawalResponse = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "description": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "depositMethod": zod.string().nullish(),
+  "payerCountry": zod.string().nullish(),
+  "payerPhone": zod.string().nullish(),
+  "sendavapayRef": zod.string().nullish(),
+  "txid": zod.string().nullish(),
+  "screenshotPath": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })
@@ -253,6 +396,12 @@ export const GetTransactionsResponse = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "description": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "depositMethod": zod.string().nullish(),
+  "payerCountry": zod.string().nullish(),
+  "payerPhone": zod.string().nullish(),
+  "sendavapayRef": zod.string().nullish(),
+  "txid": zod.string().nullish(),
+  "screenshotPath": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })),
@@ -579,6 +728,12 @@ export const CreateAdminDepositResponse = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "description": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "depositMethod": zod.string().nullish(),
+  "payerCountry": zod.string().nullish(),
+  "payerPhone": zod.string().nullish(),
+  "sendavapayRef": zod.string().nullish(),
+  "txid": zod.string().nullish(),
+  "screenshotPath": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })
@@ -607,6 +762,12 @@ export const UpdateAdminDepositResponse = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "description": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "depositMethod": zod.string().nullish(),
+  "payerCountry": zod.string().nullish(),
+  "payerPhone": zod.string().nullish(),
+  "sendavapayRef": zod.string().nullish(),
+  "txid": zod.string().nullish(),
+  "screenshotPath": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })
@@ -667,6 +828,12 @@ export const UpdateAdminWithdrawalResponse = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "description": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
+  "depositMethod": zod.string().nullish(),
+  "payerCountry": zod.string().nullish(),
+  "payerPhone": zod.string().nullish(),
+  "sendavapayRef": zod.string().nullish(),
+  "txid": zod.string().nullish(),
+  "screenshotPath": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })

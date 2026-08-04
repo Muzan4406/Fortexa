@@ -213,6 +213,144 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /deposits/initiate:
+    post:
+      operationId: initiateDeposit
+      tags: [deposits]
+      summary: Create a Sendavapay Mobile Money payment and fetch operators
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InitiateDepositInput"
+      responses:
+        "200":
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InitiateDepositPayload"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /deposits/confirm:
+    post:
+      operationId: confirmDeposit
+      tags: [deposits]
+      summary: Trigger Mobile Money push on the user's phone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmDepositInput"
+      responses:
+        "200":
+          description: Payment initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmDepositPayload"
+        "400":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /deposits/submit-otp:
+    post:
+      operationId: submitDepositOtp
+      tags: [deposits]
+      summary: Submit OTP for Orange Money operators
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitOtpInput"
+      responses:
+        "200":
+          description: OTP accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessage"
+        "400":
+          description: Invalid OTP
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /deposits/usdt-info:
+    get:
+      operationId: getUsdtInfo
+      tags: [deposits]
+      summary: Get USDT wallet address and current XOF rate
+      responses:
+        "200":
+          description: USDT info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsdtInfoResponse"
+
+  /deposits/usdt:
+    post:
+      operationId: createUsdtDeposit
+      tags: [deposits]
+      summary: Submit a USDT deposit request for admin review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsdtDepositInput"
+      responses:
+        "201":
+          description: USDT deposit created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /deposits/{id}/status:
+    get:
+      operationId: getDepositStatus
+      tags: [deposits]
+      summary: Poll the current status of a deposit
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Deposit status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DepositStatusResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   # ─── Withdrawals ─────────────────────────────────────────────────────────────
 
   /withdrawals:
@@ -1026,12 +1164,158 @@ components:
           type: ["string", "null"]
         rejectionReason:
           type: ["string", "null"]
+        depositMethod:
+          type: ["string", "null"]
+        payerCountry:
+          type: ["string", "null"]
+        payerPhone:
+          type: ["string", "null"]
+        sendavapayRef:
+          type: ["string", "null"]
+        txid:
+          type: ["string", "null"]
+        screenshotPath:
+          type: ["string", "null"]
         createdAt:
           type: string
           format: date-time
         updatedAt:
           type: string
           format: date-time
+
+    # ── Deposit flow schemas ──
+
+    InitiateDepositInput:
+      type: object
+      required: [amount, payerCountry, payerPhone]
+      properties:
+        amount:
+          type: number
+          minimum: 3000
+        payerCountry:
+          type: string
+          description: "ISO country code: TG | BJ | BF | CI"
+        payerPhone:
+          type: string
+          description: Phone number without country prefix (digits only)
+
+    OperatorInfo:
+      type: object
+      required: [id, name, status]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        requiresOtp:
+          type: boolean
+
+    InitiateDepositPayload:
+      type: object
+      required: [transactionId, reference, amount, payerCountry, payerPhone, operators]
+      properties:
+        transactionId:
+          type: number
+        reference:
+          type: string
+        amount:
+          type: number
+        payerCountry:
+          type: string
+        payerPhone:
+          type: string
+        operators:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperatorInfo"
+
+    ConfirmDepositInput:
+      type: object
+      required: [transactionId, operatorId]
+      properties:
+        transactionId:
+          type: number
+        operatorId:
+          type: string
+
+    ConfirmDepositPayload:
+      type: object
+      required: [requiresOtp]
+      properties:
+        requiresOtp:
+          type: boolean
+        otpToken:
+          type: ["string", "null"]
+        requiresRedirect:
+          type: boolean
+        redirectUrl:
+          type: ["string", "null"]
+        reference:
+          type: string
+
+    SubmitOtpInput:
+      type: object
+      required: [otpToken, otp]
+      properties:
+        otpToken:
+          type: string
+        otp:
+          type: string
+
+    SuccessMessage:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: ["string", "null"]
+
+    DepositStatusResponse:
+      type: object
+      required: [id, status, amount]
+      properties:
+        id:
+          type: number
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        amount:
+          type: number
+        depositMethod:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    UsdtDepositInput:
+      type: object
+      required: [amount, payerCountry, txid, screenshotBase64]
+      properties:
+        amount:
+          type: number
+          minimum: 3000
+        payerCountry:
+          type: string
+        txid:
+          type: string
+          description: Blockchain transaction hash
+        screenshotBase64:
+          type: string
+          description: Base64-encoded screenshot image
+
+    UsdtInfoResponse:
+      type: object
+      required: [address, usdtRate]
+      properties:
+        address:
+          type: string
+          description: BEP20 USDT wallet address
+        usdtRate:
+          type: number
+          description: How many XOF equals 1 USDT
 
     TransactionList:
       type: object

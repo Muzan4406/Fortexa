@@ -19,6 +19,11 @@ function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof 
     status: tx.status,
     description: tx.description ?? null,
     rejectionReason: tx.rejectionReason ?? null,
+    depositMethod: tx.depositMethod ?? null,
+    payerCountry: tx.payerCountry ?? null,
+    payerPhone: tx.payerPhone ?? null,
+    txid: tx.txid ?? null,
+    screenshotPath: tx.screenshotPath ?? null,
     createdAt: tx.createdAt.toISOString(),
     updatedAt: tx.updatedAt.toISOString(),
   };

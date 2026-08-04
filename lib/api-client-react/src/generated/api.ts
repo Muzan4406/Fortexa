@@ -28,8 +28,11 @@ import type {
   Announcement,
   AnnouncementInput,
   AuthResponse,
+  ConfirmDepositInput,
+  ConfirmDepositPayload,
   Dashboard,
   DepositInput,
+  DepositStatusResponse,
   ErrorResponse,
   FundsAdjustment,
   GainsSnapshot,
@@ -38,6 +41,8 @@ import type {
   GetAdminWithdrawalsParams,
   GetTransactionsParams,
   HealthStatus,
+  InitiateDepositInput,
+  InitiateDepositPayload,
   LoginInput,
   ManualDepositInput,
   PasswordUpdate,
@@ -48,10 +53,14 @@ import type {
   ReferralSettings,
   ReferralSettingsUpdate,
   RegisterInput,
+  SubmitOtpInput,
+  SuccessMessage,
   SuccessResponse,
   Transaction,
   TransactionList,
   TransactionStatusUpdate,
+  UsdtDepositInput,
+  UsdtInfoResponse,
   User,
   WithdrawalInput
 } from './api.schemas';
@@ -751,6 +760,444 @@ export const useCreateDeposit = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getCreateDepositMutationOptions(options));
     }
+
+export const getInitiateDepositUrl = () => {
+
+
+
+
+  return `/api/deposits/initiate`
+}
+
+/**
+ * @summary Create a Sendavapay Mobile Money payment and fetch operators
+ */
+export const initiateDeposit = async (initiateDepositInput: InitiateDepositInput, options?: Parameters<typeof customFetch>[1]): Promise<InitiateDepositPayload> => {
+
+  return customFetch<InitiateDepositPayload>(getInitiateDepositUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(initiateDepositInput)
+  }
+);}
+
+
+
+
+
+export const getInitiateDepositMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof initiateDeposit>>, TError,{data: BodyType<InitiateDepositInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof initiateDeposit>>, TError,{data: BodyType<InitiateDepositInput>}, TContext> => {
+
+const mutationKey = ['initiateDeposit'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof initiateDeposit>>, {data: BodyType<InitiateDepositInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  initiateDeposit(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InitiateDepositMutationResult = NonNullable<Awaited<ReturnType<typeof initiateDeposit>>>
+    export type InitiateDepositMutationBody = BodyType<InitiateDepositInput>
+    export type InitiateDepositMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Create a Sendavapay Mobile Money payment and fetch operators
+ */
+export const useInitiateDeposit = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof initiateDeposit>>, TError,{data: BodyType<InitiateDepositInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof initiateDeposit>>,
+        TError,
+        {data: BodyType<InitiateDepositInput>},
+        TContext
+      > => {
+      return useMutation(getInitiateDepositMutationOptions(options));
+    }
+
+export const getConfirmDepositUrl = () => {
+
+
+
+
+  return `/api/deposits/confirm`
+}
+
+/**
+ * @summary Trigger Mobile Money push on the user's phone
+ */
+export const confirmDeposit = async (confirmDepositInput: ConfirmDepositInput, options?: Parameters<typeof customFetch>[1]): Promise<ConfirmDepositPayload> => {
+
+  return customFetch<ConfirmDepositPayload>(getConfirmDepositUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(confirmDepositInput)
+  }
+);}
+
+
+
+
+
+export const getConfirmDepositMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmDeposit>>, TError,{data: BodyType<ConfirmDepositInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof confirmDeposit>>, TError,{data: BodyType<ConfirmDepositInput>}, TContext> => {
+
+const mutationKey = ['confirmDeposit'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmDeposit>>, {data: BodyType<ConfirmDepositInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  confirmDeposit(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmDepositMutationResult = NonNullable<Awaited<ReturnType<typeof confirmDeposit>>>
+    export type ConfirmDepositMutationBody = BodyType<ConfirmDepositInput>
+    export type ConfirmDepositMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Trigger Mobile Money push on the user's phone
+ */
+export const useConfirmDeposit = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmDeposit>>, TError,{data: BodyType<ConfirmDepositInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof confirmDeposit>>,
+        TError,
+        {data: BodyType<ConfirmDepositInput>},
+        TContext
+      > => {
+      return useMutation(getConfirmDepositMutationOptions(options));
+    }
+
+export const getSubmitDepositOtpUrl = () => {
+
+
+
+
+  return `/api/deposits/submit-otp`
+}
+
+/**
+ * @summary Submit OTP for Orange Money operators
+ */
+export const submitDepositOtp = async (submitOtpInput: SubmitOtpInput, options?: Parameters<typeof customFetch>[1]): Promise<SuccessMessage> => {
+
+  return customFetch<SuccessMessage>(getSubmitDepositOtpUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(submitOtpInput)
+  }
+);}
+
+
+
+
+
+export const getSubmitDepositOtpMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitDepositOtp>>, TError,{data: BodyType<SubmitOtpInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitDepositOtp>>, TError,{data: BodyType<SubmitOtpInput>}, TContext> => {
+
+const mutationKey = ['submitDepositOtp'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitDepositOtp>>, {data: BodyType<SubmitOtpInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitDepositOtp(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitDepositOtpMutationResult = NonNullable<Awaited<ReturnType<typeof submitDepositOtp>>>
+    export type SubmitDepositOtpMutationBody = BodyType<SubmitOtpInput>
+    export type SubmitDepositOtpMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Submit OTP for Orange Money operators
+ */
+export const useSubmitDepositOtp = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitDepositOtp>>, TError,{data: BodyType<SubmitOtpInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitDepositOtp>>,
+        TError,
+        {data: BodyType<SubmitOtpInput>},
+        TContext
+      > => {
+      return useMutation(getSubmitDepositOtpMutationOptions(options));
+    }
+
+export const getGetUsdtInfoUrl = () => {
+
+
+
+
+  return `/api/deposits/usdt-info`
+}
+
+/**
+ * @summary Get USDT wallet address and current XOF rate
+ */
+export const getUsdtInfo = async ( options?: Parameters<typeof customFetch>[1]): Promise<UsdtInfoResponse> => {
+
+  return customFetch<UsdtInfoResponse>(getGetUsdtInfoUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetUsdtInfoQueryKey = () => {
+    return [
+    `/api/deposits/usdt-info`
+    ] as const;
+    }
+
+
+export const getGetUsdtInfoQueryOptions = <TData = Awaited<ReturnType<typeof getUsdtInfo>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getUsdtInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetUsdtInfoQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsdtInfo>>> = ({ signal }) => getUsdtInfo({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUsdtInfo>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetUsdtInfoQueryResult = NonNullable<Awaited<ReturnType<typeof getUsdtInfo>>>
+export type GetUsdtInfoQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get USDT wallet address and current XOF rate
+ */
+
+export function useGetUsdtInfo<TData = Awaited<ReturnType<typeof getUsdtInfo>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getUsdtInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetUsdtInfoQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateUsdtDepositUrl = () => {
+
+
+
+
+  return `/api/deposits/usdt`
+}
+
+/**
+ * @summary Submit a USDT deposit request for admin review
+ */
+export const createUsdtDeposit = async (usdtDepositInput: UsdtDepositInput, options?: Parameters<typeof customFetch>[1]): Promise<Transaction> => {
+
+  return customFetch<Transaction>(getCreateUsdtDepositUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(usdtDepositInput)
+  }
+);}
+
+
+
+
+
+export const getCreateUsdtDepositMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUsdtDeposit>>, TError,{data: BodyType<UsdtDepositInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createUsdtDeposit>>, TError,{data: BodyType<UsdtDepositInput>}, TContext> => {
+
+const mutationKey = ['createUsdtDeposit'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUsdtDeposit>>, {data: BodyType<UsdtDepositInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createUsdtDeposit(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateUsdtDepositMutationResult = NonNullable<Awaited<ReturnType<typeof createUsdtDeposit>>>
+    export type CreateUsdtDepositMutationBody = BodyType<UsdtDepositInput>
+    export type CreateUsdtDepositMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Submit a USDT deposit request for admin review
+ */
+export const useCreateUsdtDeposit = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUsdtDeposit>>, TError,{data: BodyType<UsdtDepositInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createUsdtDeposit>>,
+        TError,
+        {data: BodyType<UsdtDepositInput>},
+        TContext
+      > => {
+      return useMutation(getCreateUsdtDepositMutationOptions(options));
+    }
+
+export const getGetDepositStatusUrl = (id: number,) => {
+
+
+
+
+  return `/api/deposits/${id}/status`
+}
+
+/**
+ * @summary Poll the current status of a deposit
+ */
+export const getDepositStatus = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<DepositStatusResponse> => {
+
+  return customFetch<DepositStatusResponse>(getGetDepositStatusUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDepositStatusQueryKey = (id: number,) => {
+    return [
+    `/api/deposits/${id}/status`
+    ] as const;
+    }
+
+
+export const getGetDepositStatusQueryOptions = <TData = Awaited<ReturnType<typeof getDepositStatus>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDepositStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDepositStatusQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDepositStatus>>> = ({ signal }) => getDepositStatus(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDepositStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDepositStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getDepositStatus>>>
+export type GetDepositStatusQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Poll the current status of a deposit
+ */
+
+export function useGetDepositStatus<TData = Awaited<ReturnType<typeof getDepositStatus>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDepositStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDepositStatusQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetWithdrawalsUrl = () => {
 

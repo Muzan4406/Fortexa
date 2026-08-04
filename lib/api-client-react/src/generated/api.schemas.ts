@@ -136,8 +136,106 @@ export interface Transaction {
   description?: string | null;
   /** @nullable */
   rejectionReason?: string | null;
+  /** @nullable */
+  depositMethod?: string | null;
+  /** @nullable */
+  payerCountry?: string | null;
+  /** @nullable */
+  payerPhone?: string | null;
+  /** @nullable */
+  sendavapayRef?: string | null;
+  /** @nullable */
+  txid?: string | null;
+  /** @nullable */
+  screenshotPath?: string | null;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface InitiateDepositInput {
+  /** @minimum 3000 */
+  amount: number;
+  /** ISO country code: TG | BJ | BF | CI */
+  payerCountry: string;
+  /** Phone number without country prefix (digits only) */
+  payerPhone: string;
+}
+
+export interface OperatorInfo {
+  id: string;
+  name: string;
+  status: string;
+  requiresOtp?: boolean;
+}
+
+export interface InitiateDepositPayload {
+  transactionId: number;
+  reference: string;
+  amount: number;
+  payerCountry: string;
+  payerPhone: string;
+  operators: OperatorInfo[];
+}
+
+export interface ConfirmDepositInput {
+  transactionId: number;
+  operatorId: string;
+}
+
+export interface ConfirmDepositPayload {
+  requiresOtp: boolean;
+  /** @nullable */
+  otpToken?: string | null;
+  requiresRedirect?: boolean;
+  /** @nullable */
+  redirectUrl?: string | null;
+  reference?: string;
+}
+
+export interface SubmitOtpInput {
+  otpToken: string;
+  otp: string;
+}
+
+export interface SuccessMessage {
+  success: boolean;
+  /** @nullable */
+  message?: string | null;
+}
+
+export type DepositStatusResponseStatus = typeof DepositStatusResponseStatus[keyof typeof DepositStatusResponseStatus];
+
+
+export const DepositStatusResponseStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface DepositStatusResponse {
+  id: number;
+  status: DepositStatusResponseStatus;
+  amount: number;
+  /** @nullable */
+  depositMethod?: string | null;
+  createdAt?: string;
+}
+
+export interface UsdtDepositInput {
+  /** @minimum 3000 */
+  amount: number;
+  payerCountry: string;
+  /** Blockchain transaction hash */
+  txid: string;
+  /** Base64-encoded screenshot image */
+  screenshotBase64: string;
+}
+
+export interface UsdtInfoResponse {
+  /** BEP20 USDT wallet address */
+  address: string;
+  /** How many XOF equals 1 USDT */
+  usdtRate: number;
 }
 
 export interface TransactionList {

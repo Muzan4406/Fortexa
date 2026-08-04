@@ -20,6 +20,18 @@ export interface Transaction {
   description?: string | null;
   /** @nullable */
   rejectionReason?: string | null;
+  /** @nullable */
+  depositMethod?: string | null;
+  /** @nullable */
+  payerCountry?: string | null;
+  /** @nullable */
+  payerPhone?: string | null;
+  /** @nullable */
+  sendavapayRef?: string | null;
+  /** @nullable */
+  txid?: string | null;
+  /** @nullable */
+  screenshotPath?: string | null;
   createdAt: Date;
   updatedAt?: Date;
 }
