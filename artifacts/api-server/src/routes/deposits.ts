@@ -189,7 +189,14 @@ router.post("/deposits/initiate", requireAuth, async (req, res): Promise<void> =
 
   const externalReference = `fortexa_dep_${userId}_${Date.now()}`;
 
-  const payment = await createPayment({
+  // Read SDK key from DB settings (admin-configurable)
+  const sendavapayKey = settings.sendavapayKey || process.env.SENDAVAPAY_SDK_KEY || "";
+  if (!sendavapayKey) {
+    res.status(503).json({ error: "Paiement Mobile Money non configuré — contactez l'administrateur" });
+    return;
+  }
+
+  const payment = await createPayment(sendavapayKey, {
     amount: numAmount,
     currency: "XOF",
     description: "Dépôt Fortexa",
@@ -339,7 +346,9 @@ router.post("/deposits/submit-otp", requireAuth, async (req, res): Promise<void>
  * Returns USDT wallet address and current XOF/USDT rate.
  */
 router.get("/deposits/usdt-info", requireAuth, async (req, res): Promise<void> => {
-  const address = process.env.USDT_ADDRESS ?? "";
+  const settings = await getSettings();
+  // Read USDT address from DB settings (admin-configurable), fallback to env
+  const address = settings.usdtAddress || process.env.USDT_ADDRESS || "";
 
   let usdtRate = 655; // fallback: approximate XOF/USD (CFA peg)
   try {

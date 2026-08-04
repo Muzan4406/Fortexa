@@ -851,7 +851,10 @@ export const GetAdminSettingsResponse = zod.object({
   "gainsActive": zod.boolean(),
   "level1Percent": zod.number(),
   "level2Percent": zod.number(),
-  "level3Percent": zod.number()
+  "level3Percent": zod.number(),
+  "sendavapayKeySet": zod.boolean().describe('Whether a Sendavapay SDK key has been configured'),
+  "sendavapayWebhookSecretSet": zod.boolean().describe('Whether a Sendavapay webhook secret has been configured'),
+  "usdtAddress": zod.string().describe('USDT BEP20 wallet address for deposits')
 })
 
 
@@ -864,7 +867,10 @@ export const UpdateAdminSettingsBody = zod.object({
   "minDeposit": zod.number().optional(),
   "minWithdrawal": zod.number().optional(),
   "withdrawalFeePercent": zod.number().optional(),
-  "gainsActive": zod.boolean().optional()
+  "gainsActive": zod.boolean().optional(),
+  "sendavapayKey": zod.string().optional().describe('Sendavapay SDK key (write-only — never returned in GET)'),
+  "sendavapayWebhookSecret": zod.string().optional().describe('Sendavapay webhook HMAC secret (write-only — never returned in GET)'),
+  "usdtAddress": zod.string().optional().describe('USDT BEP20 wallet address for deposits')
 })
 
 export const UpdateAdminSettingsResponse = zod.object({
@@ -876,7 +882,10 @@ export const UpdateAdminSettingsResponse = zod.object({
   "gainsActive": zod.boolean(),
   "level1Percent": zod.number(),
   "level2Percent": zod.number(),
-  "level3Percent": zod.number()
+  "level3Percent": zod.number(),
+  "sendavapayKeySet": zod.boolean().describe('Whether a Sendavapay SDK key has been configured'),
+  "sendavapayWebhookSecretSet": zod.boolean().describe('Whether a Sendavapay webhook secret has been configured'),
+  "usdtAddress": zod.string().describe('USDT BEP20 wallet address for deposits')
 })
 
 

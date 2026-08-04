@@ -10,6 +10,7 @@ export async function getSettings() {
   return settings;
 }
 
+/** Public-facing settings (no sensitive keys) — used by business logic helpers */
 export function formatSettings(s: Awaited<ReturnType<typeof getSettings>>) {
   return {
     dailyRatePercent: parseFloat(s.dailyRatePercent),
@@ -21,5 +22,18 @@ export function formatSettings(s: Awaited<ReturnType<typeof getSettings>>) {
     level1Percent: parseFloat(s.level1Percent),
     level2Percent: parseFloat(s.level2Percent),
     level3Percent: parseFloat(s.level3Percent),
+  };
+}
+
+/**
+ * Admin-facing settings — includes masked payment integration status.
+ * Never returns the raw key/secret values; only whether they are configured.
+ */
+export function formatAdminSettings(s: Awaited<ReturnType<typeof getSettings>>) {
+  return {
+    ...formatSettings(s),
+    sendavapayKeySet: s.sendavapayKey.length > 0,
+    sendavapayWebhookSecretSet: s.sendavapayWebhookSecret.length > 0,
+    usdtAddress: s.usdtAddress,
   };
 }

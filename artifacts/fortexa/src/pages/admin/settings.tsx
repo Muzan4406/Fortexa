@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/admin-layout';
 import {
   useGetAdminSettings, useUpdateAdminSettings,
@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
-import { Settings, Bell, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Settings, Bell, Trash2, ToggleLeft, ToggleRight, CreditCard, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 
 const settingsSchema = z.object({
   dailyRatePercent: z.coerce.number().min(0).max(100),
@@ -28,13 +28,42 @@ const settingsSchema = z.object({
   level3Percent: z.coerce.number().min(0).max(100),
 });
 
+const paymentSchema = z.object({
+  sendavapayKey: z.string(),
+  sendavapayWebhookSecret: z.string(),
+  usdtAddress: z.string(),
+});
+
 const announcementSchema = z.object({
   title: z.string().min(2, 'Titre requis'),
   message: z.string().min(5, 'Message requis'),
 });
 
 type SettingsForm = z.infer<typeof settingsSchema>;
+type PaymentForm = z.infer<typeof paymentSchema>;
 type AnnouncementForm = z.infer<typeof announcementSchema>;
+
+function SecretInput({ placeholder, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative">
+      <input
+        type={show ? 'text' : 'password'}
+        placeholder={placeholder}
+        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        {...props}
+      />
+      <button
+        type="button"
+        onClick={() => setShow((v) => !v)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+        tabIndex={-1}
+      >
+        {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+      </button>
+    </div>
+  );
+}
 
 export default function AdminSettingsPage() {
   const { toast } = useToast();
@@ -64,6 +93,11 @@ export default function AdminSettingsPage() {
     },
   });
 
+  const paymentForm = useForm<PaymentForm>({
+    resolver: zodResolver(paymentSchema),
+    defaultValues: { sendavapayKey: '', sendavapayWebhookSecret: '', usdtAddress: '' },
+  });
+
   useEffect(() => {
     if (settings) {
       form.reset({
@@ -77,8 +111,13 @@ export default function AdminSettingsPage() {
         level2Percent: settings.level2Percent,
         level3Percent: settings.level3Percent,
       });
+      paymentForm.reset({
+        sendavapayKey: '',
+        sendavapayWebhookSecret: '',
+        usdtAddress: settings.usdtAddress ?? '',
+      });
     }
-  }, [settings, form]);
+  }, [settings, form, paymentForm]);
 
   const announcementForm = useForm<AnnouncementForm>({
     resolver: zodResolver(announcementSchema),
@@ -91,6 +130,28 @@ export default function AdminSettingsPage() {
       {
         onSuccess: () => {
           toast({ title: 'Paramètres mis à jour' });
+          queryClient.invalidateQueries({ queryKey: getGetAdminSettingsQueryKey() });
+        },
+        onError: (err: any) => toast({ title: 'Erreur', description: err.data?.error, variant: 'destructive' }),
+      }
+    );
+  };
+
+  const onPaymentSubmit = (data: PaymentForm) => {
+    // Only send fields that have values — prevents accidental clearing
+    const payload: Record<string, string> = {};
+    if (data.sendavapayKey.trim()) payload.sendavapayKey = data.sendavapayKey.trim();
+    if (data.sendavapayWebhookSecret.trim()) payload.sendavapayWebhookSecret = data.sendavapayWebhookSecret.trim();
+    payload.usdtAddress = data.usdtAddress.trim();
+
+    updateSettingsMutation.mutate(
+      { data: payload },
+      {
+        onSuccess: () => {
+          toast({ title: 'Paramètres de paiement mis à jour' });
+          // Clear sensitive fields after save
+          paymentForm.setValue('sendavapayKey', '');
+          paymentForm.setValue('sendavapayWebhookSecret', '');
           queryClient.invalidateQueries({ queryKey: getGetAdminSettingsQueryKey() });
         },
         onError: (err: any) => toast({ title: 'Erreur', description: err.data?.error, variant: 'destructive' }),
@@ -236,6 +297,89 @@ export default function AdminSettingsPage() {
 
                 <Button type="submit" className="w-full h-11" disabled={updateSettingsMutation.isPending}>
                   {updateSettingsMutation.isPending ? 'Enregistrement...' : 'Enregistrer les paramètres'}
+                </Button>
+              </form>
+            </Form>
+          )}
+        </div>
+
+        {/* Payment integration settings */}
+        <div className="bg-card rounded-2xl p-6 border border-border shadow-sm">
+          <div className="flex items-center gap-2 mb-1">
+            <CreditCard className="w-5 h-5 text-primary" />
+            <h2 className="font-bold text-foreground">Intégration de paiement</h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-5">
+            Ces clés sont stockées de façon sécurisée en base de données. Laissez un champ vide pour conserver la valeur actuelle.
+          </p>
+
+          {isLoading ? (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => <div key={i} className="h-10 bg-muted rounded animate-pulse" />)}
+            </div>
+          ) : (
+            <Form {...paymentForm}>
+              <form onSubmit={paymentForm.handleSubmit(onPaymentSubmit)} className="space-y-4">
+
+                {/* Sendavapay SDK Key */}
+                <FormField control={paymentForm.control} name="sendavapayKey" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      Clé SDK Sendavapay
+                      {settings?.sendavapayKeySet && (
+                        <span className="flex items-center gap-1 text-xs text-emerald-600 font-normal">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Configurée
+                        </span>
+                      )}
+                    </FormLabel>
+                    <FormControl>
+                      <SecretInput
+                        placeholder={settings?.sendavapayKeySet ? '••••••••••••• (laisser vide pour conserver)' : 'Entrez votre clé SDK Sendavapay'}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                {/* Sendavapay Webhook Secret */}
+                <FormField control={paymentForm.control} name="sendavapayWebhookSecret" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      Secret Webhook Sendavapay
+                      {settings?.sendavapayWebhookSecretSet && (
+                        <span className="flex items-center gap-1 text-xs text-emerald-600 font-normal">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Configuré
+                        </span>
+                      )}
+                    </FormLabel>
+                    <FormControl>
+                      <SecretInput
+                        placeholder={settings?.sendavapayWebhookSecretSet ? '••••••••••••• (laisser vide pour conserver)' : 'Entrez le secret webhook Sendavapay'}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">Utilisé pour vérifier les signatures HMAC des webhooks de confirmation de dépôt.</p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                {/* USDT Address */}
+                <FormField control={paymentForm.control} name="usdtAddress" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Adresse USDT BEP20</FormLabel>
+                    <FormControl>
+                      <Input placeholder="0x..." {...field} className="font-mono text-xs" />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">Adresse affichée aux utilisateurs pour les dépôts en USDT.</p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <Button type="submit" className="w-full h-11" disabled={updateSettingsMutation.isPending}>
+                  {updateSettingsMutation.isPending ? 'Enregistrement...' : 'Enregistrer les paramètres de paiement'}
                 </Button>
               </form>
             </Form>

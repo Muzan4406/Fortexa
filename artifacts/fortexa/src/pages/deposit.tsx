@@ -120,7 +120,7 @@ export default function DepositPage() {
   // ── Server data ───────────────────────────────────────────────────────────
   const { data: dashboard } = useGetDashboard();
   const { data: deposits, isLoading: depositsLoading } = useGetDeposits();
-  const { data: usdtInfo } = useGetUsdtInfo({ enabled: flow === 'usdt' || step.startsWith('usdt') });
+  const { data: usdtInfo } = useGetUsdtInfo();
 
   // ── Mutations ─────────────────────────────────────────────────────────────
   const initiateMutation = useInitiateDeposit();
@@ -219,7 +219,7 @@ export default function DepositPage() {
             amount: res.amount,
             payerCountry: res.payerCountry,
             payerPhone: res.payerPhone,
-            operators: res.operators,
+            operators: (res.operators ?? []).map((op) => ({ ...op, requiresOtp: op.requiresOtp ?? false })),
             selectedOperator: res.operators[0]?.id ?? '',
             otpToken: null,
           });

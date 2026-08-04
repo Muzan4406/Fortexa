@@ -13,4 +13,10 @@ export interface PlatformSettingsUpdate {
   minWithdrawal?: number;
   withdrawalFeePercent?: number;
   gainsActive?: boolean;
+  /** Sendavapay SDK key (write-only — never returned in GET) */
+  sendavapayKey?: string;
+  /** Sendavapay webhook HMAC secret (write-only — never returned in GET) */
+  sendavapayWebhookSecret?: string;
+  /** USDT BEP20 wallet address for deposits */
+  usdtAddress?: string;
 }

@@ -4,12 +4,16 @@ import { db, usersTable, transactionsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { creditReferralCommissions } from "../lib/referral";
 import { logger } from "../lib/logger";
+import { getSettings } from "../lib/settings";
 
 const router: IRouter = Router();
 
 router.post("/webhooks/sendavapay", async (req, res): Promise<void> => {
   const sig = req.headers["x-sendavapay-signature"] as string | undefined;
-  const secret = process.env.SENDAVAPAY_WEBHOOK_SECRET;
+
+  // Read webhook secret from DB settings (falls back to env for backwards compatibility)
+  const settings = await getSettings();
+  const secret = settings.sendavapayWebhookSecret || process.env.SENDAVAPAY_WEBHOOK_SECRET;
 
   // Verify HMAC signature when secret is configured
   if (secret) {

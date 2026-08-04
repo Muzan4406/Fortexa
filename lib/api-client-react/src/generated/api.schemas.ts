@@ -499,6 +499,12 @@ export interface PlatformSettings {
   level1Percent: number;
   level2Percent: number;
   level3Percent: number;
+  /** Whether a Sendavapay SDK key has been configured */
+  sendavapayKeySet: boolean;
+  /** Whether a Sendavapay webhook secret has been configured */
+  sendavapayWebhookSecretSet: boolean;
+  /** USDT BEP20 wallet address for deposits */
+  usdtAddress: string;
 }
 
 export interface PlatformSettingsUpdate {
@@ -508,6 +514,12 @@ export interface PlatformSettingsUpdate {
   minWithdrawal?: number;
   withdrawalFeePercent?: number;
   gainsActive?: boolean;
+  /** Sendavapay SDK key (write-only — never returned in GET) */
+  sendavapayKey?: string;
+  /** Sendavapay webhook HMAC secret (write-only — never returned in GET) */
+  sendavapayWebhookSecret?: string;
+  /** USDT BEP20 wallet address for deposits */
+  usdtAddress?: string;
 }
 
 export interface ReferralSettings {

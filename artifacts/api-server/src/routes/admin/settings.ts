@@ -2,13 +2,13 @@ import { Router, type IRouter } from "express";
 import { db, platformSettingsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { requireAdmin } from "../../lib/auth";
-import { getSettings, formatSettings } from "../../lib/settings";
+import { getSettings, formatSettings, formatAdminSettings } from "../../lib/settings";
 
 const router: IRouter = Router();
 
 router.get("/admin/settings", requireAdmin, async (_req, res): Promise<void> => {
   const settings = await getSettings();
-  res.json(formatSettings(settings));
+  res.json(formatAdminSettings(settings));
 });
 
 router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
@@ -19,6 +19,9 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     minWithdrawal,
     withdrawalFeePercent,
     gainsActive,
+    sendavapayKey,
+    sendavapayWebhookSecret,
+    usdtAddress,
   } = req.body;
 
   const settings = await getSettings();
@@ -30,6 +33,14 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
   if (minWithdrawal !== undefined) updates.minWithdrawal = String(minWithdrawal);
   if (withdrawalFeePercent !== undefined) updates.withdrawalFeePercent = String(withdrawalFeePercent);
   if (gainsActive !== undefined) updates.gainsActive = gainsActive;
+  // Only update payment keys if a non-empty value is provided (prevents accidental clearing)
+  if (sendavapayKey && typeof sendavapayKey === "string" && sendavapayKey.trim().length > 0) {
+    updates.sendavapayKey = sendavapayKey.trim();
+  }
+  if (sendavapayWebhookSecret && typeof sendavapayWebhookSecret === "string" && sendavapayWebhookSecret.trim().length > 0) {
+    updates.sendavapayWebhookSecret = sendavapayWebhookSecret.trim();
+  }
+  if (usdtAddress !== undefined) updates.usdtAddress = String(usdtAddress).trim();
 
   const [updated] = await db
     .update(platformSettingsTable)
@@ -37,7 +48,7 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     .where(eq(platformSettingsTable.id, settings.id))
     .returning();
 
-  res.json(formatSettings(updated));
+  res.json(formatAdminSettings(updated));
 });
 
 router.get("/admin/referral-settings", requireAdmin, async (_req, res): Promise<void> => {

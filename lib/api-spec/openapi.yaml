@@ -1660,6 +1660,9 @@ components:
         - level1Percent
         - level2Percent
         - level3Percent
+        - sendavapayKeySet
+        - sendavapayWebhookSecretSet
+        - usdtAddress
       properties:
         dailyRatePercent:
           type: number
@@ -1679,6 +1682,15 @@ components:
           type: number
         level3Percent:
           type: number
+        sendavapayKeySet:
+          type: boolean
+          description: Whether a Sendavapay SDK key has been configured
+        sendavapayWebhookSecretSet:
+          type: boolean
+          description: Whether a Sendavapay webhook secret has been configured
+        usdtAddress:
+          type: string
+          description: USDT BEP20 wallet address for deposits
 
     PlatformSettingsUpdate:
       type: object
@@ -1695,6 +1707,15 @@ components:
           type: number
         gainsActive:
           type: boolean
+        sendavapayKey:
+          type: string
+          description: Sendavapay SDK key (write-only — never returned in GET)
+        sendavapayWebhookSecret:
+          type: string
+          description: Sendavapay webhook HMAC secret (write-only — never returned in GET)
+        usdtAddress:
+          type: string
+          description: USDT BEP20 wallet address for deposits
 
     ReferralSettings:
       type: object

@@ -7,9 +7,8 @@
 
 const BASE_URL = "https://sendavapay.com/api/sdk/v1";
 
-function sdkHeaders(): Record<string, string> {
-  const key = process.env.SENDAVAPAY_SDK_KEY;
-  if (!key) throw new Error("SENDAVAPAY_SDK_KEY is not configured");
+function sdkHeaders(key: string): Record<string, string> {
+  if (!key) throw new Error("Clé Sendavapay non configurée — configurez-la dans les paramètres admin");
   return {
     Authorization: `Bearer ${key}`,
     "Content-Type": "application/json",
@@ -21,13 +20,14 @@ function corsHeaders(): Record<string, string> {
 }
 
 async function sdkFetch<T = unknown>(
+  key: string,
   path: string,
   options: { method?: string; body?: unknown } = {}
 ): Promise<T> {
   const { method = "GET", body } = options;
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
-    headers: sdkHeaders(),
+    headers: sdkHeaders(key),
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
   return res.json() as Promise<T>;
@@ -62,8 +62,8 @@ export interface CreatePaymentResult {
   code?: string;
 }
 
-export function createPayment(params: CreatePaymentParams): Promise<CreatePaymentResult> {
-  return sdkFetch("/create-payment", { method: "POST", body: params });
+export function createPayment(key: string, params: CreatePaymentParams): Promise<CreatePaymentResult> {
+  return sdkFetch(key, "/create-payment", { method: "POST", body: params });
 }
 
 export interface VerifyPaymentResult {
@@ -85,8 +85,8 @@ export interface VerifyPaymentResult {
   error?: string;
 }
 
-export function verifyPayment(reference: string): Promise<VerifyPaymentResult> {
-  return sdkFetch("/verify-payment", { method: "POST", body: { reference } });
+export function verifyPayment(key: string, reference: string): Promise<VerifyPaymentResult> {
+  return sdkFetch(key, "/verify-payment", { method: "POST", body: { reference } });
 }
 
 export interface PaymentStatusResult {
@@ -101,8 +101,8 @@ export interface PaymentStatusResult {
   error?: string;
 }
 
-export function getPaymentStatus(reference: string): Promise<PaymentStatusResult> {
-  return sdkFetch(`/payment-status/${reference}`);
+export function getPaymentStatus(key: string, reference: string): Promise<PaymentStatusResult> {
+  return sdkFetch(key, `/payment-status/${reference}`);
 }
 
 // ─── CORS client endpoints (no SDK key, proxied for security) ────────────────
@@ -124,7 +124,7 @@ export async function getOperators(countryCode: string): Promise<GetOperatorsRes
   const res = await fetch(`${BASE_URL}/operators/${countryCode}`, {
     headers: corsHeaders(),
   });
-  return res.json();
+  return res.json() as Promise<GetOperatorsResult>;
 }
 
 export interface InitiatePaymentParams {
@@ -154,7 +154,7 @@ export async function initiatePayment(params: InitiatePaymentParams): Promise<In
     headers: corsHeaders(),
     body: JSON.stringify(params),
   });
-  return res.json();
+  return res.json() as Promise<InitiatePaymentResult>;
 }
 
 export interface SubmitOtpResult {
@@ -170,5 +170,5 @@ export async function submitOtp(params: { otpToken: string; otp: string }): Prom
     headers: corsHeaders(),
     body: JSON.stringify(params),
   });
-  return res.json();
+  return res.json() as Promise<SubmitOtpResult>;
 }

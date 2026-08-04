@@ -1,4 +1,4 @@
-import { pgTable, serial, numeric, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, numeric, boolean, timestamp, text } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -14,6 +14,10 @@ export const platformSettingsTable = pgTable("platform_settings", {
   level1Percent: numeric("level1_percent", { precision: 10, scale: 4 }).notNull().default("5"),
   level2Percent: numeric("level2_percent", { precision: 10, scale: 4 }).notNull().default("2"),
   level3Percent: numeric("level3_percent", { precision: 10, scale: 4 }).notNull().default("1"),
+  // Payment integration keys — stored in DB so admin can configure from the panel
+  sendavapayKey: text("sendavapay_key").notNull().default(""),
+  sendavapayWebhookSecret: text("sendavapay_webhook_secret").notNull().default(""),
+  usdtAddress: text("usdt_address").notNull().default(""),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 

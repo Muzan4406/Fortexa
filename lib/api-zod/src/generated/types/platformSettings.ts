@@ -16,4 +16,10 @@ export interface PlatformSettings {
   level1Percent: number;
   level2Percent: number;
   level3Percent: number;
+  /** Whether a Sendavapay SDK key has been configured */
+  sendavapayKeySet: boolean;
+  /** Whether a Sendavapay webhook secret has been configured */
+  sendavapayWebhookSecretSet: boolean;
+  /** USDT BEP20 wallet address for deposits */
+  usdtAddress: string;
 }
