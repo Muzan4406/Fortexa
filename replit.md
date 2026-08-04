@@ -1,6 +1,6 @@
-# [Project name]
+# Fortexa
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Investment platform where users deposit funds, accumulate gains, and earn referral commissions — managed by an admin panel.
 
 ## Run & Operate
 
@@ -22,15 +22,25 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/fortexa/` — React + Vite frontend (port `$PORT` / 19420 in dev)
+- `artifacts/api-server/` — Express 5 API server (port 8080 in dev)
+- `lib/db/src/schema/` — Drizzle ORM schema (source of truth for DB shape)
+- `lib/api-spec/` — OpenAPI spec (source of truth for API contract)
+- `lib/api-client-react/` — generated React Query hooks (run codegen after spec changes)
+- `scripts/seed-admin.mjs` — seeds the admin user into a fresh DB
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- JWT tokens stored in localStorage; gains computed server-side on each request
+- 3-level referral commission tree tracked in `referral_commissions` table
+- API codegen via Orval — edit `lib/api-spec/` then run codegen, never edit generated files directly
+- esbuild bundles the API server into `artifacts/api-server/dist/` for production
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Users register, deposit investment capital, and watch gains accumulate over time
+- Referral system: users earn commissions across 3 levels of their referral tree
+- Admin panel: approve/reject deposits & withdrawals, manage users, post announcements, configure platform settings
 
 ## User preferences
 
@@ -38,7 +48,10 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- `pnpm --filter @workspace/db run push` must be run after any schema change (dev only)
+- `pnpm --filter @workspace/api-spec run codegen` must be run after any OpenAPI spec change
+- Admin user seed: `pnpm --filter @workspace/scripts run seed-admin` (admin@fortexa.com / admin123 — change password before going live)
+- `SESSION_SECRET` env secret is available and used by the API server for session signing
 
 ## Pointers
 
