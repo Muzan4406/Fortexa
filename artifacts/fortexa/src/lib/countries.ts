@@ -10,13 +10,13 @@ export const FCFA_COUNTRIES: Country[] = [
   { name: "Bénin", currency: "FCFA (XOF)" },
   { name: "Burkina Faso", currency: "FCFA (XOF)" },
   { name: "Côte d'Ivoire", currency: "FCFA (XOF)" },
-  { name: "Sénégal", currency: "FCFA (XOF)" },
-  { name: "Mali", currency: "FCFA (XOF)" },
-  { name: "Niger", currency: "FCFA (XOF)" },
-  { name: "Guinée-Bissau", currency: "FCFA (XOF)" },
 ];
 
 export const USDT_COUNTRIES: Country[] = [
+  { name: "Sénégal", currency: "USDT (BEP20)" },
+  { name: "Mali", currency: "USDT (BEP20)" },
+  { name: "Niger", currency: "USDT (BEP20)" },
+  { name: "Guinée-Bissau", currency: "USDT (BEP20)" },
   { name: "Cameroun", currency: "USDT (BEP20)" },
   { name: "Congo", currency: "USDT (BEP20)" },
   { name: "République démocratique du Congo", currency: "USDT (BEP20)" },
