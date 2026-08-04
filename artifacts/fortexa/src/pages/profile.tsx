@@ -96,14 +96,16 @@ export default function ProfilePage() {
 
   return (
     <UserLayout>
-      <div className="gradient-green py-8 px-6">
+      <div className="bg-background py-8 px-6 border-b border-border">
         <div className="flex items-center gap-4 mb-2">
-          <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <User className="w-8 h-8 text-white" />
-          </div>
+          <img
+            src="/logo.jpg"
+            alt="Fortexa"
+            className="w-16 h-16 rounded-full object-cover border-2 border-primary/20 shadow-md"
+          />
           <div>
-            <h1 className="text-2xl font-bold text-white">{user?.name ?? '...'}</h1>
-            <p className="text-white/80 text-sm">{user?.email ?? ''}</p>
+            <h1 className="text-2xl font-bold text-foreground">{user?.name ?? '...'}</h1>
+            <p className="text-muted-foreground text-sm">{user?.email ?? ''}</p>
           </div>
         </div>
       </div>

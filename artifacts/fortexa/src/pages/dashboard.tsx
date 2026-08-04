@@ -6,7 +6,7 @@ import { GainsCounter } from '@/components/gains-counter';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { ArrowDownCircle, ArrowUpCircle, Wallet, TrendingUp, AlertCircle } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -25,34 +25,31 @@ export default function DashboardPage() {
 
   return (
     <UserLayout>
-      <div className="gradient-green pt-8 pb-24 px-6 relative">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
-        
-        <div className="relative">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12 border-2 border-white/30">
-                <AvatarFallback className="bg-white/20 text-white font-bold text-lg backdrop-blur-sm">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-white/80 text-sm font-medium">Bienvenue,</p>
-                <h1 className="text-white text-xl font-bold" data-testid="text-username">{user.name}</h1>
-              </div>
+      <div className="bg-background border-b border-border pt-8 pb-6 px-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Avatar className="w-12 h-12 border-2 border-primary/20">
+              <AvatarImage src="/logo.jpg" alt="Fortexa" className="object-cover" />
+              <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-muted-foreground text-sm font-medium">Bienvenue,</p>
+              <h1 className="text-foreground text-xl font-bold" data-testid="text-username">{user.name}</h1>
             </div>
           </div>
+        </div>
 
-          <div className="space-y-3">
-            <p className="text-white/90 text-sm font-medium">Capital investi</p>
-            <div className="text-4xl font-bold text-white" data-testid="text-investment-balance">
-              {isLoading ? '...' : formatCurrency(dashboard?.investmentBalance || 0)}
-            </div>
+        <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
+          <p className="text-muted-foreground text-sm font-medium mb-1">Capital investi</p>
+          <div className="text-3xl font-bold text-primary" data-testid="text-investment-balance">
+            {isLoading ? '...' : formatCurrency(dashboard?.investmentBalance || 0)}
           </div>
         </div>
       </div>
 
-      <div className="px-6 -mt-16 pb-6 space-y-4">
+      <div className="px-6 pt-4 pb-6 space-y-4">
         <GainsCounter />
 
         <div className="grid grid-cols-2 gap-3">

@@ -9,8 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus } from 'lucide-react';
-
 const registerSchema = z.object({
   name: z.string().min(2, 'Nom requis (min 2 caractères)'),
   phone: z.string().min(8, 'Numéro de téléphone invalide'),
@@ -74,21 +72,21 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <div className="gradient-green py-16 px-6 text-center">
-        <h1 className="text-4xl font-bold text-white mb-2">Fortexa</h1>
-        <p className="text-white/90 text-sm">Votre capital, nos résultats</p>
+      <div className="bg-background py-10 px-6 text-center flex flex-col items-center">
+        <img
+          src="/logo.jpg"
+          alt="Fortexa"
+          className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg mb-4"
+        />
+        <h1 className="text-3xl font-bold text-foreground mb-1">Fortexa</h1>
+        <p className="text-muted-foreground text-sm">Votre capital, nos résultats</p>
       </div>
 
-      <div className="flex-1 px-6 py-8 -mt-6">
+      <div className="flex-1 px-6 pb-8">
         <div className="bg-card rounded-2xl shadow-xl p-6 max-w-md mx-auto">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <UserPlus className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-foreground">Inscription</h2>
-              <p className="text-sm text-muted-foreground">Créez votre compte</p>
-            </div>
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-foreground">Inscription</h2>
+            <p className="text-sm text-muted-foreground">Créez votre compte</p>
           </div>
 
           <Form {...form}>
