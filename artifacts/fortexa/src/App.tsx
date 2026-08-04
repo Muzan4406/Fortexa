@@ -13,6 +13,9 @@ import WithdrawPage from '@/pages/withdraw';
 import TransactionsPage from '@/pages/transactions';
 import ReferralsPage from '@/pages/referrals';
 import ProfilePage from '@/pages/profile';
+import NotificationsPage from '@/pages/notifications';
+import SupportPage from '@/pages/support';
+import AboutPage from '@/pages/about';
 import NotFound from '@/pages/not-found';
 
 import AdminDashboard from '@/pages/admin/index';
@@ -55,6 +58,15 @@ function Router() {
       </Route>
       <Route path="/profile">
         <ProtectedRoute><ProfilePage /></ProtectedRoute>
+      </Route>
+      <Route path="/notifications">
+        <ProtectedRoute><NotificationsPage /></ProtectedRoute>
+      </Route>
+      <Route path="/support">
+        <ProtectedRoute><SupportPage /></ProtectedRoute>
+      </Route>
+      <Route path="/about">
+        <ProtectedRoute><AboutPage /></ProtectedRoute>
       </Route>
 
       {/* Admin routes */}

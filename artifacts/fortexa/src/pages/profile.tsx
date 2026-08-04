@@ -10,7 +10,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { useLocation } from 'wouter';
-import { User, Lock, Copy, LogOut, ChevronRight, Shield } from 'lucide-react';
+import {
+  User, Lock, Copy, LogOut, ChevronRight, Shield,
+  ArrowDownCircle, ArrowUpCircle, Info, Headphones, Users,
+} from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getGetProfileQueryKey, getGetMeQueryKey } from '@workspace/api-client-react';
 
@@ -96,30 +99,52 @@ export default function ProfilePage() {
 
   return (
     <UserLayout>
-      <div className="bg-background py-8 px-6 border-b border-border">
-        <div className="flex items-center gap-4 mb-2">
-          <img
-            src="/logo.jpg"
-            alt="Fortexa"
-            className="w-16 h-16 rounded-full object-cover border-2 border-primary/20 shadow-md"
-          />
+      {/* Hero */}
+      <div className="gradient-green px-6 pt-12 pb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-white text-2xl font-bold shrink-0">
+            {user?.name?.[0]?.toUpperCase() ?? '?'}
+          </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">{user?.name ?? '...'}</h1>
-            <p className="text-muted-foreground text-sm">{user?.email ?? ''}</p>
+            <h1 className="text-xl font-bold text-white">{user?.name ?? '...'}</h1>
+            <p className="text-white/70 text-sm">{user?.email ?? ''}</p>
           </div>
         </div>
       </div>
 
-      <div className="px-6 py-6 space-y-4">
-        {/* Referral code */}
+      <div className="px-4 py-5 space-y-3">
+
+        {/* ── Actions financières ── */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => setLocation('/deposit')}
+            className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="w-11 h-11 rounded-xl bg-green-500 flex items-center justify-center shadow-sm">
+              <ArrowDownCircle className="w-5 h-5 text-white" strokeWidth={2} />
+            </div>
+            <span className="text-sm font-semibold text-foreground">Déposer</span>
+          </button>
+          <button
+            onClick={() => setLocation('/withdraw')}
+            className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="w-11 h-11 rounded-xl bg-blue-500 flex items-center justify-center shadow-sm">
+              <ArrowUpCircle className="w-5 h-5 text-white" strokeWidth={2} />
+            </div>
+            <span className="text-sm font-semibold text-foreground">Retirer</span>
+          </button>
+        </div>
+
+        {/* ── Referral code ── */}
         {profile?.referralCode && (
           <button
             onClick={copyReferralCode}
-            className="w-full bg-card rounded-xl p-4 border border-border flex items-center justify-between"
+            className="w-full bg-card rounded-2xl p-4 border border-border flex items-center justify-between shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Users2 className="w-5 h-5 text-primary" />
+              <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-orange-500" />
               </div>
               <div className="text-left">
                 <p className="text-xs text-muted-foreground">Code parrainage</p>
@@ -130,14 +155,14 @@ export default function ProfilePage() {
           </button>
         )}
 
-        {/* Admin link */}
+        {/* ── Admin link ── */}
         {user?.role === 'admin' && (
           <button
             onClick={() => setLocation('/admin')}
-            className="w-full bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between"
+            className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
                 <Shield className="w-5 h-5 text-amber-600" />
               </div>
               <div className="text-left">
@@ -149,7 +174,7 @@ export default function ProfilePage() {
           </button>
         )}
 
-        {/* Tabs */}
+        {/* ── Tabs profil / sécurité ── */}
         <div className="flex bg-muted rounded-xl p-1">
           <button
             onClick={() => setActiveTab('info')}
@@ -166,7 +191,7 @@ export default function ProfilePage() {
         </div>
 
         {activeTab === 'info' && (
-          <div className="bg-card rounded-2xl p-6 shadow-lg border border-border">
+          <div className="bg-card rounded-2xl p-5 shadow-sm border border-border">
             <div className="flex items-center gap-2 mb-4">
               <User className="w-5 h-5 text-primary" />
               <h2 className="font-semibold text-foreground">Mes informations</h2>
@@ -185,9 +210,7 @@ export default function ProfilePage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Nom complet</FormLabel>
-                        <FormControl>
-                          <Input {...field} className="h-12" />
-                        </FormControl>
+                        <FormControl><Input {...field} className="h-12" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -198,18 +221,12 @@ export default function ProfilePage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Téléphone (optionnel)</FormLabel>
-                        <FormControl>
-                          <Input type="tel" placeholder="+225 XX XX XX XX" {...field} className="h-12" />
-                        </FormControl>
+                        <FormControl><Input type="tel" placeholder="+225 XX XX XX XX" {...field} className="h-12" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button
-                    type="submit"
-                    className="w-full h-12"
-                    disabled={updateProfileMutation.isPending}
-                  >
+                  <Button type="submit" className="w-full h-12" disabled={updateProfileMutation.isPending}>
                     {updateProfileMutation.isPending ? 'Enregistrement...' : 'Enregistrer'}
                   </Button>
                 </form>
@@ -219,7 +236,7 @@ export default function ProfilePage() {
         )}
 
         {activeTab === 'password' && (
-          <div className="bg-card rounded-2xl p-6 shadow-lg border border-border">
+          <div className="bg-card rounded-2xl p-5 shadow-sm border border-border">
             <div className="flex items-center gap-2 mb-4">
               <Lock className="w-5 h-5 text-primary" />
               <h2 className="font-semibold text-foreground">Changer le mot de passe</h2>
@@ -232,9 +249,7 @@ export default function ProfilePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Mot de passe actuel</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} className="h-12" />
-                      </FormControl>
+                      <FormControl><Input type="password" placeholder="••••••••" {...field} className="h-12" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -245,18 +260,12 @@ export default function ProfilePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nouveau mot de passe</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} className="h-12" />
-                      </FormControl>
+                      <FormControl><Input type="password" placeholder="••••••••" {...field} className="h-12" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="submit"
-                  className="w-full h-12"
-                  disabled={updatePasswordMutation.isPending}
-                >
+                <Button type="submit" className="w-full h-12" disabled={updatePasswordMutation.isPending}>
                   {updatePasswordMutation.isPending ? 'Modification...' : 'Modifier le mot de passe'}
                 </Button>
               </form>
@@ -264,25 +273,49 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* Logout */}
+        {/* ── Service client ── */}
+        <button
+          onClick={() => setLocation('/support')}
+          className="w-full bg-card rounded-2xl p-4 border border-border flex items-center justify-between shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#229ED9]/10 flex items-center justify-center">
+              <Headphones className="w-5 h-5 text-[#229ED9]" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-foreground">Service client</p>
+              <p className="text-xs text-muted-foreground">Canal & support Telegram</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        {/* ── À propos ── */}
+        <button
+          onClick={() => setLocation('/about')}
+          className="w-full bg-card rounded-2xl p-4 border border-border flex items-center justify-between shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Info className="w-5 h-5 text-primary" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-foreground">À propos de nous</p>
+              <p className="text-xs text-muted-foreground">Notre mission et nos valeurs</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        {/* ── Déconnexion ── */}
         <button
           onClick={handleLogout}
-          className="w-full bg-destructive/10 border border-destructive/20 rounded-xl p-4 flex items-center justify-center gap-2 text-destructive font-medium"
+          className="w-full bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-center justify-center gap-2 text-destructive font-medium"
         >
           <LogOut className="w-5 h-5" />
           Se déconnecter
         </button>
       </div>
     </UserLayout>
-  );
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-function Users2({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
   );
 }

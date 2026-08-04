@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 import { BottomNav } from './bottom-nav';
+import { AppSidebar } from './app-sidebar';
+import { SidebarProvider } from '@/lib/sidebar-context';
 
 interface UserLayoutProps {
   children: ReactNode;
@@ -7,11 +9,14 @@ interface UserLayoutProps {
 
 export function UserLayout({ children }: UserLayoutProps) {
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="max-w-md mx-auto">
-        {children}
+    <SidebarProvider>
+      <div className="min-h-screen bg-background pb-20">
+        <AppSidebar />
+        <div className="max-w-md mx-auto">
+          {children}
+        </div>
+        <BottomNav />
       </div>
-      <BottomNav />
-    </div>
+    </SidebarProvider>
   );
 }
