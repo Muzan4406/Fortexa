@@ -1,15 +1,13 @@
 import { useLocation } from 'wouter';
 import { useSidebar } from '@/lib/sidebar-context';
 import { useAuth } from '@/lib/auth-context';
-import {
-  Home, FileText, Users, X, LogOut, Bell, Settings, Shield,
-} from 'lucide-react';
+import { Home, FileText, Users, User, X, LogOut, Shield } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { href: '/dashboard',     icon: Home,     label: 'Tableau de bord' },
-  { href: '/transactions',  icon: FileText, label: 'Historique'       },
-  { href: '/referrals',     icon: Users,    label: 'Mon équipe'       },
-  { href: '/notifications', icon: Bell,     label: 'Notifications'    },
+  { href: '/dashboard',    icon: Home,     label: 'Accueil'                 },
+  { href: '/referrals',    icon: Users,    label: 'Équipe'                  },
+  { href: '/transactions', icon: FileText, label: 'Historique de transaction'},
+  { href: '/profile',      icon: User,     label: 'Compte'                  },
 ];
 
 export function AppSidebar() {
@@ -17,16 +15,8 @@ export function AppSidebar() {
   const [location, setLocation] = useLocation();
   const { clearAuth, user } = useAuth();
 
-  const navigate = (href: string) => {
-    setLocation(href);
-    close();
-  };
-
-  const handleLogout = () => {
-    close();
-    clearAuth();
-    setLocation('/login');
-  };
+  const navigate = (href: string) => { setLocation(href); close(); };
+  const handleLogout = () => { close(); clearAuth(); setLocation('/login'); };
 
   return (
     <>
@@ -57,15 +47,12 @@ export function AppSidebar() {
               <p className="text-white/70 text-xs truncate max-w-[140px]">{user?.email ?? ''}</p>
             </div>
           </div>
-          <button
-            onClick={close}
-            className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"
-          >
+          <button onClick={close} className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
             <X className="w-4 h-4 text-white" />
           </button>
         </div>
 
-        {/* Nav items */}
+        {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
             const isActive = location === href;
@@ -73,13 +60,13 @@ export function AppSidebar() {
               <button
                 key={href}
                 onClick={() => navigate(href)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
+                className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all ${
                   isActive
                     ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
-                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-primary' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
+                <Icon className="w-5 h-5 shrink-0" strokeWidth={isActive ? 2.5 : 2} />
                 <span className={`text-sm ${isActive ? 'font-semibold' : 'font-medium'}`}>{label}</span>
               </button>
             );
@@ -88,7 +75,7 @@ export function AppSidebar() {
           {user?.role === 'admin' && (
             <button
               onClick={() => navigate('/admin')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-amber-600 hover:bg-amber-50 transition-all"
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left text-amber-600 hover:bg-amber-50 transition-all"
             >
               <Shield className="w-5 h-5 shrink-0" strokeWidth={2} />
               <span className="text-sm font-medium">Administration</span>
@@ -97,17 +84,10 @@ export function AppSidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="px-3 pb-8 pt-2 border-t border-border space-y-1">
-          <button
-            onClick={() => navigate('/profile')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
-          >
-            <Settings className="w-5 h-5 shrink-0" strokeWidth={2} />
-            <span className="text-sm font-medium">Paramètres</span>
-          </button>
+        <div className="px-3 pb-8 pt-2 border-t border-border">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-destructive hover:bg-destructive/10 transition-all"
+            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left text-destructive hover:bg-destructive/10 transition-all"
           >
             <LogOut className="w-5 h-5 shrink-0" strokeWidth={2} />
             <span className="text-sm font-medium">Se déconnecter</span>
