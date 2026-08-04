@@ -4,6 +4,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
 import { AuthProvider } from '@/lib/auth-context';
 import { ProtectedRoute } from '@/components/protected-route';
+import { UserLayout } from '@/components/user-layout';
 
 import LoginPage from '@/pages/login';
 import RegisterPage from '@/pages/register';
@@ -40,33 +41,33 @@ function Router() {
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
 
-      {/* User routes */}
+      {/* User routes — wrapped in UserLayout to provide the sidebar context */}
       <Route path="/dashboard">
-        <ProtectedRoute><DashboardPage /></ProtectedRoute>
+        <ProtectedRoute><UserLayout><DashboardPage /></UserLayout></ProtectedRoute>
       </Route>
       <Route path="/deposit">
-        <ProtectedRoute><DepositPage /></ProtectedRoute>
+        <ProtectedRoute><UserLayout><DepositPage /></UserLayout></ProtectedRoute>
       </Route>
       <Route path="/withdraw">
-        <ProtectedRoute><WithdrawPage /></ProtectedRoute>
+        <ProtectedRoute><UserLayout><WithdrawPage /></UserLayout></ProtectedRoute>
       </Route>
       <Route path="/transactions">
-        <ProtectedRoute><TransactionsPage /></ProtectedRoute>
+        <ProtectedRoute><UserLayout><TransactionsPage /></UserLayout></ProtectedRoute>
       </Route>
       <Route path="/referrals">
-        <ProtectedRoute><ReferralsPage /></ProtectedRoute>
+        <ProtectedRoute><UserLayout><ReferralsPage /></UserLayout></ProtectedRoute>
       </Route>
       <Route path="/profile">
-        <ProtectedRoute><ProfilePage /></ProtectedRoute>
+        <ProtectedRoute><UserLayout><ProfilePage /></UserLayout></ProtectedRoute>
       </Route>
       <Route path="/notifications">
-        <ProtectedRoute><NotificationsPage /></ProtectedRoute>
+        <ProtectedRoute><UserLayout><NotificationsPage /></UserLayout></ProtectedRoute>
       </Route>
       <Route path="/support">
-        <ProtectedRoute><SupportPage /></ProtectedRoute>
+        <ProtectedRoute><UserLayout><SupportPage /></UserLayout></ProtectedRoute>
       </Route>
       <Route path="/about">
-        <ProtectedRoute><AboutPage /></ProtectedRoute>
+        <ProtectedRoute><UserLayout><AboutPage /></UserLayout></ProtectedRoute>
       </Route>
 
       {/* Admin routes */}

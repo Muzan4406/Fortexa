@@ -6,15 +6,16 @@ interface UserLayoutProps {
   children: ReactNode;
 }
 
+/**
+ * Wraps user-facing pages with the SidebarProvider and the slide-out drawer.
+ * Pages manage their own layout/padding — this component only provides
+ * the sidebar context and renders the drawer overlay.
+ */
 export function UserLayout({ children }: UserLayoutProps) {
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-background">
-        <AppSidebar />
-        <div className="max-w-md mx-auto">
-          {children}
-        </div>
-      </div>
+      <AppSidebar />
+      {children}
     </SidebarProvider>
   );
 }
