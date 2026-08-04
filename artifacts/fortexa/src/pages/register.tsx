@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
+import { CountrySelect } from '@/components/country-select';
 const registerSchema = z.object({
   name: z.string().min(2, 'Nom requis (min 2 caractères)'),
   phone: z.string().min(8, 'Numéro de téléphone invalide'),
@@ -139,11 +140,9 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Pays</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Ex: Côte d'Ivoire, Sénégal, Togo..."
-                        {...field}
-                        data-testid="input-country"
-                        className="h-12"
+                      <CountrySelect
+                        value={field.value}
+                        onChange={field.onChange}
                       />
                     </FormControl>
                     <FormMessage />
