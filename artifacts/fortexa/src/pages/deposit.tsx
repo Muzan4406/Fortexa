@@ -409,6 +409,12 @@ export default function DepositPage() {
             <p className="text-xs text-muted-foreground">Minimum : {formatCurrency(minDeposit)}</p>
           </div>
 
+          {flow === 'xof' && (
+            <p className="text-xs text-muted-foreground text-center -mb-1">
+              L'opérateur Mobile Money sera sélectionné à l'étape suivante.
+            </p>
+          )}
+
           <Button
             className="w-full h-12 text-base font-semibold bg-accent hover:bg-accent/90"
             onClick={handleContinue}
@@ -802,14 +808,14 @@ export default function DepositPage() {
   return (
     <>
       {/* Header */}
-      <div className="gradient-green py-8 px-6">
+      <div className="bg-background border-b border-border py-8 px-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-            <ArrowDownCircle className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center">
+            <ArrowDownCircle className="w-6 h-6 text-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Dépôt</h1>
-            <p className="text-white/80 text-sm">Alimentez votre capital</p>
+            <h1 className="text-2xl font-bold text-foreground">Dépôt</h1>
+            <p className="text-muted-foreground text-sm">Alimentez votre capital</p>
           </div>
         </div>
       </div>

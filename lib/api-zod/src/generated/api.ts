@@ -349,7 +349,8 @@ export const createWithdrawalBodyAmountMin = 3000;
 
 
 export const CreateWithdrawalBody = zod.object({
-  "amount": zod.number().min(createWithdrawalBodyAmountMin)
+  "amount": zod.number().min(createWithdrawalBodyAmountMin),
+  "usdtAddress": zod.string().describe('Adresse USDT BEP20 pour le virement')
 })
 
 export const CreateWithdrawalResponse = zod.object({

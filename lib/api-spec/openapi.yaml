@@ -1338,11 +1338,14 @@ components:
 
     WithdrawalInput:
       type: object
-      required: [amount]
+      required: [amount, usdtAddress]
       properties:
         amount:
           type: number
           minimum: 3000
+        usdtAddress:
+          type: string
+          description: Adresse USDT BEP20 pour le virement
 
     # ── Referrals ──
 

@@ -21,14 +21,14 @@ export default function TransactionsPage() {
 
   return (
     <>
-      <div className="gradient-green py-8 px-6">
+      <div className="bg-background border-b border-border py-8 px-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-            <FileText className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center">
+            <FileText className="w-6 h-6 text-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Transactions</h1>
-            <p className="text-white/80 text-sm">Historique complet</p>
+            <h1 className="text-2xl font-bold text-foreground">Transactions</h1>
+            <p className="text-muted-foreground text-sm">Historique complet</p>
           </div>
         </div>
       </div>

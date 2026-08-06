@@ -19,25 +19,23 @@ export default function ProfilePage() {
   return (
     <>
       {/* ── Header : logo + nom ── */}
-      <div className="gradient-green px-5 pt-10 pb-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20 pointer-events-none" />
-
+      <div className="bg-background border-b border-border px-5 pt-10 pb-8 relative">
         {/* hamburger */}
         <button
           onClick={openSidebar}
-          className="absolute top-10 left-5 w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+          className="absolute top-10 left-5 w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
         >
-          <Menu className="w-5 h-5 text-white" />
+          <Menu className="w-5 h-5 text-foreground" />
         </button>
 
-        <div className="relative flex flex-col items-center pt-2">
+        <div className="flex flex-col items-center pt-2">
           <img
             src="/logo.jpg"
             alt="Fortexa"
-            className="w-20 h-20 rounded-full object-cover border-4 border-white/30 shadow-lg mb-3"
+            className="w-20 h-20 rounded-full object-cover border-4 border-border shadow-lg mb-3"
           />
-          <h1 className="text-xl font-bold text-white">{user?.name ?? '...'}</h1>
-          <p className="text-white/60 text-sm">{user?.email ?? ''}</p>
+          <h1 className="text-xl font-bold text-foreground">{user?.name ?? '...'}</h1>
+          <p className="text-muted-foreground text-sm">{user?.email ?? ''}</p>
         </div>
       </div>
 

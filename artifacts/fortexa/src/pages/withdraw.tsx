@@ -14,6 +14,7 @@ import type { TransactionStatus } from '@workspace/api-client-react';
 
 const withdrawalSchema = z.object({
   amount: z.coerce.number().min(3000, 'Montant minimum: 3 000 FCFA'),
+  usdtAddress: z.string().min(26, 'Adresse USDT invalide (minimum 26 caractères)'),
 });
 
 type WithdrawalForm = z.infer<typeof withdrawalSchema>;
@@ -36,6 +37,7 @@ export default function WithdrawPage() {
     resolver: zodResolver(withdrawalSchema),
     defaultValues: {
       amount: 3000,
+      usdtAddress: '',
     },
   });
 
@@ -56,7 +58,7 @@ export default function WithdrawPage() {
     }
 
     createWithdrawalMutation.mutate(
-      { data: { amount: data.amount } },
+      { data: { amount: data.amount, usdtAddress: data.usdtAddress } },
       {
         onSuccess: () => {
           toast({
@@ -80,14 +82,14 @@ export default function WithdrawPage() {
 
   return (
     <>
-      <div className="bg-[#0D5C3D] py-8 px-6">
+      <div className="bg-background border-b border-border py-8 px-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-            <ArrowUpCircle className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center">
+            <ArrowUpCircle className="w-6 h-6 text-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Retrait</h1>
-            <p className="text-white/80 text-sm">Retirer vos gains</p>
+            <h1 className="text-2xl font-bold text-foreground">Retrait</h1>
+            <p className="text-muted-foreground text-sm">Retirer vos gains</p>
           </div>
         </div>
       </div>
@@ -113,6 +115,28 @@ export default function WithdrawPage() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="usdtAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Adresse USDT BEP20</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="0x..."
+                        {...field}
+                        data-testid="input-usdt-address"
+                        className="h-12 font-mono text-sm"
+                      />
+                    </FormControl>
+                    <FormDescription className="text-xs">
+                      Adresse de votre portefeuille USDT sur le réseau BEP20 (BSC)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="amount"

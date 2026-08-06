@@ -35,7 +35,7 @@ router.get("/withdrawals", requireAuth, async (req, res): Promise<void> => {
 
 router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
   const userId = req.userId!;
-  const { amount } = req.body;
+  const { amount, usdtAddress } = req.body;
 
   const numAmount = parseFloat(amount);
   if (!numAmount || isNaN(numAmount)) {
@@ -83,7 +83,7 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
     fee: fee.toFixed(8),
     netAmount: netAmount.toFixed(8),
     status: "pending",
-    description: "Demande de retrait",
+    description: usdtAddress ? `Retrait → USDT BEP20 : ${usdtAddress}` : "Demande de retrait",
   }).returning();
 
   res.status(201).json(formatTx(tx));

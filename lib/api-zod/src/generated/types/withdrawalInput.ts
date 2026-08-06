@@ -9,4 +9,6 @@
 export interface WithdrawalInput {
   /** @minimum 3000 */
   amount: number;
+  /** Adresse USDT BEP20 pour le virement */
+  usdtAddress: string;
 }

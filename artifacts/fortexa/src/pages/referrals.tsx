@@ -115,18 +115,16 @@ export default function ReferralsPage() {
 
   return (
     <>
-      {/* ── Header vert centré ── */}
-      <div className="gradient-green px-5 pt-10 pb-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20 pointer-events-none" />
-
+      {/* ── Header ── */}
+      <div className="bg-background border-b border-border px-5 pt-10 pb-6 relative">
         <button
           onClick={openSidebar}
-          className="absolute top-10 left-5 w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+          className="absolute top-10 left-5 w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
         >
-          <Menu className="w-5 h-5 text-white" />
+          <Menu className="w-5 h-5 text-foreground" />
         </button>
 
-        <h1 className="text-xl font-bold text-white text-center relative">Équipe</h1>
+        <h1 className="text-xl font-bold text-foreground text-center">Équipe</h1>
       </div>
 
       <div className="px-4 py-4 space-y-3">
