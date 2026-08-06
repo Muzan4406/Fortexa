@@ -6,7 +6,7 @@ import { useLocation } from 'wouter';
 import { useSidebar } from '@/lib/sidebar-context';
 import {
   Bell, Eye, EyeOff, ChevronRight, Menu,
-  TrendingUp, AlertCircle,
+  TrendingUp,
 } from 'lucide-react';
 
 function LiveGains({ snapshot }: { snapshot: { gainBalance: number; investmentBalance: number; dailyRatePercent: number; gainsActive: boolean; snapshotTime: string } }) {
@@ -84,20 +84,6 @@ export default function DashboardPage() {
 
       <div className="px-4 pb-6 space-y-4">
 
-        {/* ── Annonce ── */}
-        {announcements && announcements.length > 0 && (
-          <button
-            onClick={() => setLocation('/notifications')}
-            className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3 text-left"
-          >
-            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-amber-900 text-sm">{announcements[0].title}</p>
-              <p className="text-xs text-amber-800 mt-0.5 line-clamp-2">{announcements[0].message}</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-          </button>
-        )}
 
         {/* ── Solde d'investissement ── */}
         <div className="gradient-green rounded-2xl p-5 relative overflow-hidden">

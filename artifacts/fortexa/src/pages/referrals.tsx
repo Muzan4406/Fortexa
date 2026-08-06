@@ -158,23 +158,6 @@ export default function ReferralsPage() {
           </div>
         </div>
 
-        {/* ── 3 tiles actions ── */}
-        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-          <div className="grid grid-cols-3 divide-x divide-border">
-            <button
-              onClick={shareReferralLink}
-              className="hover:bg-muted/50 transition-colors"
-            >
-              <PersonTile label="Recrutement" />
-            </button>
-            <div>
-              <PersonTile label={`employé\ntemporaire`} dot="bg-amber-400" />
-            </div>
-            <div>
-              <PersonTile label={`employé\npermanent`} dot="bg-green-500" />
-            </div>
-          </div>
-        </div>
 
         {/* ── Code de parrainage ── */}
         {referralInfo && (
@@ -207,22 +190,6 @@ export default function ReferralsPage() {
           </div>
         )}
 
-        {/* ── Section événement ── */}
-        <div className="bg-card rounded-2xl border border-border shadow-sm p-6 flex flex-col items-center text-center">
-          {/* Decorative circle with ? */}
-          <div className="w-24 h-24 rounded-full bg-primary/10 border-4 border-primary/20 flex items-center justify-center mb-4 relative">
-            <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center">
-              <span className="text-3xl font-bold text-primary/60">?</span>
-            </div>
-            {/* floating dots */}
-            <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-primary/30" />
-            <span className="absolute bottom-2 left-1 w-1.5 h-1.5 rounded-full bg-primary/20" />
-          </div>
-          <p className="font-bold text-foreground text-base mb-1">L'événement n'a pas encore commencé</p>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Pour plus d'événements exceptionnels, veuillez suivre les notifications.
-          </p>
-        </div>
 
         {/* ── Commissions totales ── */}
         {referralInfo && (
