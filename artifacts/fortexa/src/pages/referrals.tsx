@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { UserLayout } from '@/components/user-layout';
 import { useGetReferrals } from '@workspace/api-client-react';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { Copy, Share2, CheckCircle, Menu, ChevronDown, ChevronUp } from 'lucide-react';
@@ -115,7 +114,7 @@ export default function ReferralsPage() {
     : 0;
 
   return (
-    <UserLayout>
+    <>
       {/* ── Header vert centré ── */}
       <div className="gradient-green px-5 pt-10 pb-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20 pointer-events-none" />
@@ -264,6 +263,6 @@ export default function ReferralsPage() {
         )}
 
       </div>
-    </UserLayout>
+    </>
   );
 }

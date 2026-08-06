@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { UserLayout } from '@/components/user-layout';
 import { useAuth } from '@/lib/auth-context';
 import { useGetDashboard, useGetGainsSnapshot, useGetAnnouncements } from '@workspace/api-client-react';
 import { formatCurrency } from '@/lib/format';
@@ -50,7 +49,7 @@ export default function DashboardPage() {
   const unreadCount = announcements?.length ?? 0;
 
   return (
-    <UserLayout>
+    <>
       {/* ── Top bar ── */}
       <div className="bg-background px-4 pt-10 pb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -168,6 +167,6 @@ export default function DashboardPage() {
         </div>
 
       </div>
-    </UserLayout>
+    </>
   );
 }

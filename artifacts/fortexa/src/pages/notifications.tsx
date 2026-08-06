@@ -1,4 +1,3 @@
-import { UserLayout } from '@/components/user-layout';
 import { useGetAnnouncements } from '@workspace/api-client-react';
 import { Bell, Megaphone, ChevronLeft } from 'lucide-react';
 import { useLocation } from 'wouter';
@@ -9,7 +8,7 @@ export default function NotificationsPage() {
   const { data: announcements, isLoading } = useGetAnnouncements();
 
   return (
-    <UserLayout>
+    <>
       {/* Header */}
       <div className="bg-background px-4 pt-8 pb-4 flex items-center gap-3 border-b border-border sticky top-0 z-10">
         <button
@@ -65,6 +64,6 @@ export default function NotificationsPage() {
           </div>
         ))}
       </div>
-    </UserLayout>
+    </>
   );
 }

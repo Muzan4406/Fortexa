@@ -1,4 +1,3 @@
-import { UserLayout } from '@/components/user-layout';
 import { ChevronLeft, Send, Headphones, ExternalLink } from 'lucide-react';
 import { useLocation } from 'wouter';
 
@@ -9,7 +8,7 @@ export default function SupportPage() {
   const [, setLocation] = useLocation();
 
   return (
-    <UserLayout>
+    <>
       {/* Header */}
       <div className="bg-background px-4 pt-8 pb-4 flex items-center gap-3 border-b border-border sticky top-0 z-10">
         <button
@@ -76,6 +75,6 @@ export default function SupportPage() {
           </p>
         </div>
       </div>
-    </UserLayout>
+    </>
   );
 }

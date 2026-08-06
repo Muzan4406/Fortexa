@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { UserLayout } from '@/components/user-layout';
 import { useGetDashboard, useGetWithdrawals, useCreateWithdrawal, getGetWithdrawalsQueryKey, getGetDashboardQueryKey } from '@workspace/api-client-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -80,7 +79,7 @@ export default function WithdrawPage() {
   };
 
   return (
-    <UserLayout>
+    <>
       <div className="bg-[#0D5C3D] py-8 px-6">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
@@ -212,6 +211,6 @@ export default function WithdrawPage() {
           )}
         </div>
       </div>
-    </UserLayout>
+    </>
   );
 }

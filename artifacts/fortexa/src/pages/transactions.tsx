@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { UserLayout } from '@/components/user-layout';
 import { useGetTransactions } from '@workspace/api-client-react';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { FileText, ArrowDownCircle, ArrowUpCircle, Users, TrendingUp } from 'lucide-react';
@@ -21,7 +20,7 @@ export default function TransactionsPage() {
   );
 
   return (
-    <UserLayout>
+    <>
       <div className="gradient-green py-8 px-6">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
@@ -113,6 +112,6 @@ export default function TransactionsPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </UserLayout>
+    </>
   );
 }

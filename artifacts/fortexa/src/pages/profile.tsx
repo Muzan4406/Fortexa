@@ -1,4 +1,3 @@
-import { UserLayout } from '@/components/user-layout';
 import { useAuth } from '@/lib/auth-context';
 import { useLocation } from 'wouter';
 import {
@@ -18,7 +17,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <UserLayout>
+    <>
       {/* ── Header : logo + nom ── */}
       <div className="gradient-green px-5 pt-10 pb-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20 pointer-events-none" />
@@ -128,6 +127,6 @@ export default function ProfilePage() {
           Se déconnecter
         </button>
       </div>
-    </UserLayout>
+    </>
   );
 }
