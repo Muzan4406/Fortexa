@@ -18,6 +18,7 @@ import NotificationsPage from '@/pages/notifications';
 import SupportPage from '@/pages/support';
 import AboutPage from '@/pages/about';
 import NotFound from '@/pages/not-found';
+import { PWAInstallBanner } from '@/components/pwa-install-banner';
 
 import AdminDashboard from '@/pages/admin/index';
 import AdminUsersPage from '@/pages/admin/users';
@@ -106,6 +107,7 @@ function App() {
             <Router />
           </WouterRouter>
           <Toaster />
+          <PWAInstallBanner />
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>

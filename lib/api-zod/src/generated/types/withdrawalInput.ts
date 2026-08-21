@@ -9,6 +9,8 @@
 export interface WithdrawalInput {
   /** @minimum 3000 */
   amount: number;
-  /** Adresse USDT BEP20 pour le virement */
-  usdtAddress: string;
+  /** Adresse USDT BEP20 pour le virement (pays hors-XOF) */
+  usdtAddress?: string;
+  /** Numéro de téléphone Mobile Money (TG, BJ, BF, CI) */
+  phone?: string;
 }

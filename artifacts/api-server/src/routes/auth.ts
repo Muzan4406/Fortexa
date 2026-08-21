@@ -13,6 +13,7 @@ function formatUser(u: typeof usersTable.$inferSelect) {
     id: u.id,
     name: u.name,
     phone: u.phone,
+    country: u.country,
     email: u.email,
     referralCode: u.referralCode,
     referredById: u.referredById || null,

@@ -56,6 +56,8 @@ export interface User {
   id: number;
   name: string;
   phone: string;
+  /** ISO country code (e.g. TG, BJ, BF, CI) */
+  country?: string;
   email: string;
   referralCode: string;
   /** @nullable */
@@ -251,8 +253,10 @@ export interface DepositInput {
 export interface WithdrawalInput {
   /** @minimum 3000 */
   amount: number;
-  /** Adresse USDT BEP20 pour le virement */
-  usdtAddress: string;
+  /** Adresse USDT BEP20 pour le virement (pays hors-XOF) */
+  usdtAddress?: string;
+  /** Numéro de téléphone Mobile Money (TG, BJ, BF, CI) */
+  phone?: string;
 }
 
 export interface CommissionRecord {

@@ -1055,6 +1055,9 @@ components:
           type: string
         phone:
           type: string
+        country:
+          type: string
+          description: "ISO country code (e.g. TG, BJ, BF, CI)"
         email:
           type: string
         referralCode:
@@ -1338,14 +1341,17 @@ components:
 
     WithdrawalInput:
       type: object
-      required: [amount, usdtAddress]
+      required: [amount]
       properties:
         amount:
           type: number
           minimum: 3000
         usdtAddress:
           type: string
-          description: Adresse USDT BEP20 pour le virement
+          description: Adresse USDT BEP20 pour le virement (pays hors-XOF)
+        phone:
+          type: string
+          description: Numéro de téléphone Mobile Money (TG, BJ, BF, CI)
 
     # ── Referrals ──
 

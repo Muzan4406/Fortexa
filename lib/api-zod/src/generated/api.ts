@@ -38,6 +38,7 @@ export const RegisterResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "phone": zod.string(),
+  "country": zod.string().optional().describe('ISO country code (e.g. TG, BJ, BF, CI)'),
   "email": zod.string(),
   "referralCode": zod.string(),
   "referredById": zod.number().nullish(),
@@ -64,6 +65,7 @@ export const LoginResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "phone": zod.string(),
+  "country": zod.string().optional().describe('ISO country code (e.g. TG, BJ, BF, CI)'),
   "email": zod.string(),
   "referralCode": zod.string(),
   "referredById": zod.number().nullish(),
@@ -93,6 +95,7 @@ export const GetMeResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "phone": zod.string(),
+  "country": zod.string().optional().describe('ISO country code (e.g. TG, BJ, BF, CI)'),
   "email": zod.string(),
   "referralCode": zod.string(),
   "referredById": zod.number().nullish(),
@@ -350,7 +353,8 @@ export const createWithdrawalBodyAmountMin = 3000;
 
 export const CreateWithdrawalBody = zod.object({
   "amount": zod.number().min(createWithdrawalBodyAmountMin),
-  "usdtAddress": zod.string().describe('Adresse USDT BEP20 pour le virement')
+  "usdtAddress": zod.string().optional().describe('Adresse USDT BEP20 pour le virement (pays hors-XOF)'),
+  "phone": zod.string().optional().describe('Numéro de téléphone Mobile Money (TG, BJ, BF, CI)')
 })
 
 export const CreateWithdrawalResponse = zod.object({
@@ -438,6 +442,7 @@ export const GetProfileResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "phone": zod.string(),
+  "country": zod.string().optional().describe('ISO country code (e.g. TG, BJ, BF, CI)'),
   "email": zod.string(),
   "referralCode": zod.string(),
   "referredById": zod.number().nullish(),
@@ -466,6 +471,7 @@ export const UpdateProfileResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "phone": zod.string(),
+  "country": zod.string().optional().describe('ISO country code (e.g. TG, BJ, BF, CI)'),
   "email": zod.string(),
   "referralCode": zod.string(),
   "referredById": zod.number().nullish(),

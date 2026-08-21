@@ -12,6 +12,8 @@ export interface User {
   id: number;
   name: string;
   phone: string;
+  /** ISO country code (e.g. TG, BJ, BF, CI) */
+  country?: string;
   email: string;
   referralCode: string;
   /** @nullable */
