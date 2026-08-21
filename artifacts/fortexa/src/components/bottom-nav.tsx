@@ -1,9 +1,9 @@
 import { Link, useRoute } from 'wouter';
-import { Home, Users, User } from 'lucide-react';
+import { Home, Network, User } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: Home,  label: 'Accueil'    },
-  { href: '/referrals', icon: Users, label: 'Mon équipe' },
+  { href: '/referrals', icon: Network, label: 'Communauté' },
   { href: '/profile',   icon: User,  label: 'Compte'     },
 ];
 

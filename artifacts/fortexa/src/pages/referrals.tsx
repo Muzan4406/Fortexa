@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGetReferrals } from '@workspace/api-client-react';
 import { formatCurrency, formatDate } from '@/lib/format';
-import { Copy, Share2, CheckCircle, Menu, ChevronDown, ChevronUp, Users } from 'lucide-react';
+import { Copy, Share2, CheckCircle, Menu, ChevronDown, ChevronUp, Network, Sparkles, ArrowUpRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSidebar } from '@/lib/sidebar-context';
 
@@ -111,12 +111,12 @@ export default function ReferralsPage() {
           </button>
 
           <div className="text-center pt-0.5">
-            <p className="text-white/50 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Mon Équipe</p>
+             <p className="text-white/50 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Ma communauté</p>
 
             {/* Team icon */}
             <div className="w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center"
               style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.25)', boxShadow: '0 0 24px rgba(52,211,153,0.15)' }}>
-              <Users className="w-8 h-8 text-emerald-400" />
+               <Network className="w-8 h-8 text-emerald-400" />
             </div>
 
             {/* Total members */}
@@ -126,7 +126,7 @@ export default function ReferralsPage() {
             >
               {isLoading ? '…' : total}
             </p>
-            <p className="text-white/40 text-sm mt-1">membre{total !== 1 ? 's' : ''} au total</p>
+             <p className="text-white/40 text-sm mt-1">personne{total !== 1 ? 's' : ''} connectée{total !== 1 ? 's' : ''}</p>
           </div>
         </div>
       </div>
@@ -150,8 +150,8 @@ export default function ReferralsPage() {
             }}
           >
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(52,211,153,0.6)' }}>
-                Commissions totales
+               <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(52,211,153,0.6)' }}>
+                 Récompenses générées
               </p>
               <p className="text-2xl font-bold mt-0.5 text-emerald-400" data-testid="text-total-commissions">
                 {formatCurrency(referralInfo.totalCommissions)}
@@ -161,7 +161,7 @@ export default function ReferralsPage() {
               className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
               style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}
             >
-              💸
+               <Sparkles className="w-5 h-5 text-emerald-400" />
             </div>
           </div>
         )}
@@ -174,7 +174,7 @@ export default function ReferralsPage() {
           >
             <div className="px-5 pt-4 pb-3">
               <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                Votre code de parrainage
+                 Invitez votre communauté
               </p>
               <div className="flex items-center gap-3">
                 <div
@@ -211,7 +211,7 @@ export default function ReferralsPage() {
               data-testid="button-share"
             >
               <Share2 className="w-4 h-4" />
-              Partager mon lien d'invitation
+               Partager mon invitation
             </button>
           </div>
         )}
@@ -226,7 +226,7 @@ export default function ReferralsPage() {
               onClick={() => setShowHistory(h => !h)}
               className="w-full flex items-center justify-between px-5 py-4"
             >
-              <p className="font-semibold text-sm text-white">Historique des commissions</p>
+               <p className="font-semibold text-sm text-white">Dernières récompenses</p>
               {showHistory
                 ? <ChevronUp className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.4)' }} />
                 : <ChevronDown className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.4)' }} />}

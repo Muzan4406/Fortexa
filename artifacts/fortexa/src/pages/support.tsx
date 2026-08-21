@@ -1,4 +1,4 @@
-import { ChevronLeft, Send, Headphones, ExternalLink } from 'lucide-react';
+import { ChevronLeft, Send, Headphones, ExternalLink, Clock3, ShieldCheck, MessageCircle } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 const TELEGRAM_CANAL = 'https://t.me/fortexa_officiel';
@@ -10,10 +10,10 @@ export default function SupportPage() {
   return (
     <>
       {/* Header */}
-      <div className="bg-background px-4 pt-8 pb-4 flex items-center gap-3 border-b border-border sticky top-0 z-10">
+      <div className="bg-background/80 backdrop-blur-xl px-4 pt-8 pb-4 flex items-center gap-3 border-b border-white/10 sticky top-0 z-10">
         <button
           onClick={() => setLocation('/profile')}
-          className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
+           className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center"
         >
           <ChevronLeft className="w-5 h-5 text-foreground" />
         </button>
@@ -23,14 +23,17 @@ export default function SupportPage() {
         </div>
       </div>
 
-      <div className="px-4 py-6 space-y-4">
+       <div className="px-4 py-6 space-y-4">
         {/* Hero */}
-        <div className="gradient-green rounded-2xl p-6 text-white text-center">
-          <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
-            <Headphones className="w-7 h-7 text-white" />
-          </div>
-          <h2 className="text-xl font-bold mb-1">Support Fortexa</h2>
-          <p className="text-white/80 text-sm">Une question ? Notre équipe vous répond rapidement via Telegram.</p>
+         <div className="relative overflow-hidden rounded-3xl p-6 text-white text-center border border-emerald-300/20"
+           style={{ background: 'linear-gradient(145deg, #062a2a, #071a35 70%, #0a1628)' }}>
+           <div className="absolute -right-10 -top-12 w-40 h-40 rounded-full bg-emerald-400/15 blur-2xl" />
+           <img src="/logo.jpg" alt="" className="relative w-16 h-16 rounded-2xl object-cover border border-emerald-200/30 shadow-[0_0_28px_rgba(52,211,153,.25)] mx-auto mb-4" />
+           <div className="relative flex items-center justify-center gap-2 mb-1">
+             <h2 className="text-xl font-bold">Support Fortexa</h2>
+             <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]" />
+           </div>
+           <p className="text-white/65 text-sm">Une équipe humaine pour vous accompagner à chaque étape.</p>
         </div>
 
         {/* Canal officiel */}
@@ -38,10 +41,10 @@ export default function SupportPage() {
           href={TELEGRAM_CANAL}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full bg-card rounded-2xl border border-border p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow block"
+           className="w-full bg-card/80 rounded-2xl border border-white/10 p-4 flex items-center gap-4 shadow-lg hover:border-sky-400/30 transition-all block"
         >
           <div className="w-12 h-12 rounded-2xl bg-[#229ED9]/10 flex items-center justify-center shrink-0">
-            <Send className="w-6 h-6 text-[#229ED9]" />
+             <MessageCircle className="w-6 h-6 text-[#229ED9]" />
           </div>
           <div className="flex-1">
             <p className="font-semibold text-foreground">Canal officiel</p>
@@ -55,10 +58,10 @@ export default function SupportPage() {
           href={TELEGRAM_SUPPORT}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full bg-card rounded-2xl border border-border p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow block"
+           className="w-full bg-card/80 rounded-2xl border border-white/10 p-4 flex items-center gap-4 shadow-lg hover:border-emerald-400/30 transition-all block"
         >
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Headphones className="w-6 h-6 text-primary" />
+             <Headphones className="w-6 h-6 text-emerald-400" />
           </div>
           <div className="flex-1">
             <p className="font-semibold text-foreground">Service client Telegram</p>
@@ -68,8 +71,12 @@ export default function SupportPage() {
         </a>
 
         {/* Info */}
-        <div className="bg-muted/50 rounded-2xl p-4 border border-border">
-          <p className="text-xs text-muted-foreground text-center leading-relaxed">
+         <div className="bg-white/[0.04] rounded-2xl p-4 border border-white/10">
+           <div className="flex justify-center gap-5 mb-3">
+             <div className="flex items-center gap-1.5 text-xs text-emerald-300"><Clock3 className="w-3.5 h-3.5" /> 8h–22h</div>
+             <div className="flex items-center gap-1.5 text-xs text-sky-300"><ShieldCheck className="w-3.5 h-3.5" /> 7j/7</div>
+           </div>
+           <p className="text-xs text-muted-foreground text-center leading-relaxed">
             Notre équipe est disponible <span className="font-semibold text-foreground">7j/7 de 8h à 22h</span>.
             Temps de réponse moyen : <span className="font-semibold text-foreground">moins de 2h</span>.
           </p>

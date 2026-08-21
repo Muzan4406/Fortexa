@@ -75,7 +75,10 @@ router.post("/admin/deposits", requireAdmin, async (req, res): Promise<void> => 
 
   // Apply to investment balance
   const newInvestment = parseFloat(user.investmentBalance) + numAmount;
-  await db.update(usersTable).set({ investmentBalance: newInvestment.toFixed(8) }).where(eq(usersTable.id, parseInt(userId, 10)));
+  await db.update(usersTable).set({
+    investmentBalance: newInvestment.toFixed(8),
+    lastGainUpdate: new Date(),
+  }).where(eq(usersTable.id, parseInt(userId, 10)));
 
   // Credit referral commissions
   await creditReferralCommissions(numAmount, parseInt(userId, 10), tx.id);
@@ -105,7 +108,10 @@ router.put("/admin/deposits/:id", requireAdmin, async (req, res): Promise<void> 
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, tx.userId));
     if (user) {
       const newBalance = parseFloat(user.investmentBalance) + effectiveAmount;
-      await db.update(usersTable).set({ investmentBalance: newBalance.toFixed(8) }).where(eq(usersTable.id, tx.userId));
+       await db.update(usersTable).set({
+         investmentBalance: newBalance.toFixed(8),
+         lastGainUpdate: new Date(),
+       }).where(eq(usersTable.id, tx.userId));
       await creditReferralCommissions(effectiveAmount, tx.userId, tx.id);
     }
   }

@@ -1,11 +1,11 @@
 import { useLocation } from 'wouter';
 import { useSidebar } from '@/lib/sidebar-context';
 import { useAuth } from '@/lib/auth-context';
-import { Home, FileText, Users, User, X, LogOut, Shield } from 'lucide-react';
+import { Home, FileText, Network, User, X, LogOut, Shield } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/dashboard',    icon: Home,     label: 'Accueil'                  },
-  { href: '/referrals',    icon: Users,    label: 'Équipe'                   },
+   { href: '/referrals',    icon: Network,  label: 'Communauté'               },
   { href: '/transactions', icon: FileText, label: 'Historique de transaction' },
   { href: '/profile',      icon: User,     label: 'Compte'                   },
 ];

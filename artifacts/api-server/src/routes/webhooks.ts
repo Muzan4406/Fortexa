@@ -89,7 +89,11 @@ router.post("/webhooks/sendavapay", async (req, res): Promise<void> => {
         const newBalance = parseFloat(user.investmentBalance) + effectiveAmount;
         await db
           .update(usersTable)
-          .set({ investmentBalance: newBalance.toFixed(8) })
+          .set({
+            investmentBalance: newBalance.toFixed(8),
+            // The earning clock begins at payment confirmation.
+            lastGainUpdate: new Date(),
+          })
           .where(eq(usersTable.id, tx.userId));
 
         // Distribute referral commissions
