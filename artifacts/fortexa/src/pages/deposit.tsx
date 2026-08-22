@@ -863,6 +863,25 @@ export default function DepositPage() {
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground">{formatDate(deposit.createdAt)}</p>
+                      <div className="mt-3 rounded-xl bg-muted/40 border border-border p-3 space-y-1.5">
+                        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Informations du dépôt</p>
+                        {deposit.depositMethod === 'mobile_money' && (
+                          <>
+                            <p className="text-xs text-foreground">Méthode : <span className="font-semibold">Mobile Money</span></p>
+                            {deposit.payerCountry && <p className="text-xs text-foreground">Pays : <span className="font-semibold">{COUNTRIES.find(c => c.code === deposit.payerCountry)?.name ?? deposit.payerCountry}</span></p>}
+                            {deposit.payerPhone && <p className="text-xs text-foreground">Numéro : <span className="font-mono font-semibold">{deposit.payerPhone}</span></p>}
+                          </>
+                        )}
+                        {deposit.depositMethod === 'usdt' && (
+                          <>
+                            <p className="text-xs text-foreground">Méthode : <span className="font-semibold">USDT BEP20</span></p>
+                            {deposit.payerCountry && <p className="text-xs text-foreground">Pays : <span className="font-semibold">{COUNTRIES.find(c => c.code === deposit.payerCountry)?.name ?? deposit.payerCountry}</span></p>}
+                            {deposit.txid && <p className="text-xs text-foreground break-all">TXID : <span className="font-mono font-semibold">{deposit.txid}</span></p>}
+                            {deposit.screenshotPath && <a href={deposit.screenshotPath} target="_blank" rel="noopener noreferrer" className="text-xs text-primary font-semibold">Voir la preuve de paiement</a>}
+                          </>
+                        )}
+                        {!deposit.depositMethod && <p className="text-xs text-muted-foreground">Dépôt manuel — en attente de traitement</p>}
+                      </div>
                       {deposit.rejectionReason && (
                         <p className="text-sm text-red-600 mt-1">{deposit.rejectionReason}</p>
                       )}

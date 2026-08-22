@@ -236,6 +236,18 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        <div className="relative overflow-hidden rounded-2xl border border-emerald-400/20 bg-gradient-to-br from-[#101d3f] via-[#14285a] to-[#071a2a] p-4 shadow-lg">
+          <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-emerald-400/10 blur-2xl" />
+          <div className="relative flex items-center gap-4">
+            <img src="/dashboard-investment-icon.png" alt="" className="h-20 w-20 shrink-0 object-contain drop-shadow-[0_0_18px_rgba(251,191,36,.25)]" />
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300/70">Votre argent travaille</p>
+              <p className="mt-1 text-sm font-semibold text-white">Investissez avec confiance</p>
+              <p className="mt-1 text-xs leading-relaxed text-white/55">Suivez votre capital et vos gains en temps réel.</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </>
   );
