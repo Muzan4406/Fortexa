@@ -53,14 +53,6 @@ router.get("/admin/users", requireAdmin, async (req, res): Promise<void> => {
     .limit(limitNum)
     .offset(offsetNum);
 
-  const team = await db.select({
-    id: usersTable.id,
-    name: usersTable.name,
-    email: usersTable.email,
-    country: usersTable.country,
-    status: usersTable.status,
-  }).from(usersTable).where(eq(usersTable.referredById, id)).orderBy(desc(usersTable.createdAt));
-
   const items = await Promise.all(users.map(async (user) => {
     const [teamRow] = await db
       .select({ count: count() })
