@@ -19,6 +19,12 @@ function formatTx(t: typeof transactionsTable.$inferSelect) {
     status: t.status,
     description: t.description ?? null,
     rejectionReason: t.rejectionReason ?? null,
+     depositMethod: t.depositMethod ?? null,
+     payerCountry: t.payerCountry ?? null,
+     payerPhone: t.payerPhone ?? null,
+     sendavapayRef: t.sendavapayRef ?? null,
+     txid: t.txid ?? null,
+     screenshotPath: t.screenshotPath ?? null,
     createdAt: t.createdAt.toISOString(),
     updatedAt: t.updatedAt.toISOString(),
   };
@@ -79,6 +85,7 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
 
   const fee = numAmount * feeRate;
   const netAmount = numAmount - fee;
+  const withdrawalMethod = mobileMoneyUser ? "mobile_money" : "usdt";
 
   // Deduct from gain balance immediately (hold funds)
   const newGainBalance = gainBalance - numAmount;
@@ -94,6 +101,9 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
     fee: fee.toFixed(8),
     netAmount: netAmount.toFixed(8),
     status: "pending",
+    depositMethod: withdrawalMethod,
+    payerCountry: user.country,
+    payerPhone: mobileMoneyUser ? phone.trim() : null,
     description: phone
         ? `Retrait Mobile Money → ${phone}`
         : usdtAddress

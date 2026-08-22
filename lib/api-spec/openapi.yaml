@@ -1632,6 +1632,8 @@ components:
           type: string
         userEmail:
           type: string
+        userCountry:
+          type: ["string", "null"]
         type:
           type: string
           enum: [deposit, withdrawal, commission, gain]
@@ -1647,6 +1649,18 @@ components:
         description:
           type: ["string", "null"]
         rejectionReason:
+          type: ["string", "null"]
+        depositMethod:
+          type: ["string", "null"]
+        payerCountry:
+          type: ["string", "null"]
+        payerPhone:
+          type: ["string", "null"]
+        sendavapayRef:
+          type: ["string", "null"]
+        txid:
+          type: ["string", "null"]
+        screenshotPath:
           type: ["string", "null"]
         createdAt:
           type: string

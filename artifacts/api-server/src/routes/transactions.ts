@@ -16,6 +16,12 @@ function formatTx(t: typeof transactionsTable.$inferSelect) {
     status: t.status,
     description: t.description ?? null,
     rejectionReason: t.rejectionReason ?? null,
+    depositMethod: t.depositMethod ?? null,
+    payerCountry: t.payerCountry ?? null,
+    payerPhone: t.payerPhone ?? null,
+    sendavapayRef: t.sendavapayRef ?? null,
+    txid: t.txid ?? null,
+    screenshotPath: t.screenshotPath ?? null,
     createdAt: t.createdAt.toISOString(),
     updatedAt: t.updatedAt.toISOString(),
   };

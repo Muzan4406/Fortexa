@@ -466,6 +466,8 @@ export interface AdminTransaction {
   userId: number;
   userName: string;
   userEmail: string;
+  /** @nullable */
+  userCountry?: string | null;
   type: AdminTransactionType;
   amount: number;
   fee: number;
@@ -475,6 +477,18 @@ export interface AdminTransaction {
   description?: string | null;
   /** @nullable */
   rejectionReason?: string | null;
+  /** @nullable */
+  depositMethod?: string | null;
+  /** @nullable */
+  payerCountry?: string | null;
+  /** @nullable */
+  payerPhone?: string | null;
+  /** @nullable */
+  sendavapayRef?: string | null;
+  /** @nullable */
+  txid?: string | null;
+  /** @nullable */
+  screenshotPath?: string | null;
   createdAt: string;
   updatedAt?: string;
 }

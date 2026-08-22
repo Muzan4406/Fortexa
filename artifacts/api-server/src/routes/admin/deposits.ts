@@ -12,6 +12,7 @@ function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof 
     userId: tx.userId,
     userName: user?.name ?? "Inconnu",
     userEmail: user?.email ?? "",
+     userCountry: user?.country ?? null,
     type: tx.type,
     amount: parseFloat(tx.amount),
     fee: parseFloat(tx.fee),
