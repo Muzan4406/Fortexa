@@ -55,7 +55,7 @@ function LiveGains({ snapshot }: {
 
   return (
     <span
-      className={`text-3xl font-bold text-emerald-300 drop-shadow-[0_0_12px_rgba(52,211,153,0.6)] ${flipping ? 'animate-number-flip' : ''}`}
+      className={`text-3xl font-bold text-rose-500 drop-shadow-[0_0_12px_rgba(244,63,94,0.25)] ${flipping ? 'animate-number-flip' : ''}`}
       data-testid="text-gains-live"
     >
       {formatCurrency(gains, 5)}
@@ -93,7 +93,7 @@ export default function DashboardPage() {
           </button>
           <div>
             <h1 className="text-xl font-bold text-foreground">
-              Bonjour, {user.name.split(' ')[0]} 👋
+               Bonjour, {user.name.split(' ')[0]}
             </h1>
             <p className="text-xs text-muted-foreground">Fais fructifier ton investissement</p>
           </div>
@@ -114,108 +114,108 @@ export default function DashboardPage() {
 
         {/* ── Solde d'investissement — Nocturnal gold card ── */}
         <div
-          className="rounded-2xl p-5 relative overflow-hidden"
-           style={{ background: 'linear-gradient(135deg, #ffffff 0%, #f0f7ff 60%, #ffffff 100%)' }}
+           className="rounded-2xl p-5 relative overflow-hidden border border-rose-100 shadow-sm"
+            style={{ background: 'linear-gradient(135deg, #ffffff 0%, #fff1f5 60%, #ffffff 100%)' }}
         >
           <StarField />
           {/* Glowing orb top-right */}
           <div
             className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%)' }}
+             style={{ background: 'radial-gradient(circle, rgba(244,63,94,0.14) 0%, transparent 70%)' }}
           />
           {/* Subtle gold border */}
-          <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(251,191,36,0.2)' }} />
+           <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(244,63,94,0.12)' }} />
 
           <div className="relative">
             <div className="flex items-center justify-between mb-2">
-             <p className="text-amber-700 text-xs font-semibold tracking-widest uppercase">
+              <p className="text-rose-600 text-xs font-semibold tracking-widest uppercase">
                 Solde d'investissement
               </p>
               <div className="flex gap-1.5">
                 <button
                   onClick={() => setHideBalance(b => !b)}
                   className="w-7 h-7 rounded-lg flex items-center justify-center"
-                  style={{ background: 'rgba(251,191,36,0.15)' }}
+                   style={{ background: 'rgba(244,63,94,0.1)' }}
                 >
                   {hideBalance
-                    ? <EyeOff className="w-3.5 h-3.5 text-amber-300" />
-                    : <Eye className="w-3.5 h-3.5 text-amber-300" />}
+                     ? <EyeOff className="w-3.5 h-3.5 text-rose-500" />
+                     : <Eye className="w-3.5 h-3.5 text-rose-500" />}
                 </button>
                 <button
                   onClick={() => setLocation('/transactions')}
                   className="w-7 h-7 rounded-lg flex items-center justify-center"
-                  style={{ background: 'rgba(251,191,36,0.15)' }}
+                   style={{ background: 'rgba(244,63,94,0.1)' }}
                 >
-                  <ChevronRight className="w-3.5 h-3.5 text-amber-300" />
+                   <ChevronRight className="w-3.5 h-3.5 text-rose-500" />
                 </button>
               </div>
             </div>
 
             <div
                className="text-3xl font-bold mb-0.5"
-               style={{ color: '#b77900' }}
+                style={{ color: '#be123c' }}
               data-testid="text-investment-balance"
             >
               {isLoading ? '...' : hideBalance ? '••••••' : formatCurrency(dashboard?.investmentBalance ?? 0)}
             </div>
-             <p className="text-amber-700/70 text-xs mb-3">Capital qui travaille pour vous</p>
+             <p className="text-rose-700/70 text-xs mb-3">Capital qui travaille pour vous</p>
 
             <div
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
-              style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.25)' }}
+               style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.18)' }}
             >
-               <span className="text-amber-700/80 text-xs">Maximum autorisé :</span>
-               <span className="text-amber-800 font-bold text-xs">{formatCurrency(maxCapital)}</span>
+                <span className="text-rose-700/80 text-xs">Maximum autorisé :</span>
+                <span className="text-rose-800 font-bold text-xs">{formatCurrency(maxCapital)}</span>
             </div>
           </div>
         </div>
 
         {/* ── Gains en direct — Nocturnal emerald card ── */}
         <div
-          className="rounded-2xl p-5 relative overflow-hidden"
-           style={{ background: 'linear-gradient(135deg, #ffffff 0%, #effcf7 50%, #ffffff 100%)' }}
+           className="rounded-2xl p-5 relative overflow-hidden border border-pink-100 shadow-sm"
+            style={{ background: 'linear-gradient(135deg, #ffffff 0%, #fff1f6 50%, #ffffff 100%)' }}
         >
           <StarField />
           {/* Green glow orb */}
           <div
             className="absolute -bottom-8 -right-8 w-44 h-44 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(52,211,153,0.12) 0%, transparent 70%)' }}
+             style={{ background: 'radial-gradient(circle, rgba(244,63,94,0.12) 0%, transparent 70%)' }}
           />
           <div
             className="absolute top-0 left-0 w-32 h-32 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(52,211,153,0.06) 0%, transparent 70%)' }}
+             style={{ background: 'radial-gradient(circle, rgba(236,72,153,0.06) 0%, transparent 70%)' }}
           />
           {/* Emerald border */}
-          <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(52,211,153,0.15)' }} />
+           <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(244,63,94,0.14)' }} />
 
           <div className="relative">
             <div className="flex items-center gap-2 mb-2">
               <div
                 className="w-7 h-7 rounded-lg flex items-center justify-center"
-                style={{ background: 'rgba(52,211,153,0.15)' }}
+                 style={{ background: 'rgba(244,63,94,0.1)' }}
               >
-                <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                 <TrendingUp className="w-3.5 h-3.5 text-rose-500" />
               </div>
-             <p className="text-emerald-700 text-xs font-semibold tracking-widest uppercase">Gains en direct</p>
+              <p className="text-rose-600 text-xs font-semibold tracking-widest uppercase">Gains en direct</p>
             </div>
 
             {snapshot ? (
               <LiveGains snapshot={snapshot} />
             ) : (
-               <span className="text-3xl font-bold text-emerald-700" data-testid="text-gains-live">
+                <span className="text-3xl font-bold text-rose-600" data-testid="text-gains-live">
                 {formatCurrency(dashboard?.referralEarnings ?? 0, 5)}
               </span>
             )}
-             <p className="text-emerald-700/70 text-xs mt-0.5 mb-4">Solde retirable à tout moment</p>
+             <p className="text-rose-700/70 text-xs mt-0.5 mb-4">Solde retirable à tout moment</p>
 
             <div className="flex items-center justify-between">
               <button
                 onClick={() => setLocation('/withdraw')}
                 className="font-semibold text-sm px-5 py-2 rounded-xl transition-all"
                 style={{
-                  background: 'linear-gradient(135deg, #059669, #10b981)',
+                   background: 'linear-gradient(135deg, #e11d48, #ec4899)',
                   color: '#fff',
-                  boxShadow: '0 0 16px rgba(16,185,129,0.35)',
+                   boxShadow: '0 0 16px rgba(225,29,72,0.25)',
                 }}
                 data-testid="button-withdraw-gains"
               >
@@ -224,11 +224,11 @@ export default function DashboardPage() {
 
               <div className="text-right">
                 <div className="flex items-center gap-1.5 justify-end mb-0.5">
-                  <Zap className="w-3 h-3 text-emerald-400" />
-                   <span className="text-emerald-700/70 text-xs">Temps réel</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                   <Zap className="w-3 h-3 text-rose-500" />
+                    <span className="text-rose-700/70 text-xs">Temps réel</span>
+                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
                 </div>
-                <p className="text-emerald-300/80 text-xs font-semibold">
+                 <p className="text-rose-500/80 text-xs font-semibold">
                    {dailyRate}% / 24h
                 </p>
               </div>
@@ -236,14 +236,14 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-emerald-400/20 bg-gradient-to-br from-[#101d3f] via-[#14285a] to-[#071a2a] p-4 shadow-lg">
-          <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-emerald-400/10 blur-2xl" />
+        <div className="relative overflow-hidden rounded-2xl border border-rose-200 bg-gradient-to-br from-[#fff1f5] via-[#fff7fb] to-[#ffe4ef] p-4 shadow-sm">
+          <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-rose-300/20 blur-2xl" />
           <div className="relative flex items-center gap-4">
-            <img src="/dashboard-investment-icon.png" alt="" className="h-20 w-20 shrink-0 object-contain drop-shadow-[0_0_18px_rgba(251,191,36,.25)]" />
+            <img src="/dashboard-investment-icon.png" alt="" className="h-20 w-20 shrink-0 object-contain drop-shadow-[0_0_18px_rgba(244,63,94,.2)]" />
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300/70">Votre argent travaille</p>
-              <p className="mt-1 text-sm font-semibold text-white">Investissez avec confiance</p>
-              <p className="mt-1 text-xs leading-relaxed text-white/55">Suivez votre capital et vos gains en temps réel.</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-rose-500/80">Votre argent travaille</p>
+              <p className="mt-1 text-sm font-semibold text-slate-900">Investissez avec confiance</p>
+              <p className="mt-1 text-xs leading-relaxed text-slate-500">Suivez votre capital et vos gains en temps réel.</p>
             </div>
           </div>
         </div>

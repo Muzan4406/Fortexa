@@ -1,47 +1,25 @@
 import { useState } from 'react';
 import { useGetReferrals } from '@workspace/api-client-react';
 import { formatCurrency, formatDate } from '@/lib/format';
-import { Copy, Share2, CheckCircle, Menu, ChevronDown, ChevronUp, Network, Sparkles, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, CheckCircle, ChevronDown, ChevronUp, Copy, Gift, Link2, Menu, Share2, TrendingUp, UsersRound } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSidebar } from '@/lib/sidebar-context';
 
-/* ── Stars background ── */
-function Stars({ count = 30 }: { count?: number }) {
-  const pts = Array.from({ length: count }, (_, i) => ({
-    cx: (i * 97 + 13) % 320,
-    cy: (i * 53 + 7) % 120,
-    r: i % 5 === 0 ? 1.2 : 0.65,
-    op: i % 3 === 0 ? 0.55 : 0.25,
-  }));
-  return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 320 120" preserveAspectRatio="xMidYMid slice">
-      {pts.map((p, i) => <circle key={i} cx={p.cx} cy={p.cy} r={p.r} fill="white" opacity={p.op} />)}
-    </svg>
-  );
-}
+const LEVELS = [
+  { key: 'LV1', count: 'level1Count' as const, percent: 5, tone: 'from-rose-500 to-pink-500' },
+  { key: 'LV2', count: 'level2Count' as const, percent: 3, tone: 'from-pink-500 to-fuchsia-500' },
+  { key: 'LV3', count: 'level3Count' as const, percent: 2, tone: 'from-fuchsia-500 to-purple-500' },
+];
 
-/* ── Level medal badges ── */
-function LevelBadge({ level, count, percent, isLoading }: { level: 'A' | 'B' | 'C'; count: number; percent: string; isLoading: boolean }) {
-  const styles = {
-    A: { bg: 'rgba(251,191,36,0.1)',  border: 'rgba(251,191,36,0.3)',  text: '#fcd34d', glow: 'rgba(251,191,36,0.2)',  label: 'Niveau A', sub: '5% / filleul' },
-    B: { bg: 'rgba(147,197,253,0.1)', border: 'rgba(147,197,253,0.3)', text: '#93c5fd', glow: 'rgba(147,197,253,0.15)', label: 'Niveau B', sub: '3% / filleul' },
-    C: { bg: 'rgba(252,165,165,0.1)', border: 'rgba(252,165,165,0.3)', text: '#fca5a5', glow: 'rgba(252,165,165,0.15)', label: 'Niveau C', sub: '2% / filleul' },
-  }[level];
-  const emoji = { A: '🥇', B: '🥈', C: '🥉' }[level];
+function ProgressRing({ percent }: { percent: number }) {
   return (
     <div
-      className="flex flex-col items-center py-5 px-3 rounded-xl"
-      style={{ background: styles.bg, border: `1px solid ${styles.border}`, boxShadow: `0 0 20px ${styles.glow}` }}
+      className="h-11 w-11 rounded-full p-[4px]"
+      style={{ background: `conic-gradient(#e11d48 ${percent * 10}%, #fce7f3 0)` }}
     >
-      <span className="text-2xl mb-1">{emoji}</span>
-      <p className="text-2xl font-bold" style={{ color: styles.text }}>
-        {isLoading ? '…' : count}
-      </p>
-      <p className="text-xs font-semibold mt-0.5" style={{ color: styles.text }}>{styles.label}</p>
-      <p className="text-xs mt-0.5" style={{ color: `${styles.text}80` }}>{styles.sub}</p>
-      <p className="text-xs font-medium mt-1.5 px-2 py-0.5 rounded-full" style={{ background: `${styles.border}40`, color: styles.text }}>
-        {percent}%
-      </p>
+      <div className="flex h-full w-full items-center justify-center rounded-full bg-white">
+        <div className="h-2 w-2 rounded-full bg-rose-500" />
+      </div>
     </div>
   );
 }
@@ -57,10 +35,10 @@ export default function ReferralsPage() {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      toast({ title: 'Copié !', description: 'Code copié dans le presse-papier' });
+      toast({ title: 'Copié', description: 'Le code est dans le presse-papier.' });
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast({ title: 'Erreur', description: 'Impossible de copier', variant: 'destructive' });
+      toast({ title: 'Erreur', description: 'Impossible de copier le code.', variant: 'destructive' });
     }
   };
 
@@ -73,187 +51,102 @@ export default function ReferralsPage() {
           text: `Utilisez mon code de parrainage : ${referralInfo.referralCode}`,
           url: referralInfo.referralLink,
         });
-      } catch { /* cancelled */ }
+      } catch { /* partage annulé */ }
     } else {
-      copyToClipboard(referralInfo.referralLink);
+      await copyToClipboard(referralInfo.referralLink);
     }
   };
 
-  const l1 = referralInfo?.level1Count ?? 0;
-  const l2 = referralInfo?.level2Count ?? 0;
-  const l3 = referralInfo?.level3Count ?? 0;
-  const total = l1 + l2 + l3;
+  const total = (referralInfo?.level1Count ?? 0) + (referralInfo?.level2Count ?? 0) + (referralInfo?.level3Count ?? 0);
 
   return (
-    <>
-      {/* ── Nocturnal Header ── */}
-      <div
-        className="relative overflow-hidden px-5 pt-10 pb-8"
-        style={{ background: 'linear-gradient(160deg, #0a1628 0%, #071a14 60%, #060d1f 100%)' }}
-      >
-        <Stars count={35} />
-        {/* Glow orbs */}
-        <div className="absolute -top-10 right-0 w-48 h-48 rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(52,211,153,0.12) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-16 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse, rgba(52,211,153,0.08) 0%, transparent 70%)' }} />
-        {/* Bottom separator */}
-        <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(52,211,153,0.3), transparent)' }} />
-
-        <div className="relative">
-          <button
-            onClick={openSidebar}
-            className="absolute top-0 left-0 w-9 h-9 rounded-xl flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
-          >
-            <Menu className="w-5 h-5 text-white/70" />
-          </button>
-
-          <div className="text-center pt-0.5">
-             <p className="text-white/50 text-xs font-semibold tracking-[0.2em] uppercase mb-3">Ma communauté</p>
-
-            {/* Team icon */}
-            <div className="w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center"
-              style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.25)', boxShadow: '0 0 24px rgba(52,211,153,0.15)' }}>
-               <img src="/team-icon.png" alt="" className="w-10 h-10 object-contain" />
-            </div>
-
-            {/* Total members */}
-            <p
-              className="text-5xl font-bold"
-              style={{ color: '#34d399', textShadow: '0 0 30px rgba(52,211,153,0.5)' }}
-            >
-              {isLoading ? '…' : total}
-            </p>
-             <p className="text-white/40 text-sm mt-1">personne{total !== 1 ? 's' : ''} connectée{total !== 1 ? 's' : ''}</p>
+    <div className="min-h-screen bg-[#fffafb] pb-5 text-slate-900">
+      <header className="flex items-center justify-between border-b border-rose-100 bg-white px-4 pb-3 pt-8">
+        <div className="flex items-center gap-2">
+          <img src="/logo.jpg" alt="Fortexa" className="h-8 w-8 rounded-full object-cover" />
+          <div>
+            <p className="text-sm font-extrabold tracking-tight">FORTEXA</p>
+            <p className="text-[8px] uppercase tracking-[0.18em] text-slate-400">Investir. Grandir. Réussir.</p>
           </div>
         </div>
-      </div>
+        <button onClick={openSidebar} className="flex items-center gap-1 rounded-full border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600">
+          Mon espace <ArrowRight className="h-3.5 w-3.5" />
+        </button>
+      </header>
 
-      <div className="px-4 py-4 space-y-3">
+      <main className="space-y-3 px-3 pt-3">
+        <section className="relative overflow-hidden rounded-[22px] border border-rose-100 bg-gradient-to-br from-white via-rose-50 to-pink-100 px-5 pb-16 pt-6 shadow-sm">
+          <div className="absolute -right-8 top-4 h-44 w-44 rounded-full bg-pink-200/50 blur-2xl" />
+          <div className="relative z-10 max-w-[62%]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-rose-500">Votre communauté</p>
+            <h1 className="mt-2 text-[27px] font-black leading-[1.03] text-slate-900">Construisez<br /><span className="text-rose-600">votre équipe</span></h1>
+            <p className="mt-3 text-[11px] leading-relaxed text-slate-500">Invitez vos proches et développez votre réseau tout en gagnant des récompenses.</p>
+          </div>
+          <div className="absolute bottom-3 right-6 flex h-28 w-28 rotate-3 items-center justify-center rounded-[28px] bg-white/80 shadow-lg shadow-rose-200/50">
+            <img src="/team-icon.png" alt="" className="h-20 w-20 object-contain" />
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 grid grid-cols-3 divide-x divide-rose-100 rounded-2xl border border-rose-100 bg-white/95 px-2 py-3 shadow-md">
+            <div className="text-center"><UsersRound className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold">{isLoading ? '—' : total}</p><p className="text-[9px] text-slate-400">Utilisateurs<br />totaux</p></div>
+            <div className="text-center"><Gift className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold text-rose-600">{formatCurrency(referralInfo?.totalCommissions ?? 0)}</p><p className="text-[9px] text-slate-400">Récompenses<br />totales</p></div>
+            <div className="text-center"><TrendingUp className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold">LV{total > 0 ? 1 : 0}</p><p className="text-[9px] text-slate-400">Niveau<br />actuel</p></div>
+          </div>
+        </section>
 
-        {/* ── Niveau grid ── */}
-        <div className="grid grid-cols-3 gap-2">
-          <LevelBadge level="A" count={l1} percent="5" isLoading={isLoading} />
-          <LevelBadge level="B" count={l2} percent="3" isLoading={isLoading} />
-          <LevelBadge level="C" count={l3} percent="2" isLoading={isLoading} />
-        </div>
-
-        {/* ── Commissions totales ── */}
         {referralInfo && (
-          <div
-            className="rounded-2xl p-4 flex items-center justify-between"
-            style={{
-              background: 'linear-gradient(135deg, rgba(52,211,153,0.06) 0%, rgba(52,211,153,0.02) 100%)',
-              border: '1px solid rgba(52,211,153,0.2)',
-            }}
-          >
-            <div>
-               <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(52,211,153,0.6)' }}>
-                 Récompenses générées
-              </p>
-              <p className="text-2xl font-bold mt-0.5 text-emerald-400" data-testid="text-total-commissions">
-                {formatCurrency(referralInfo.totalCommissions)}
-              </p>
+          <section className="grid grid-cols-[42%_58%] overflow-hidden rounded-[20px] border border-rose-100 bg-white shadow-sm">
+            <div className="flex min-h-[172px] items-center justify-center bg-gradient-to-br from-slate-100 via-white to-rose-50 p-4">
+              <img src="/dashboard-investment-icon.png" alt="" className="max-h-36 w-full object-contain" />
             </div>
-            <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-              style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}
-            >
-               <Sparkles className="w-5 h-5 text-emerald-400" />
+            <div className="p-4">
+              <h2 className="text-base font-extrabold leading-tight">Commencez à inviter vos amis</h2>
+              <p className="mt-1 text-[10px] text-slate-400">Partagez votre code ou votre lien d’invitation</p>
+              <button onClick={() => copyToClipboard(referralInfo.referralCode)} className="mt-3 flex w-full items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-2.5 py-2 text-left text-[10px] text-slate-600">
+                <span className="flex items-center gap-1.5"><Copy className="h-3 w-3 text-slate-400" />{referralInfo.referralCode}</span>
+                {copied ? <CheckCircle className="h-3.5 w-3.5 text-rose-500" /> : <Copy className="h-3.5 w-3.5 text-rose-400" />}
+              </button>
+              <button onClick={() => copyToClipboard(referralInfo.referralLink)} className="mt-2 flex w-full items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-2.5 py-2 text-left text-[9px] text-slate-500">
+                <span className="flex min-w-0 items-center gap-1.5"><Link2 className="h-3 w-3 shrink-0 text-slate-400" /><span className="truncate">{referralInfo.referralLink}</span></span><Copy className="h-3.5 w-3.5 shrink-0 text-rose-400" />
+              </button>
+              <button onClick={shareReferralLink} className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-rose-600 py-2.5 text-xs font-bold text-white shadow-sm shadow-rose-200">
+                <Share2 className="h-3.5 w-3.5" /> Partager maintenant
+              </button>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* ── Code de parrainage ── */}
-        {referralInfo && (
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{ background: '#111827', border: '1px solid rgba(255,255,255,0.08)' }}
-          >
-            <div className="px-5 pt-4 pb-3">
-              <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                 Invitez votre communauté
-              </p>
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex-1 rounded-xl px-4 py-3"
-                  style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.2)' }}
-                >
-                  <p
-                    className="text-xl font-bold tracking-[0.25em]"
-                    style={{ color: '#34d399' }}
-                    data-testid="text-referral-code"
-                  >
-                    {referralInfo.referralCode}
-                  </p>
-                </div>
-                <button
-                  onClick={() => copyToClipboard(referralInfo.referralCode)}
-                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all"
-                  style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}
-                  data-testid="button-copy-code"
-                >
-                  {copied
-                    ? <CheckCircle className="w-5 h-5 text-emerald-400" />
-                    : <Copy className="w-5 h-5 text-emerald-400" />}
-                </button>
+        <section className="overflow-hidden rounded-[20px] border border-rose-100 bg-white shadow-sm">
+          <div className="flex items-center gap-2 border-b border-rose-50 px-4 py-3">
+            <TrendingUp className="h-4 w-4 text-rose-500" />
+            <h2 className="text-xs font-extrabold uppercase tracking-wide">Vos gains par niveau</h2>
+          </div>
+          {LEVELS.map((level) => {
+            const count = referralInfo?.[level.count] ?? 0;
+            return (
+              <div key={level.key} className="grid grid-cols-[72px_52px_1fr_52px] items-center gap-2 border-b border-slate-50 px-3 py-2 last:border-0">
+                <div className={`rounded-xl bg-gradient-to-r ${level.tone} py-2.5 text-center text-sm font-black text-white shadow-sm`}>{level.key}</div>
+                <ProgressRing percent={level.percent} />
+                <div><p className="text-sm font-extrabold text-rose-600">{level.percent}%</p><p className="text-[9px] text-slate-400">Commission</p></div>
+                <div className="text-center"><p className="text-xs font-bold">{count}</p><p className="text-[9px] text-slate-400">Membres</p></div>
               </div>
-            </div>
-            <button
-              onClick={shareReferralLink}
-              className="w-full py-3.5 flex items-center justify-center gap-2 font-semibold text-sm transition-all"
-              style={{
-                background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-                color: '#fff',
-              }}
-              data-testid="button-share"
-            >
-              <Share2 className="w-4 h-4" />
-               Partager mon invitation
-            </button>
-          </div>
-        )}
+            );
+          })}
+        </section>
 
-        {/* ── Historique commissions (collapsable) ── */}
         {referralInfo?.commissions && referralInfo.commissions.length > 0 && (
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{ background: '#111827', border: '1px solid rgba(255,255,255,0.08)' }}
-          >
-            <button
-              onClick={() => setShowHistory(h => !h)}
-              className="w-full flex items-center justify-between px-5 py-4"
-            >
-               <p className="font-semibold text-sm text-white">Dernières récompenses</p>
-              {showHistory
-                ? <ChevronUp className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.4)' }} />
-                : <ChevronDown className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.4)' }} />}
+          <section className="overflow-hidden rounded-[20px] border border-rose-100 bg-white shadow-sm">
+            <button onClick={() => setShowHistory((value) => !value)} className="flex w-full items-center justify-between px-4 py-4">
+              <span className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide"><Gift className="h-4 w-4 text-rose-500" />Dernières récompenses</span>
+              {showHistory ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
             </button>
-            {showHistory && (
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                {referralInfo.commissions.map((c, idx) => (
-                  <div
-                    key={c.id ?? idx}
-                    className="px-5 py-3.5 flex items-center justify-between"
-                    style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-white">{c.refereeName}</p>
-                      <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                        Niveau {c.level} · {formatDate(c.createdAt)}
-                      </p>
-                    </div>
-                    <p className="text-base font-bold text-emerald-400">+{formatCurrency(c.amount)}</p>
-                  </div>
-                ))}
+            {showHistory && referralInfo.commissions.map((commission, index) => (
+              <div key={commission.id ?? index} className="flex items-center justify-between border-t border-slate-50 px-4 py-3">
+                <div><p className="text-xs font-bold">{commission.refereeName}</p><p className="text-[10px] text-slate-400">Niveau {commission.level} · {formatDate(commission.createdAt)}</p></div>
+                <p className="text-sm font-extrabold text-rose-600">+{formatCurrency(commission.amount)}</p>
               </div>
-            )}
-          </div>
+            ))}
+          </section>
         )}
-
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
