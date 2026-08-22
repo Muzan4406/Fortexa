@@ -3,7 +3,7 @@ import { AdminLayout } from '@/components/admin-layout';
 import {
   useGetAdminUsers, useGetAdminUser, useSuspendUser, useBanUser, useReactivateUser,
   useAdjustUserFunds,
-  getGetAdminUsersQueryKey,
+  getGetAdminUsersQueryKey, getGetAdminUserQueryKey,
   FundsAdjustmentType, FundsAdjustmentWalletType,
 } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,10 @@ export default function AdminUsersPage() {
   const { data: result, isLoading } = useGetAdminUsers({ search: search || undefined });
   const users = result?.items ?? [];
   const { data: teamUser } = useGetAdminUser(teamUserId ?? 0, {
-    query: { enabled: teamUserId !== null },
+    query: {
+      enabled: teamUserId !== null,
+      queryKey: getGetAdminUserQueryKey(teamUserId ?? 0),
+    },
   });
 
   const suspendMutation = useSuspendUser();

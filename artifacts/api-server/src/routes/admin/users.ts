@@ -90,6 +90,18 @@ router.get("/admin/users/:id", requireAdmin, async (req, res): Promise<void> => 
     .from(transactionsTable)
     .where(and(eq(transactionsTable.userId, id), eq(transactionsTable.type, "commission"), eq(transactionsTable.status, "approved")));
 
+  const team = await db
+    .select({
+      id: usersTable.id,
+      name: usersTable.name,
+      email: usersTable.email,
+      country: usersTable.country,
+      status: usersTable.status,
+    })
+    .from(usersTable)
+    .where(eq(usersTable.referredById, id))
+    .orderBy(desc(usersTable.createdAt));
+
   res.json({
     id: user.id,
     name: user.name,
