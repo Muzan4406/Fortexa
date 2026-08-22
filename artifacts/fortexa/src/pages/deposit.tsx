@@ -865,11 +865,18 @@ export default function DepositPage() {
                       <p className="text-xs text-muted-foreground">{formatDate(deposit.createdAt)}</p>
                       <div className="mt-3 rounded-xl bg-muted/40 border border-border p-3 space-y-1.5">
                         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Informations du dépôt</p>
+                        <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                          <p className="text-xs text-foreground">Montant : <span className="font-semibold">{formatCurrency(deposit.amount)}</span></p>
+                          <p className="text-xs text-foreground">Frais : <span className="font-semibold">{formatCurrency(deposit.fee)}</span></p>
+                          <p className="text-xs text-foreground">Net crédité : <span className="font-semibold">{formatCurrency(deposit.netAmount)}</span></p>
+                          <p className="text-xs text-foreground">Statut : <span className={`font-semibold ${statusInfo.color}`}>{statusInfo.label}</span></p>
+                        </div>
                         {deposit.depositMethod === 'mobile_money' && (
                           <>
                             <p className="text-xs text-foreground">Méthode : <span className="font-semibold">Mobile Money</span></p>
                             {deposit.payerCountry && <p className="text-xs text-foreground">Pays : <span className="font-semibold">{COUNTRIES.find(c => c.code === deposit.payerCountry)?.name ?? deposit.payerCountry}</span></p>}
                             {deposit.payerPhone && <p className="text-xs text-foreground">Numéro : <span className="font-mono font-semibold">{deposit.payerPhone}</span></p>}
+                            {deposit.sendavapayRef && <p className="text-xs text-foreground break-all">Référence : <span className="font-mono font-semibold">{deposit.sendavapayRef}</span></p>}
                           </>
                         )}
                         {deposit.depositMethod === 'usdt' && (

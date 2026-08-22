@@ -296,6 +296,17 @@ export default function WithdrawPage() {
                       <p className="text-xs text-muted-foreground mb-1 font-mono truncate">{withdrawal.description}</p>
                     )}
                     <p className="text-xs text-muted-foreground">{formatDate(withdrawal.createdAt)}</p>
+                    <div className="mt-3 space-y-1.5 rounded-xl border border-border bg-muted/40 p-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Informations du retrait</p>
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                        <p><span className="text-muted-foreground">Moyen :</span> <span className="font-semibold">{withdrawal.depositMethod === 'mobile_money' ? 'Mobile Money' : withdrawal.depositMethod === 'usdt' ? 'USDT BEP20' : 'Non renseigné'}</span></p>
+                        <p><span className="text-muted-foreground">Pays :</span> <span className="font-semibold">{withdrawal.payerCountry || country || 'Non renseigné'}</span></p>
+                        <p><span className="text-muted-foreground">Montant :</span> <span className="font-semibold">{formatCurrency(withdrawal.amount)}</span></p>
+                        <p><span className="text-muted-foreground">Frais :</span> <span className="font-semibold">{formatCurrency(withdrawal.fee)}</span></p>
+                        {withdrawal.payerPhone && <p className="col-span-2"><span className="text-muted-foreground">Numéro :</span> <span className="font-mono font-semibold">{withdrawal.payerPhone}</span></p>}
+                        {withdrawal.description && <p className="col-span-2 break-all text-muted-foreground"><span className="font-semibold">Détail :</span> {withdrawal.description}</p>}
+                      </div>
+                    </div>
                     {withdrawal.rejectionReason && (
                       <p className="text-sm text-red-600 mt-2">{withdrawal.rejectionReason}</p>
                     )}

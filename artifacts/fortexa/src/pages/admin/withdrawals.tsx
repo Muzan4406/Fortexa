@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { formatCurrency, formatDate } from '@/lib/format';
-import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Smartphone, Wallet } from 'lucide-react';
 
 const STATUS_CONFIG: Record<TransactionStatus, { label: string; color: string }> = {
   pending: { label: 'En attente', color: 'bg-amber-100 text-amber-700' },
@@ -122,6 +122,17 @@ export default function AdminWithdrawalsPage() {
                     {STATUS_CONFIG[wd.status as TransactionStatus].label}
                   </span>
                 </div>
+              </div>
+              <div className="mt-3 space-y-1.5 rounded-xl border border-border bg-muted/30 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Informations complètes</p>
+                <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                  <p className="flex items-center gap-1"><span className="text-muted-foreground">Moyen :</span> {wd.depositMethod === 'mobile_money' ? <><Smartphone className="h-3 w-3 text-emerald-600" /><span className="font-semibold">Mobile Money</span></> : wd.depositMethod === 'usdt' ? <><Wallet className="h-3 w-3 text-amber-600" /><span className="font-semibold">USDT BEP20</span></> : <span className="font-semibold">Non renseigné</span>}</p>
+                  <p><span className="text-muted-foreground">Pays :</span> <span className="font-semibold">{wd.payerCountry || wd.userCountry || 'Non renseigné'}</span></p>
+                  {wd.payerPhone && <p className="col-span-2"><span className="text-muted-foreground">Numéro :</span> <span className="font-mono font-semibold">{wd.payerPhone}</span></p>}
+                  {wd.txid && <p className="col-span-2 break-all"><span className="text-muted-foreground">TXID :</span> <span className="font-mono font-semibold">{wd.txid}</span></p>}
+                  {wd.sendavapayRef && <p className="col-span-2 break-all"><span className="text-muted-foreground">Référence :</span> <span className="font-mono font-semibold">{wd.sendavapayRef}</span></p>}
+                </div>
+                {wd.description && <p className="break-all text-xs text-muted-foreground"><span className="font-semibold">Détail :</span> {wd.description}</p>}
               </div>
               {wd.status === 'pending' && (
                 <div className="flex gap-2 mt-3">
