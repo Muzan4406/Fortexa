@@ -116,7 +116,7 @@ export default function ReferralsPage() {
             {/* Team icon */}
             <div className="w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center"
               style={{ background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.25)', boxShadow: '0 0 24px rgba(52,211,153,0.15)' }}>
-               <Network className="w-8 h-8 text-emerald-400" />
+               <img src="/team-icon.png" alt="" className="w-10 h-10 object-contain" />
             </div>
 
             {/* Total members */}

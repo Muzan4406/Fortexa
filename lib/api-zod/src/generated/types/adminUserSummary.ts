@@ -13,6 +13,9 @@ export interface AdminUserSummary {
   name: string;
   phone: string;
   email: string;
+  /** ISO country code */
+  country?: string;
+  directTeamCount?: number;
   investmentBalance: number;
   gainBalance: number;
   status: AdminUserSummaryStatus;

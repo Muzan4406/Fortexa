@@ -6,6 +6,7 @@ import { getSettings } from "../lib/settings";
 import { updateGainBalance } from "../lib/gains";
 
 const router: IRouter = Router();
+const MOBILE_MONEY_COUNTRIES = new Set(["TG", "BJ", "BF", "CI"]);
 
 function formatTx(t: typeof transactionsTable.$inferSelect) {
   return {
@@ -57,6 +58,16 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId));
   if (!user) {
     res.status(401).json({ error: "Utilisateur non trouvé" });
+    return;
+  }
+
+  const mobileMoneyUser = MOBILE_MONEY_COUNTRIES.has(user.country);
+  if (mobileMoneyUser && (!phone || typeof phone !== "string" || !/^\d{6,12}$/.test(phone.trim()))) {
+    res.status(400).json({ error: "Un numéro Mobile Money valide est requis pour votre pays" });
+    return;
+  }
+  if (!mobileMoneyUser && (!usdtAddress || typeof usdtAddress !== "string" || usdtAddress.trim().length < 26)) {
+    res.status(400).json({ error: "Une adresse USDT BEP20 valide est requise pour votre pays" });
     return;
   }
 

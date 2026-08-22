@@ -11,6 +11,7 @@ function formatUserSummary(u: typeof usersTable.$inferSelect) {
     name: u.name,
     phone: u.phone,
     email: u.email,
+    country: u.country,
     investmentBalance: parseFloat(u.investmentBalance),
     gainBalance: parseFloat(u.gainBalance),
     status: u.status,
@@ -52,8 +53,24 @@ router.get("/admin/users", requireAdmin, async (req, res): Promise<void> => {
     .limit(limitNum)
     .offset(offsetNum);
 
+  const team = await db.select({
+    id: usersTable.id,
+    name: usersTable.name,
+    email: usersTable.email,
+    country: usersTable.country,
+    status: usersTable.status,
+  }).from(usersTable).where(eq(usersTable.referredById, id)).orderBy(desc(usersTable.createdAt));
+
+  const items = await Promise.all(users.map(async (user) => {
+    const [teamRow] = await db
+      .select({ count: count() })
+      .from(usersTable)
+      .where(eq(usersTable.referredById, user.id));
+    return { ...formatUserSummary(user), directTeamCount: teamRow?.count ?? 0 };
+  }));
+
   res.json({
-    items: users.map(formatUserSummary),
+    items,
     total: totalRow?.count ?? 0,
   });
 });
@@ -86,6 +103,7 @@ router.get("/admin/users/:id", requireAdmin, async (req, res): Promise<void> => 
     name: user.name,
     phone: user.phone,
     email: user.email,
+    country: user.country,
     investmentBalance: parseFloat(user.investmentBalance),
     gainBalance: parseFloat(user.gainBalance),
     status: user.status,
@@ -95,6 +113,7 @@ router.get("/admin/users/:id", requireAdmin, async (req, res): Promise<void> => 
     totalDeposited: parseFloat(depositsRow?.total ?? "0"),
     totalWithdrawn: parseFloat(withdrawalsRow?.total ?? "0"),
     referralEarnings: parseFloat(commissionsRow?.total ?? "0"),
+    team,
     createdAt: user.createdAt.toISOString(),
   });
 });
@@ -116,7 +135,7 @@ router.put("/admin/users/:id", requireAdmin, async (req, res): Promise<void> => 
 
   res.json({ id: user.id, name: user.name, phone: user.phone, email: user.email,
     investmentBalance: parseFloat(user.investmentBalance), gainBalance: parseFloat(user.gainBalance),
-    status: user.status, role: user.role, referralCode: user.referralCode,
+    country: user.country, status: user.status, role: user.role, referralCode: user.referralCode,
     referredById: user.referredById || null, totalDeposited: 0, totalWithdrawn: 0,
     referralEarnings: 0, createdAt: user.createdAt.toISOString() });
 });

@@ -2,18 +2,38 @@ import { useAuth } from '@/lib/auth-context';
 import { useLocation } from 'wouter';
 import {
   ArrowDownCircle, ArrowUpCircle, ChevronRight,
-  Shield, Headphones, Info, LogOut, Menu,
+  Shield, Headphones, Info, LogOut, Menu, KeyRound, X,
 } from 'lucide-react';
+import { useState } from 'react';
+import { useUpdatePassword } from '@workspace/api-client-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { useSidebar } from '@/lib/sidebar-context';
 
 export default function ProfilePage() {
   const { clearAuth, user } = useAuth();
   const [, setLocation] = useLocation();
   const { open: openSidebar } = useSidebar();
+  const { toast } = useToast();
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const passwordMutation = useUpdatePassword();
 
   const handleLogout = () => {
     clearAuth();
     setLocation('/login');
+  };
+
+  const changePassword = () => {
+    passwordMutation.mutate({ data: { currentPassword, newPassword } }, {
+      onSuccess: () => {
+        toast({ title: 'Mot de passe modifié', description: 'Votre nouveau mot de passe est actif.' });
+        setPasswordOpen(false); setCurrentPassword(''); setNewPassword('');
+      },
+      onError: (error: any) => toast({ title: 'Erreur', description: error.data?.error || 'Impossible de modifier le mot de passe', variant: 'destructive' }),
+    });
   };
 
   return (
@@ -40,6 +60,23 @@ export default function ProfilePage() {
       </div>
 
       <div className="px-4 py-5 space-y-3">
+        {passwordOpen && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="w-full max-w-sm bg-card border border-white/10 rounded-3xl p-5 shadow-2xl">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="font-bold text-foreground">Modifier le mot de passe</h2>
+                <button onClick={() => setPasswordOpen(false)} className="text-muted-foreground"><X className="w-5 h-5" /></button>
+              </div>
+              <div className="space-y-3">
+                <Input type="password" placeholder="Mot de passe actuel" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} />
+                <Input type="password" placeholder="Nouveau mot de passe (6 caractères minimum)" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
+                <Button className="w-full" onClick={changePassword} disabled={passwordMutation.isPending || !currentPassword || newPassword.length < 6}>
+                  {passwordMutation.isPending ? 'Modification…' : 'Enregistrer'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── Dépôt / Retrait ── */}
         <div className="grid grid-cols-2 gap-3">
@@ -48,7 +85,7 @@ export default function ProfilePage() {
             className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="w-12 h-12 rounded-2xl bg-green-500 flex items-center justify-center shadow-sm">
-              <ArrowDownCircle className="w-6 h-6 text-white" strokeWidth={2} />
+              <img src="/investment-icon.png" alt="" className="w-8 h-8 object-contain" />
             </div>
             <span className="text-sm font-semibold text-foreground">Déposer</span>
           </button>
@@ -57,7 +94,7 @@ export default function ProfilePage() {
             className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="w-12 h-12 rounded-2xl bg-blue-500 flex items-center justify-center shadow-sm">
-              <ArrowUpCircle className="w-6 h-6 text-white" strokeWidth={2} />
+              <img src="/withdrawal-icon.png" alt="" className="w-8 h-8 object-contain" />
             </div>
             <span className="text-sm font-semibold text-foreground">Retirer</span>
           </button>
@@ -81,6 +118,17 @@ export default function ProfilePage() {
             <ChevronRight className="w-4 h-4 text-amber-600" />
           </button>
         )}
+
+        <button
+          onClick={() => setPasswordOpen(true)}
+          className="w-full bg-card rounded-2xl p-4 border border-border flex items-center justify-between shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><KeyRound className="w-5 h-5 text-primary" /></div>
+            <div className="text-left"><p className="text-sm font-semibold text-foreground">Sécurité</p><p className="text-xs text-muted-foreground">Modifier votre mot de passe</p></div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </button>
 
         {/* ── Service client ── */}
         <button

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AdminLayout } from '@/components/admin-layout';
 import {
-  useGetAdminUsers, useSuspendUser, useBanUser, useUpdateAdminUser,
+  useGetAdminUsers, useGetAdminUser, useSuspendUser, useBanUser, useReactivateUser,
   useAdjustUserFunds,
   getGetAdminUsersQueryKey,
   FundsAdjustmentType, FundsAdjustmentWalletType,
@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { formatCurrency, formatDate } from '@/lib/format';
-import { Search, UserCheck, UserX, Ban, DollarSign } from 'lucide-react';
+import { Search, UserCheck, UserX, Ban, DollarSign, UsersRound, MapPin } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const { toast } = useToast();
@@ -21,13 +21,17 @@ export default function AdminUsersPage() {
   const [adjustAmount, setAdjustAmount] = useState('');
   const [adjustType, setAdjustType] = useState<'add' | 'subtract'>('add');
   const [adjustWallet, setAdjustWallet] = useState<'investment' | 'gains'>('investment');
+  const [teamUserId, setTeamUserId] = useState<number | null>(null);
 
   const { data: result, isLoading } = useGetAdminUsers({ search: search || undefined });
   const users = result?.items ?? [];
+  const { data: teamUser } = useGetAdminUser(teamUserId ?? 0, {
+    query: { enabled: teamUserId !== null },
+  });
 
   const suspendMutation = useSuspendUser();
   const banMutation = useBanUser();
-  const reactivateMutation = useUpdateAdminUser();
+  const reactivateMutation = useReactivateUser();
   const adjustFundsMutation = useAdjustUserFunds();
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: getGetAdminUsersQueryKey() });
@@ -54,7 +58,7 @@ export default function AdminUsersPage() {
 
   const handleReactivate = (id: number) => {
     reactivateMutation.mutate(
-      { id, data: {} },
+      { id },
       {
         onSuccess: () => { toast({ title: 'Utilisateur réactivé' }); invalidate(); },
         onError: (err: any) => toast({ title: 'Erreur', description: err.data?.error, variant: 'destructive' }),
@@ -110,6 +114,27 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Adjust funds modal */}
+      {teamUserId !== null && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setTeamUserId(null)}>
+          <div className="bg-card rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-border" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <div><h3 className="font-bold text-lg">Équipe directe</h3><p className="text-sm text-muted-foreground">{teamUser?.name ?? 'Chargement…'}</p></div>
+              <button onClick={() => setTeamUserId(null)} className="text-muted-foreground text-xl">×</button>
+            </div>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {(teamUser?.team ?? []).map(member => (
+                <div key={member.id} className="flex items-center justify-between rounded-xl bg-muted/50 p-3">
+                  <div><p className="text-sm font-semibold">{member.name}</p><p className="text-xs text-muted-foreground">{member.email}</p></div>
+                  <span className="text-xs text-muted-foreground">{member.country || '—'}</span>
+                </div>
+              ))}
+              {teamUser && teamUser.team?.length === 0 && <p className="text-center text-sm text-muted-foreground py-6">Aucun filleul direct.</p>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Adjust funds modal */}
       {selectedUser && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
@@ -155,6 +180,10 @@ export default function AdminUsersPage() {
                 <div>
                   <p className="font-semibold text-foreground">{user.name}</p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
+                   <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                     <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" />{(user as any).country || 'Pays non renseigné'}</span>
+                     <span className="inline-flex items-center gap-1"><UsersRound className="w-3 h-3" />{(user as any).directTeamCount ?? 0} filleul{(user as any).directTeamCount === 1 ? '' : 's'}</span>
+                   </div>
                   <p className="text-xs text-muted-foreground">{formatDate(user.createdAt)}</p>
                 </div>
                 <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${STATUS_BADGE[user.status] ?? 'bg-gray-100 text-gray-700'}`}>
@@ -172,6 +201,12 @@ export default function AdminUsersPage() {
                 </div>
               </div>
               <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => setTeamUserId(user.id)}
+                  className="flex items-center gap-1 text-xs px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg font-medium"
+                >
+                  <UsersRound className="w-3.5 h-3.5" /> Voir l'équipe
+                </button>
                 <button
                   onClick={() => { setSelectedUser(user); setAdjustAmount(''); }}
                   className="flex items-center gap-1 text-xs px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg font-medium"

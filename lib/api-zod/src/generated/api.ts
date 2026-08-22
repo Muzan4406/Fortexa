@@ -549,6 +549,8 @@ export const GetAdminUsersResponse = zod.object({
   "name": zod.string(),
   "phone": zod.string(),
   "email": zod.string(),
+  "country": zod.string().optional().describe('ISO country code'),
+  "directTeamCount": zod.number().optional(),
   "investmentBalance": zod.number(),
   "gainBalance": zod.number(),
   "status": zod.enum(['active', 'suspended', 'banned']),
@@ -572,6 +574,7 @@ export const GetAdminUserResponse = zod.object({
   "name": zod.string(),
   "phone": zod.string(),
   "email": zod.string(),
+  "country": zod.string().optional(),
   "investmentBalance": zod.number(),
   "gainBalance": zod.number(),
   "status": zod.enum(['active', 'suspended', 'banned']),
@@ -581,6 +584,13 @@ export const GetAdminUserResponse = zod.object({
   "totalDeposited": zod.number(),
   "totalWithdrawn": zod.number(),
   "referralEarnings": zod.number(),
+  "team": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional(),
+  "country": zod.string().optional(),
+  "status": zod.string().optional()
+})).optional(),
   "createdAt": zod.coerce.date()
 })
 
@@ -604,6 +614,7 @@ export const UpdateAdminUserResponse = zod.object({
   "name": zod.string(),
   "phone": zod.string(),
   "email": zod.string(),
+  "country": zod.string().optional(),
   "investmentBalance": zod.number(),
   "gainBalance": zod.number(),
   "status": zod.enum(['active', 'suspended', 'banned']),
@@ -613,6 +624,13 @@ export const UpdateAdminUserResponse = zod.object({
   "totalDeposited": zod.number(),
   "totalWithdrawn": zod.number(),
   "referralEarnings": zod.number(),
+  "team": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional(),
+  "country": zod.string().optional(),
+  "status": zod.string().optional()
+})).optional(),
   "createdAt": zod.coerce.date()
 })
 

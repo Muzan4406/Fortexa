@@ -341,6 +341,9 @@ export interface AdminUserSummary {
   name: string;
   phone: string;
   email: string;
+  /** ISO country code */
+  country?: string;
+  directTeamCount?: number;
   investmentBalance: number;
   gainBalance: number;
   status: AdminUserSummaryStatus;
@@ -371,11 +374,20 @@ export const AdminUserDetailRole = {
   admin: 'admin',
 } as const;
 
+export type AdminUserDetailTeamItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+  country?: string;
+  status?: string;
+};
+
 export interface AdminUserDetail {
   id: number;
   name: string;
   phone: string;
   email: string;
+  country?: string;
   investmentBalance: number;
   gainBalance: number;
   status: AdminUserDetailStatus;
@@ -386,6 +398,7 @@ export interface AdminUserDetail {
   totalDeposited: number;
   totalWithdrawn: number;
   referralEarnings: number;
+  team?: AdminUserDetailTeamItem[];
   createdAt: string;
 }
 

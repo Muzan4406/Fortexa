@@ -14,6 +14,7 @@ export * from './adminTransactionType';
 export * from './adminUserDetail';
 export * from './adminUserDetailRole';
 export * from './adminUserDetailStatus';
+export * from './adminUserDetailTeamItem';
 export * from './adminUserList';
 export * from './adminUserSummary';
 export * from './adminUserSummaryRole';

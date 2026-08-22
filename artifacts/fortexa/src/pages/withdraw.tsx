@@ -106,7 +106,7 @@ export default function WithdrawPage() {
       <div className="bg-background border-b border-border py-8 px-6">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center">
-            <ArrowUpCircle className="w-6 h-6 text-foreground" />
+             <img src="/withdrawal-icon.png" alt="" className="w-8 h-8 object-contain" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Retrait</h1>

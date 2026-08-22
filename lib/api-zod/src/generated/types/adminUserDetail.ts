@@ -7,12 +7,14 @@
  */
 import type { AdminUserDetailRole } from './adminUserDetailRole';
 import type { AdminUserDetailStatus } from './adminUserDetailStatus';
+import type { AdminUserDetailTeamItem } from './adminUserDetailTeamItem';
 
 export interface AdminUserDetail {
   id: number;
   name: string;
   phone: string;
   email: string;
+  country?: string;
   investmentBalance: number;
   gainBalance: number;
   status: AdminUserDetailStatus;
@@ -23,5 +25,6 @@ export interface AdminUserDetail {
   totalDeposited: number;
   totalWithdrawn: number;
   referralEarnings: number;
+  team?: AdminUserDetailTeamItem[];
   createdAt: Date;
 }

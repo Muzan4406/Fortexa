@@ -1506,6 +1506,11 @@ components:
           type: string
         email:
           type: string
+        country:
+          type: string
+          description: ISO country code
+        directTeamCount:
+          type: number
         investmentBalance:
           type: number
         gainBalance:
@@ -1534,6 +1539,8 @@ components:
           type: string
         email:
           type: string
+        country:
+          type: string
         investmentBalance:
           type: number
         gainBalance:
@@ -1554,6 +1561,21 @@ components:
           type: number
         referralEarnings:
           type: number
+        team:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+              name:
+                type: string
+              email:
+                type: string
+              country:
+                type: string
+              status:
+                type: string
         createdAt:
           type: string
           format: date-time
