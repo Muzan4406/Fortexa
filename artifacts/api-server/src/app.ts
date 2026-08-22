@@ -32,6 +32,9 @@ app.use(cors());
 // Store raw body buffer on the request for webhook HMAC verification
 app.use(
   express.json({
+    // Deposit proofs are sent as base64 images. The default 100kb parser
+    // limit rejects normal phone screenshots with HTTP 413.
+    limit: "15mb",
     verify: (req: any, _res, buf) => {
       req.rawBody = buf;
     },

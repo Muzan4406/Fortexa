@@ -115,7 +115,7 @@ export default function DashboardPage() {
         {/* ── Solde d'investissement — Nocturnal gold card ── */}
         <div
           className="rounded-2xl p-5 relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0e2140 60%, #0a1628 100%)' }}
+           style={{ background: 'linear-gradient(135deg, #ffffff 0%, #f0f7ff 60%, #ffffff 100%)' }}
         >
           <StarField />
           {/* Glowing orb top-right */}
@@ -128,7 +128,7 @@ export default function DashboardPage() {
 
           <div className="relative">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-amber-300/70 text-xs font-semibold tracking-widest uppercase">
+             <p className="text-amber-700 text-xs font-semibold tracking-widest uppercase">
                 Solde d'investissement
               </p>
               <div className="flex gap-1.5">
@@ -152,20 +152,20 @@ export default function DashboardPage() {
             </div>
 
             <div
-              className="text-3xl font-bold mb-0.5"
-              style={{ color: '#fcd34d', textShadow: '0 0 20px rgba(251,191,36,0.4)' }}
+               className="text-3xl font-bold mb-0.5"
+               style={{ color: '#b77900' }}
               data-testid="text-investment-balance"
             >
               {isLoading ? '...' : hideBalance ? '••••••' : formatCurrency(dashboard?.investmentBalance ?? 0)}
             </div>
-            <p className="text-amber-300/50 text-xs mb-3">Capital qui travaille pour vous</p>
+             <p className="text-amber-700/70 text-xs mb-3">Capital qui travaille pour vous</p>
 
             <div
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
               style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.25)' }}
             >
-              <span className="text-amber-300/70 text-xs">Maximum autorisé :</span>
-              <span className="text-amber-300 font-bold text-xs">{formatCurrency(maxCapital)}</span>
+               <span className="text-amber-700/80 text-xs">Maximum autorisé :</span>
+               <span className="text-amber-800 font-bold text-xs">{formatCurrency(maxCapital)}</span>
             </div>
           </div>
         </div>
@@ -173,7 +173,7 @@ export default function DashboardPage() {
         {/* ── Gains en direct — Nocturnal emerald card ── */}
         <div
           className="rounded-2xl p-5 relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #060d1f 0%, #071a14 50%, #060d1f 100%)' }}
+           style={{ background: 'linear-gradient(135deg, #ffffff 0%, #effcf7 50%, #ffffff 100%)' }}
         >
           <StarField />
           {/* Green glow orb */}
@@ -196,17 +196,17 @@ export default function DashboardPage() {
               >
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
               </div>
-              <p className="text-emerald-400/70 text-xs font-semibold tracking-widest uppercase">Gains en direct</p>
+             <p className="text-emerald-700 text-xs font-semibold tracking-widest uppercase">Gains en direct</p>
             </div>
 
             {snapshot ? (
               <LiveGains snapshot={snapshot} />
             ) : (
-              <span className="text-3xl font-bold text-emerald-300" data-testid="text-gains-live">
+               <span className="text-3xl font-bold text-emerald-700" data-testid="text-gains-live">
                 {formatCurrency(dashboard?.referralEarnings ?? 0, 5)}
               </span>
             )}
-            <p className="text-emerald-400/40 text-xs mt-0.5 mb-4">Solde retirable à tout moment</p>
+             <p className="text-emerald-700/70 text-xs mt-0.5 mb-4">Solde retirable à tout moment</p>
 
             <div className="flex items-center justify-between">
               <button
@@ -225,11 +225,11 @@ export default function DashboardPage() {
               <div className="text-right">
                 <div className="flex items-center gap-1.5 justify-end mb-0.5">
                   <Zap className="w-3 h-3 text-emerald-400" />
-                  <span className="text-emerald-400/70 text-xs">Temps réel</span>
+                   <span className="text-emerald-700/70 text-xs">Temps réel</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 </div>
                 <p className="text-emerald-300/80 text-xs font-semibold">
-                  {dailyRate}% / 24h
+                   {dailyRate}% / 24h
                 </p>
               </div>
             </div>
