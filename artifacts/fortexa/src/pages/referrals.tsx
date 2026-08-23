@@ -75,28 +75,24 @@ export default function ReferralsPage() {
       </header>
 
       <main className="space-y-3 px-3 pt-3">
-        <section className="relative overflow-hidden rounded-[22px] border border-rose-100 bg-gradient-to-br from-white via-rose-50 to-pink-100 px-5 pb-16 pt-6 shadow-sm">
-          <div className="absolute -right-8 top-4 h-44 w-44 rounded-full bg-pink-200/50 blur-2xl" />
-          <div className="relative z-10 max-w-[62%]">
-            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-rose-500">Votre communauté</p>
-            <h1 className="mt-2 text-[27px] font-black leading-[1.03] text-slate-900">Construisez<br /><span className="text-rose-600">votre équipe</span></h1>
-            <p className="mt-3 text-[11px] leading-relaxed text-slate-500">Invitez vos proches et développez votre réseau tout en gagnant des récompenses.</p>
+        <section className="rounded-2xl border border-rose-100 bg-gradient-to-br from-white via-rose-50 to-pink-100 p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <img src="/team-icon.png" alt="" className="h-14 w-14 rounded-2xl bg-white p-1.5 object-contain shadow-sm" />
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-rose-500">Votre communauté</p>
+              <h1 className="mt-1 text-2xl font-black leading-tight text-slate-900">Votre équipe</h1>
+              <p className="mt-1 text-[11px] text-slate-500">Invitez et gagnez des commissions.</p>
+            </div>
           </div>
-          <div className="absolute bottom-3 right-6 flex h-28 w-28 rotate-3 items-center justify-center rounded-[28px] bg-white/80 shadow-lg shadow-rose-200/50">
-            <img src="/team-icon.png" alt="" className="h-20 w-20 object-contain" />
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 grid grid-cols-3 divide-x divide-rose-100 rounded-2xl border border-rose-100 bg-white/95 px-2 py-3 shadow-md">
-            <div className="text-center"><UsersRound className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold">{isLoading ? '—' : total}</p><p className="text-[9px] text-slate-400">Utilisateurs<br />totaux</p></div>
-            <div className="text-center"><Gift className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold text-rose-600">{formatCurrency(referralInfo?.totalCommissions ?? 0)}</p><p className="text-[9px] text-slate-400">Récompenses<br />totales</p></div>
-            <div className="text-center"><TrendingUp className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold">LV{total > 0 ? 1 : 0}</p><p className="text-[9px] text-slate-400">Niveau<br />actuel</p></div>
+          <div className="mt-4 grid grid-cols-3 divide-x divide-rose-100 rounded-xl bg-white/90 px-1 py-2.5">
+            <div className="text-center"><UsersRound className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold">{isLoading ? '—' : total}</p><p className="text-[9px] text-slate-400">Membres</p></div>
+            <div className="text-center"><Gift className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold text-rose-600">{formatCurrency(referralInfo?.totalCommissions ?? 0)}</p><p className="text-[9px] text-slate-400">Récompenses</p></div>
+            <div className="text-center"><TrendingUp className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold">LV{total > 0 ? 1 : 0}</p><p className="text-[9px] text-slate-400">Niveau</p></div>
           </div>
         </section>
 
         {referralInfo && (
-          <section className="grid grid-cols-[42%_58%] overflow-hidden rounded-[20px] border border-rose-100 bg-white shadow-sm">
-            <div className="flex min-h-[172px] items-center justify-center bg-gradient-to-br from-slate-100 via-white to-rose-50 p-4">
-              <img src="/dashboard-investment-icon.png" alt="" className="max-h-36 w-full object-contain" />
-            </div>
+          <section className="overflow-hidden rounded-[20px] border border-rose-100 bg-white shadow-sm">
             <div className="p-4">
               <h2 className="text-base font-extrabold leading-tight">Commencez à inviter vos amis</h2>
               <p className="mt-1 text-[10px] text-slate-400">Partagez votre code ou votre lien d’invitation</p>

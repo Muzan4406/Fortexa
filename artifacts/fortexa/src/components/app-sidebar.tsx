@@ -26,27 +26,6 @@ function Stars() {
   );
 }
 
-/* User initials avatar */
-function Avatar({ name }: { name: string }) {
-  const initials = name
-    .split(' ')
-    .slice(0, 2)
-    .map(w => w[0])
-    .join('')
-    .toUpperCase();
-  return (
-    <div
-      className="w-12 h-12 rounded-full flex items-center justify-center text-base font-bold text-white shrink-0"
-      style={{
-        background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-        boxShadow: '0 0 0 2px rgba(52,211,153,0.4), 0 0 16px rgba(52,211,153,0.25)',
-      }}
-    >
-      {initials}
-    </div>
-  );
-}
-
 export function AppSidebar() {
   const { isOpen, close } = useSidebar();
   const [location, setLocation] = useLocation();
@@ -70,43 +49,47 @@ export function AppSidebar() {
         className={`fixed top-0 left-0 h-full w-72 z-50 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
-        style={{ background: '#0d1117' }}
+        style={{ background: '#0b1d3a' }}
       >
         {/* ── Nocturnal Header ── */}
         <div
           className="px-5 pt-12 pb-6 relative overflow-hidden"
-          style={{ background: 'linear-gradient(160deg, #0a1628 0%, #071a14 100%)' }}
+          style={{ background: 'linear-gradient(160deg, #102d5a 0%, #24132f 100%)' }}
         >
           <Stars />
-          {/* Emerald glow orb */}
+          {/* Blue and pink glow */}
           <div
             className="absolute -top-6 -right-6 w-32 h-32 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(52,211,153,0.18) 0%, transparent 70%)' }}
+            style={{ background: 'radial-gradient(circle, rgba(244,114,182,0.24) 0%, transparent 70%)' }}
           />
           {/* Subtle border */}
           <div
             className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(52,211,153,0.3), transparent)' }}
+            style={{ background: 'linear-gradient(90deg, transparent, rgba(147,197,253,0.45), transparent)' }}
           />
 
           <div className="relative flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
-              <Avatar name={user?.name ?? 'U'} />
+              <img
+                src="/icon-192.png"
+                alt="Fortexa"
+                className="h-12 w-12 shrink-0 rounded-full border-2 border-pink-300/70 bg-white object-cover shadow-lg shadow-blue-950/30"
+              />
               <div className="min-w-0">
                 <p className="text-white font-bold text-sm leading-tight truncate">
                   {user?.name ?? 'Utilisateur'}
                 </p>
                 <p
                   className="text-xs truncate max-w-[140px] mt-0.5"
-                  style={{ color: 'rgba(52,211,153,0.7)' }}
+                   style={{ color: 'rgba(191,219,254,0.82)' }}
                 >
                   {user?.email ?? ''}
                 </p>
                 <div
                   className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                  style={{ background: 'rgba(52,211,153,0.12)', color: 'rgba(52,211,153,0.9)', border: '1px solid rgba(52,211,153,0.2)' }}
+                   style={{ background: 'rgba(244,114,182,0.14)', color: '#f9a8d4', border: '1px solid rgba(244,114,182,0.25)' }}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                   <span className="w-1.5 h-1.5 rounded-full bg-pink-300 animate-pulse" />
                   Actif
                 </div>
               </div>
@@ -136,9 +119,9 @@ export function AppSidebar() {
                   isActive ? '' : 'hover:bg-white/5'
                 }`}
                 style={isActive ? {
-                  background: 'rgba(52,211,153,0.1)',
-                  border: '1px solid rgba(52,211,153,0.18)',
-                  color: '#34d399',
+                   background: 'rgba(244,114,182,0.14)',
+                   border: '1px solid rgba(244,114,182,0.28)',
+                   color: '#f9a8d4',
                 } : { color: 'rgba(255,255,255,0.5)', border: '1px solid transparent' }}
               >
                 <Icon className="w-5 h-5 shrink-0" strokeWidth={isActive ? 2.5 : 2} />
