@@ -72,7 +72,13 @@ FORTEXA_WEB_PREFIX=/
 FORTEXA_API_PREFIX=/api
 SENDAVAPAY_SDK_KEY=clé SDK Sendavapay
 SENDAVAPAY_WEBHOOK_SECRET=secret du webhook Sendavapay
+TELEGRAM_BOT_TOKEN=nouveau token Telegram généré après révocation de l'ancien
+TELEGRAM_CHAT_ID=-1003997139884
 ```
+
+`TELEGRAM_BOT_TOKEN` est un secret : ne le mettez jamais dans Git ou dans un
+message. Saisissez directement dans Plesk le nouveau token généré par BotFather.
+Le `TELEGRAM_CHAT_ID` du groupe `Fortexa Alertes` n'est pas secret.
 
 Le webhook Sendavapay sera :
 
