@@ -1,9 +1,9 @@
 # Déploiement Fortexa sur Plesk
 
-Fortexa peut cohabiter avec une autre application sur le même domaine en
-utilisant le préfixe `/fortexa`. L'ancienne application garde ses routes
-existantes à la racine et Fortexa utilise uniquement `/fortexa` et
-`/fortexa/api`.
+Cette configuration déploie Fortexa directement sur le domaine principal
+`pplaystation.online`. Le domaine doit être réservé à Fortexa : une autre
+application Node.js ne peut pas utiliser la même racine ou le même domaine
+principal en même temps.
 
 ## 1. Déploiement Git
 
@@ -14,76 +14,75 @@ Le script utilise pnpm directement lorsqu'il est disponible. Si Plesk affiche
 seulement `npm`, il télécharge temporairement la version compatible de pnpm via
 `npx`.
 
+Le dépôt doit être déployé à la racine de l'application :
+
+```text
+/pplaystation.online
+```
+
 ## 2. Frontend
 
-Configurez le document root du domaine vers :
+Le build crée automatiquement :
 
 ```text
-artifacts/fortexa/dist
+/pplaystation.online/artifacts/fortexa/dist
 ```
 
-Ce dossier est créé automatiquement par le build. Le script de déploiement
-compile le frontend avec la base `/fortexa/`. Configurez donc la publication
-du dossier vers le chemin public :
+Configurez le Document Root vers :
 
 ```text
-/fortexa
+/pplaystation.online/artifacts/fortexa/dist
 ```
 
-Activez une réécriture SPA de `/fortexa/*` vers
-`artifacts/fortexa/dist/index.html` afin que les routes comme
-`/fortexa/dashboard`, `/fortexa/deposit` et `/fortexa/profile` fonctionnent
-après un rafraîchissement.
+Activez une réécriture SPA vers `index.html` afin que les routes comme
+`/dashboard`, `/deposit` et `/profile` fonctionnent après un rafraîchissement.
 
 ## 3. API Node.js
 
-Créez une application Node.js Plesk avec la racine du projet et le fichier de
-démarrage :
+Configurez l'application Node.js Plesk avec :
 
 ```text
-app.js
+Application Root     : /pplaystation.online
+Application Startup  : app.js
+Application Mode     : production
 ```
 
-Plesk doit fournir un port à l'application via `PORT`. L'API écoute déjà cette
-variable. Le fichier démarre le bundle déjà compilé, sans dépendre de pnpm au
-moment de l'exécution. `start-plesk.mjs` reste disponible comme ancien point
-d'entrée.
+`app.js` démarre le bundle API déjà compilé :
 
-Le proxy du domaine doit envoyer uniquement `/fortexa/api` vers ce processus
-Node.js. Le frontend utilise les URLs `/fortexa/api/...`, ce qui évite toute
-collision avec l'ancienne application et ses routes `/api/...`.
+```text
+/pplaystation.online/artifacts/api-server/dist/index.mjs
+```
+
+Le frontend utilise les routes API Fortexa sous `/api/...`.
 
 ## 4. Variables d'environnement API
 
 À configurer dans Plesk, sans les mettre dans Git :
 
 ```text
-DATABASE_URL=connexion PostgreSQL Supabase
+DATABASE_URL=connexion PostgreSQL Fortexa
 SESSION_SECRET=valeur longue et aléatoire
-APP_URL=https://votre-domaine.com
-FORTEXA_WEB_PREFIX=/fortexa
-FORTEXA_API_PREFIX=/fortexa/api
+APP_URL=https://pplaystation.online
+FORTEXA_WEB_PREFIX=/
+FORTEXA_API_PREFIX=/api
 SENDAVAPAY_SDK_KEY=clé SDK Sendavapay
 SENDAVAPAY_WEBHOOK_SECRET=secret du webhook Sendavapay
 ```
 
-`APP_URL` est indispensable pour que Sendavapay puisse appeler :
+Le webhook Sendavapay sera :
 
 ```text
-https://votre-domaine.com/fortexa/api/webhooks/sendavapay
+https://pplaystation.online/api/webhooks/sendavapay
 ```
 
 ## 5. Base Supabase
 
-Après avoir configuré `DATABASE_URL`, exécutez une fois depuis la racine du
-projet :
+Après avoir configuré `DATABASE_URL`, appliquez une fois le schéma Drizzle à la
+base Fortexa :
 
 ```bash
 pnpm --filter @workspace/db run push
 ```
-
-Cette commande applique le schéma Drizzle à la base Supabase existante. Elle ne
-doit pas être lancée avec une autre base par erreur.
 
 ## 6. Redémarrage
 
@@ -91,6 +90,7 @@ Après chaque pull :
 
 1. cliquer sur **Pull + Deploy Now** ;
 2. attendre la fin de `deploy-plesk.sh` ;
-3. redémarrer l'application Node.js ;
-4. vérifier `https://votre-domaine.com/fortexa/api/healthz` ;
-5. vérifier l'installation PWA sur HTTPS.
+3. vérifier que `artifacts/fortexa/dist` existe ;
+4. configurer le Document Root vers ce dossier ;
+5. redémarrer l'application Node.js ;
+6. vérifier `https://pplaystation.online/api/healthz`.

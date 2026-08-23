@@ -11,7 +11,7 @@ export const API_PREFIX = normalizePrefix(
 
 export const WEB_PREFIX = normalizePrefix(
   process.env.FORTEXA_WEB_PREFIX,
-  "/fortexa",
+  "/",
 );
 
 export function withPrefix(prefix: string, path: string): string {
