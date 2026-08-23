@@ -63,7 +63,7 @@ export default function ReferralsPage() {
     <div className="h-[100dvh] overflow-hidden overscroll-none bg-[#fffafb] pb-5 text-slate-900">
       <header className="flex items-center justify-between border-b border-rose-100 bg-white px-4 pb-3 pt-8">
         <div className="flex items-center gap-2">
-          <img src="/fortexa-icon.svg" alt="Fortexa" className="h-8 w-8 rounded-full object-cover" />
+          <img src="/logo.jpg" alt="Fortexa" className="h-8 w-8 rounded-full object-cover" />
           <div>
             <p className="text-sm font-extrabold tracking-tight">FORTEXA</p>
             <p className="text-[8px] uppercase tracking-[0.18em] text-slate-400">Investir. Grandir. Réussir.</p>

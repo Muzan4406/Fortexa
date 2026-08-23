@@ -34,7 +34,7 @@ export default function SupportPage() {
          <div className="relative overflow-hidden rounded-3xl p-6 text-white text-center border border-emerald-300/20"
            style={{ background: 'linear-gradient(145deg, #062a2a, #071a35 70%, #0a1628)' }}>
            <div className="absolute -right-10 -top-12 w-40 h-40 rounded-full bg-emerald-400/15 blur-2xl" />
-           <img src="/fortexa-icon.svg" alt="" className="relative w-16 h-16 rounded-2xl object-cover border border-emerald-200/30 shadow-[0_0_28px_rgba(52,211,153,.25)] mx-auto mb-4" />
+           <img src="/logo.jpg" alt="" className="relative w-16 h-16 rounded-2xl object-cover border border-emerald-200/30 shadow-[0_0_28px_rgba(52,211,153,.25)] mx-auto mb-4" />
            <div className="relative flex items-center justify-center gap-2 mb-1">
              <h2 className="text-xl font-bold">Support Fortexa</h2>
              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]" />

@@ -71,7 +71,7 @@ export function AppSidebar() {
           <div className="relative flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
               <img
-                src="/fortexa-icon.svg"
+                src="/icon-192.png"
                 alt="Fortexa"
                 className="h-12 w-12 shrink-0 rounded-full border-2 border-pink-300/70 bg-white object-cover shadow-lg shadow-blue-950/30"
               />

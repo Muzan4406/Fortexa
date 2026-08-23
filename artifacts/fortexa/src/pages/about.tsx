@@ -50,7 +50,7 @@ export default function AboutPage() {
       <div className="px-4 py-6 space-y-5">
         {/* Hero */}
         <div className="gradient-green rounded-2xl p-6 text-white text-center">
-          <img src="/fortexa-icon.svg" alt="Fortexa" className="w-16 h-16 rounded-full object-cover border-2 border-white/30 mx-auto mb-3" />
+          <img src="/logo.jpg" alt="Fortexa" className="w-16 h-16 rounded-full object-cover border-2 border-white/30 mx-auto mb-3" />
           <h2 className="text-2xl font-bold mb-1">Fortexa</h2>
           <p className="text-white/80 text-sm font-medium">Votre capital, nos résultats</p>
         </div>
