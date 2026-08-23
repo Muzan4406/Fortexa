@@ -1,5 +1,6 @@
 import express, { type Express } from "express";
 import cors from "cors";
+import { existsSync } from "fs";
 import { join } from "path";
 import pinoHttp from "pino-http";
 import router from "./routes";
@@ -47,5 +48,27 @@ app.use(express.urlencoded({ extended: true }));
 app.use(`${API_PREFIX}/uploads`, express.static(join(process.cwd(), "uploads")));
 
 app.use(API_PREFIX, router);
+
+// When Plesk forwards the domain root to Node.js, serve Fortexa's compiled
+// frontend from the same process. This also keeps the app working if the
+// hosting panel's static Document Root setting is not applied immediately.
+const frontendCandidates = [
+  join(process.cwd(), "artifacts", "fortexa", "public"),
+  join(process.cwd(), "..", "fortexa", "public"),
+];
+const frontendDir =
+  frontendCandidates.find((candidate) => existsSync(join(candidate, "index.html"))) ??
+  frontendCandidates[0];
+
+app.use(express.static(frontendDir));
+app.use((req, res, next) => {
+  if (req.method === "GET" && !req.path.startsWith(API_PREFIX)) {
+    res.sendFile(join(frontendDir, "index.html"), (error) => {
+      if (error && !res.headersSent) next(error);
+    });
+    return;
+  }
+  next();
+});
 
 export default app;
