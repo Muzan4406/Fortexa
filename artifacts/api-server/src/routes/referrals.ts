@@ -78,7 +78,9 @@ router.get("/referrals", requireAuth, async (req, res): Promise<void> => {
   );
 
   const totalCommissions = commissionRecords.reduce((sum, c) => sum + c.amount, 0);
-  const baseUrl = process.env.APP_URL ?? "https://fortexa.app";
+  const configuredUrl = process.env.APP_URL?.trim().replace(/\/+$/, "");
+  const forwardedProto = String(req.headers["x-forwarded-proto"] ?? "").split(",")[0].trim();
+  const baseUrl = configuredUrl || `${forwardedProto || req.protocol}://${req.get("host")}`;
 
   res.json({
     referralCode: user.referralCode,

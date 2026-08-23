@@ -13,6 +13,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { CheckCircle, XCircle, Clock, ExternalLink, Smartphone, Wallet } from 'lucide-react';
 
+function proofUrl(path: string) {
+  return path.startsWith('/uploads/') ? `/api${path}` : path;
+}
+
 const STATUS_CONFIG: Record<TransactionStatus, { label: string; color: string }> = {
   pending: { label: 'En attente', color: 'bg-amber-100 text-amber-700' },
   approved: { label: 'Approuvé', color: 'bg-green-100 text-green-700' },
@@ -132,7 +136,7 @@ export default function AdminDepositsPage() {
                   {dep.txid && <p className="col-span-2 break-all"><span className="text-muted-foreground">TXID :</span> <span className="font-mono font-semibold">{dep.txid}</span></p>}
                 </div>
                 {dep.screenshotPath && (
-                  <a href={dep.screenshotPath} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 pt-1 text-xs font-semibold text-primary">
+                  <a href={proofUrl(dep.screenshotPath)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 pt-1 text-xs font-semibold text-primary">
                     <ExternalLink className="h-3.5 w-3.5" /> Voir la preuve de paiement
                   </a>
                 )}

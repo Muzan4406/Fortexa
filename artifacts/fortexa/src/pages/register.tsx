@@ -42,8 +42,11 @@ export default function RegisterPage() {
   useEffect(() => {
     if (user) {
       setLocation('/dashboard');
+      return;
     }
-  }, [user, setLocation]);
+    const referralCode = new URLSearchParams(window.location.search).get('ref')?.trim();
+    if (referralCode) form.setValue('referralCode', referralCode, { shouldValidate: true });
+  }, [user, setLocation, form]);
 
   const onSubmit = (data: RegisterForm) => {
     const payload = {

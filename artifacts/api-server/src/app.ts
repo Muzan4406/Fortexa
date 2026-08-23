@@ -44,6 +44,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve screenshot uploads (USDT deposit proofs)
 app.use("/uploads", express.static(join(process.cwd(), "uploads")));
+// Expose uploads through the API proxy used by the web artifact.
+app.use("/api/uploads", express.static(join(process.cwd(), "uploads")));
 
 app.use("/api", router);
 

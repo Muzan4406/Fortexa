@@ -84,10 +84,9 @@ export default function ReferralsPage() {
               <p className="mt-1 text-[11px] text-slate-500">Invitez et gagnez des commissions.</p>
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-3 divide-x divide-rose-100 rounded-xl bg-white/90 px-1 py-2.5">
+          <div className="mt-4 grid grid-cols-2 divide-x divide-rose-100 rounded-xl bg-white/90 px-1 py-2.5">
             <div className="text-center"><UsersRound className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold">{isLoading ? '—' : total}</p><p className="text-[9px] text-slate-400">Membres</p></div>
             <div className="text-center"><Gift className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold text-rose-600">{formatCurrency(referralInfo?.totalCommissions ?? 0)}</p><p className="text-[9px] text-slate-400">Récompenses</p></div>
-            <div className="text-center"><TrendingUp className="mx-auto h-4 w-4 text-rose-500" /><p className="mt-1 text-sm font-extrabold">LV{total > 0 ? 1 : 0}</p><p className="text-[9px] text-slate-400">Niveau</p></div>
           </div>
         </section>
 

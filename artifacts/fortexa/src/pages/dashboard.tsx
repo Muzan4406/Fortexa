@@ -114,39 +114,39 @@ export default function DashboardPage() {
 
         {/* ── Solde d'investissement — Nocturnal gold card ── */}
         <div
-           className="rounded-2xl p-5 relative overflow-hidden border border-rose-100 shadow-sm"
-            style={{ background: 'linear-gradient(135deg, #ffffff 0%, #fff1f5 60%, #ffffff 100%)' }}
+           className="rounded-2xl p-5 relative overflow-hidden border border-blue-200 shadow-sm"
+            style={{ background: 'linear-gradient(135deg, #ffffff 0%, #eff6ff 60%, #dbeafe 100%)' }}
         >
           <StarField />
           {/* Glowing orb top-right */}
           <div
             className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none"
-             style={{ background: 'radial-gradient(circle, rgba(244,63,94,0.14) 0%, transparent 70%)' }}
+              style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.16) 0%, transparent 70%)' }}
           />
           {/* Subtle gold border */}
-           <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(244,63,94,0.12)' }} />
+            <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(59,130,246,0.16)' }} />
 
           <div className="relative">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-rose-600 text-xs font-semibold tracking-widest uppercase">
+               <p className="text-blue-700 text-xs font-semibold tracking-widest uppercase">
                 Solde d'investissement
               </p>
               <div className="flex gap-1.5">
                 <button
                   onClick={() => setHideBalance(b => !b)}
                   className="w-7 h-7 rounded-lg flex items-center justify-center"
-                   style={{ background: 'rgba(244,63,94,0.1)' }}
+                   style={{ background: 'rgba(59,130,246,0.1)' }}
                 >
                   {hideBalance
-                     ? <EyeOff className="w-3.5 h-3.5 text-rose-500" />
-                     : <Eye className="w-3.5 h-3.5 text-rose-500" />}
+                     ? <EyeOff className="w-3.5 h-3.5 text-blue-600" />
+                     : <Eye className="w-3.5 h-3.5 text-blue-600" />}
                 </button>
                 <button
                   onClick={() => setLocation('/transactions')}
                   className="w-7 h-7 rounded-lg flex items-center justify-center"
-                   style={{ background: 'rgba(244,63,94,0.1)' }}
+                    style={{ background: 'rgba(59,130,246,0.1)' }}
                 >
-                   <ChevronRight className="w-3.5 h-3.5 text-rose-500" />
+                    <ChevronRight className="w-3.5 h-3.5 text-blue-600" />
                 </button>
               </div>
             </div>
@@ -158,35 +158,35 @@ export default function DashboardPage() {
             >
               {isLoading ? '...' : hideBalance ? '••••••' : formatCurrency(dashboard?.investmentBalance ?? 0)}
             </div>
-             <p className="text-rose-700/70 text-xs mb-3">Capital qui travaille pour vous</p>
+             <p className="text-blue-800/70 text-xs mb-3">Capital qui travaille pour vous</p>
 
             <div
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
-               style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.18)' }}
+                style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.18)' }}
             >
-                <span className="text-rose-700/80 text-xs">Maximum autorisé :</span>
-                <span className="text-rose-800 font-bold text-xs">{formatCurrency(maxCapital)}</span>
+                 <span className="text-blue-800/80 text-xs">Maximum autorisé :</span>
+                 <span className="text-blue-900 font-bold text-xs">{formatCurrency(maxCapital)}</span>
             </div>
           </div>
         </div>
 
         {/* ── Gains en direct — Nocturnal emerald card ── */}
         <div
-           className="rounded-2xl p-5 relative overflow-hidden border border-pink-100 shadow-sm"
-            style={{ background: 'linear-gradient(135deg, #ffffff 0%, #fff1f6 50%, #ffffff 100%)' }}
+            className="rounded-2xl p-5 relative overflow-hidden border border-sky-200 shadow-sm"
+             style={{ background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%)' }}
         >
           <StarField />
           {/* Green glow orb */}
           <div
             className="absolute -bottom-8 -right-8 w-44 h-44 rounded-full pointer-events-none"
-             style={{ background: 'radial-gradient(circle, rgba(244,63,94,0.12) 0%, transparent 70%)' }}
+              style={{ background: 'radial-gradient(circle, rgba(14,165,233,0.14) 0%, transparent 70%)' }}
           />
           <div
             className="absolute top-0 left-0 w-32 h-32 rounded-full pointer-events-none"
-             style={{ background: 'radial-gradient(circle, rgba(236,72,153,0.06) 0%, transparent 70%)' }}
+              style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%)' }}
           />
           {/* Emerald border */}
-           <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(244,63,94,0.14)' }} />
+            <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(14,165,233,0.16)' }} />
 
           <div className="relative">
             <div className="flex items-center gap-2 mb-2">
@@ -236,8 +236,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-rose-200 bg-gradient-to-br from-[#fff1f5] via-[#fff7fb] to-[#ffe4ef] p-4 shadow-sm">
-          <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-rose-300/20 blur-2xl" />
+        <div className="relative overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-[#eff6ff] via-[#f8fbff] to-[#e0e7ff] p-4 shadow-sm">
+          <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-blue-300/20 blur-2xl" />
           <div className="relative flex items-center gap-4">
             <img src="/dashboard-investment-icon.png" alt="" className="h-20 w-20 shrink-0 object-contain drop-shadow-[0_0_18px_rgba(244,63,94,.2)]" />
             <div>

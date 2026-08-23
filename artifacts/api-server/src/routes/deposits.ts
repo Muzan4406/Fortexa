@@ -58,7 +58,7 @@ async function saveScreenshot(base64: string, userId: number): Promise<string> {
 
   const filename = `dep_${userId}_${Date.now()}.jpg`;
   await writeFile(join(uploadsDir, filename), buffer);
-  return `/uploads/${filename}`;
+  return `/api/uploads/${filename}`;
 }
 
 // ─── Existing endpoints ───────────────────────────────────────────────────────
