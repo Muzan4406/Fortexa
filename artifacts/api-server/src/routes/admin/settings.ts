@@ -7,8 +7,15 @@ import { getSettings, formatSettings, formatAdminSettings } from "../../lib/sett
 const router: IRouter = Router();
 
 router.get("/admin/settings", requireAdmin, async (_req, res): Promise<void> => {
-  const settings = await getSettings();
-  res.json(formatAdminSettings(settings));
+  try {
+    const settings = await getSettings();
+    res.json(formatAdminSettings(settings));
+  } catch (error) {
+    console.error("Admin settings read failed", error);
+    res.status(500).json({
+      error: "Impossible de lire les paramètres. La base de production doit être mise à jour.",
+    });
+  }
 });
 
 router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
@@ -33,7 +40,6 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     whatsappChannelUrl,
   } = req.body;
 
-  const settings = await getSettings();
   const updates: any = {};
 
   if (dailyRatePercent !== undefined) updates.dailyRatePercent = String(dailyRatePercent);
@@ -80,6 +86,7 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
   }
 
   try {
+    const settings = await getSettings();
     const [updated] = await db
       .update(platformSettingsTable)
       .set(updates)
