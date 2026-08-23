@@ -5,6 +5,7 @@ import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 import { requireAuth } from "../lib/auth";
 import { getSettings } from "../lib/settings";
+import { apiPath } from "../lib/runtime-paths";
 import {
   createPayment,
   getOperators,
@@ -58,7 +59,7 @@ async function saveScreenshot(base64: string, userId: number): Promise<string> {
 
   const filename = `dep_${userId}_${Date.now()}.jpg`;
   await writeFile(join(uploadsDir, filename), buffer);
-  return `/api/uploads/${filename}`;
+  return apiPath(`/uploads/${filename}`);
 }
 
 // ─── Existing endpoints ───────────────────────────────────────────────────────
@@ -185,7 +186,7 @@ router.post("/deposits/initiate", requireAuth, async (req, res): Promise<void> =
     process.env.REPLIT_DEV_DOMAIN ||
     process.env.REPLIT_DOMAINS?.split(",")[0]?.trim();
   const webhookUrl = domain
-    ? `https://${domain}/api/webhooks/sendavapay`
+    ? `https://${domain}${apiPath("/webhooks/sendavapay")}`
     : "";
 
   const externalReference = `fortexa_dep_${userId}_${Date.now()}`;
