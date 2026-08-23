@@ -22,6 +22,7 @@ export const transactionsTable = pgTable("transactions", {
   payerPhone: text("payer_phone"),
   sendavapayRef: text("sendavapay_ref"),
   sendavapayPaymentToken: text("sendavapay_payment_token"),
+  ashtechTransactionId: text("ashtech_transaction_id"),
   txid: text("txid"),
   screenshotPath: text("screenshot_path"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

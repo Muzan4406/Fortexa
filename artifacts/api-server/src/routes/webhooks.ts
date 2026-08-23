@@ -20,11 +20,20 @@ router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
   logger.info({ event: payload.event, reference: payload.reference }, "AshtechPay webhook received");
 
   try {
-    if (payload.event === "payment.completed" && payload.reference) {
+    if (
+      (payload.event === "payment.completed" || payload.status?.toLowerCase() === "success") &&
+      (payload.reference || payload.transaction_id)
+    ) {
+      const references = [payload.reference, payload.transaction_id].filter(
+        (value): value is string => Boolean(value),
+      );
       const [tx] = await db
         .select()
         .from(transactionsTable)
-        .where(eq(transactionsTable.sendavapayRef, payload.reference));
+        .where(or(
+          ...references.map((reference) => eq(transactionsTable.sendavapayRef, reference)),
+          ...references.map((reference) => eq(transactionsTable.ashtechTransactionId, reference)),
+        ));
       if (tx) {
         const credited = await db.transaction(async (trx) => {
           const [approvedTx] = await trx
@@ -47,10 +56,24 @@ router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
         });
         if (credited) await creditReferralCommissions(credited.amount, credited.userId, credited.txId);
       }
-    } else if (payload.event === "payment.failed" && payload.reference) {
+    } else if (
+      (payload.event === "payment.failed" ||
+        payload.event === "payment.expired" ||
+        ["failed", "rejected", "expired"].includes(payload.status?.toLowerCase() ?? "")) &&
+      (payload.reference || payload.transaction_id)
+    ) {
+      const references = [payload.reference, payload.transaction_id].filter(
+        (value): value is string => Boolean(value),
+      );
       await db.update(transactionsTable)
         .set({ status: "rejected", rejectionReason: "Paiement AshtechPay refusé ou expiré" })
-        .where(and(eq(transactionsTable.sendavapayRef, payload.reference), eq(transactionsTable.status, "pending")));
+        .where(and(
+          or(
+            ...references.map((reference) => eq(transactionsTable.sendavapayRef, reference)),
+            ...references.map((reference) => eq(transactionsTable.ashtechTransactionId, reference)),
+          ),
+          eq(transactionsTable.status, "pending"),
+        ));
     }
   } catch (err) {
     logger.error({ err, reference: payload.reference }, "AshtechPay webhook processing error");

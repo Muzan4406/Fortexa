@@ -7,6 +7,7 @@ import { requireAuth } from "../lib/auth";
 import { getSettings } from "../lib/settings";
 import { apiPath } from "../lib/runtime-paths";
 import { logger } from "../lib/logger";
+import { creditReferralCommissions } from "../lib/referral";
 import {
   createPayment,
   getPaymentToken,
@@ -14,7 +15,7 @@ import {
   initiatePayment,
   submitOtp,
 } from "../lib/sendavapay";
-import { collect as ashtechCollect, getCountries as getAshtechCountries } from "../lib/ashtechpay";
+import { collect as ashtechCollect, getCountries as getAshtechCountries, getTransaction as getAshtechTransaction } from "../lib/ashtechpay";
 
 const router: IRouter = Router();
 
@@ -394,6 +395,12 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
       notify_url: notifyUrl,
     });
     if (result.status === 202) {
+      if (result.data.transaction_id) {
+        await db
+          .update(transactionsTable)
+          .set({ ashtechTransactionId: result.data.transaction_id })
+          .where(eq(transactionsTable.id, tx.id));
+      }
       res.json({
         requiresOtp: false,
         requiresRedirect: result.data.flow === "wave",
@@ -403,6 +410,12 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
       return;
     }
     if (result.data.error === "otp_required" || result.data.code === "otp_required") {
+      if (result.data.transaction_id) {
+        await db
+          .update(transactionsTable)
+          .set({ ashtechTransactionId: result.data.transaction_id })
+          .where(eq(transactionsTable.id, tx.id));
+      }
       res.json({
         requiresOtp: true,
         otpToken: result.data.reference ?? tx.sendavapayRef,
@@ -549,6 +562,58 @@ router.get("/deposits/:id/status", requireAuth, async (req, res): Promise<void> 
   if (!tx) {
     res.status(404).json({ error: "Transaction non trouvée" });
     return;
+  }
+
+  // AshtechPay webhooks are the primary confirmation path. Poll AshtechPay as
+  // a fallback because mobile operators can confirm successfully while a
+  // webhook is delayed or unavailable.
+  if (
+    tx.status === "pending" &&
+    tx.sendavapayPaymentToken?.startsWith("ashtech:") &&
+    tx.ashtechTransactionId
+  ) {
+    const settings = await getSettings();
+    const key = settings.ashtechpayKey || process.env.ASHTECHPAY_API_KEY || "";
+    if (key) {
+      try {
+        const providerStatus = await getAshtechTransaction(key, tx.ashtechTransactionId);
+        const providerState = String(providerStatus.data.status ?? "").toLowerCase();
+        if (providerStatus.status < 400 && providerState === "success") {
+          const credited = await db.transaction(async (trx) => {
+            const [approvedTx] = await trx
+              .update(transactionsTable)
+              .set({
+                status: "approved",
+                description: "Dépôt Mobile Money AshtechPay confirmé automatiquement",
+              })
+              .where(and(eq(transactionsTable.id, tx.id), eq(transactionsTable.status, "pending")))
+              .returning();
+            if (!approvedTx) return null;
+            const [user] = await trx.select().from(usersTable).where(eq(usersTable.id, approvedTx.userId));
+            if (!user) throw new Error(`User ${approvedTx.userId} not found`);
+            const amount = Number(providerStatus.data.credited_amount ?? approvedTx.amount);
+            await trx
+              .update(usersTable)
+              .set({
+                investmentBalance: (parseFloat(user.investmentBalance) + amount).toFixed(8),
+                lastGainUpdate: new Date(),
+              })
+              .where(eq(usersTable.id, approvedTx.userId));
+            return { userId: approvedTx.userId, txId: approvedTx.id, amount };
+          });
+          if (credited) await creditReferralCommissions(credited.amount, credited.userId, credited.txId);
+          tx.status = "approved";
+        } else if (providerStatus.status < 400 && ["failed", "rejected", "expired"].includes(providerState)) {
+          await db
+            .update(transactionsTable)
+            .set({ status: "rejected", rejectionReason: "Paiement AshtechPay refusé ou expiré" })
+            .where(and(eq(transactionsTable.id, tx.id), eq(transactionsTable.status, "pending")));
+          tx.status = "rejected";
+        }
+      } catch (error) {
+        logger.warn({ transactionId: tx.id, error }, "AshtechPay status sync failed; keeping deposit pending");
+      }
+    }
   }
 
   res.json({
