@@ -16,7 +16,7 @@ run = "pnpm --filter @workspace/fortexa run dev"
 [services.production]
 build = [ "pnpm", "--filter", "@workspace/fortexa", "run", "build" ]
 serve = "static"
-publicDir = "artifacts/fortexa/dist/public"
+publicDir = "artifacts/fortexa/dist"
 
 [[services.production.rewrites]]
 from = "/*"

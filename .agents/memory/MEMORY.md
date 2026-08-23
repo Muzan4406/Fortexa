@@ -1,4 +1,4 @@
 - [Fortexa architecture](fortexa-arch.md) — JWT auth in localStorage, gains computed server-side, 3-level referral commissions, Express 5 + Drizzle ORM + PostgreSQL
 - [Fortexa API client hooks](fortexa-api-hooks.md) — generated hook names differ from intuition; key patterns for admin approve/reject, user management, announcements
 - [Fortexa admin seeding](fortexa-admin-seed.md) — admin user (admin@fortexa.com / admin123) created via direct SQL; phone column is NOT NULL so must pass empty string
-- [Plesk deployment](plesk-deployment.md) — external hosting needs static frontend, Node API, relative /api proxy, and APP_URL for payment webhooks
+- [Plesk deployment](plesk-deployment.md) — Plesk serves Fortexa from dist, starts app.js, proxies /api, and needs APP_URL for payment webhooks

@@ -7,4 +7,4 @@ Plesk deployment requires a static frontend document root, a separate Node API p
 
 **Why:** Replit-specific `PORT` and domain variables are not guaranteed to exist on external hosting, while the frontend API client expects relative `/api` routes.
 
-**How to apply:** Run `deploy-plesk.sh`, publish `artifacts/fortexa/dist/public`, start `start-plesk.mjs`, proxy `/api` to the Node process, and set `DATABASE_URL`, `SESSION_SECRET`, `APP_URL`, and Sendavapay variables in Plesk.
+**How to apply:** Run `deploy-plesk.sh`, publish `artifacts/fortexa/dist`, start `app.js`, proxy `/api` to the Node process, and set `DATABASE_URL`, `SESSION_SECRET`, `APP_URL`, and Sendavapay variables in Plesk.

@@ -5,18 +5,21 @@
 Dans le déploiement Git de Plesk, utilisez `deploy-plesk.sh` comme script après
 le pull. Il installe les dépendances et compile l'API ainsi que le frontend.
 
-Le build ne nécessite pas de `PORT` ou `BASE_PATH` pour fonctionner sur Plesk.
+Le script utilise pnpm directement lorsqu'il est disponible. Si Plesk affiche
+seulement `npm`, il télécharge temporairement la version compatible de pnpm via
+`npx`.
 
 ## 2. Frontend
 
 Configurez le document root du domaine vers :
 
 ```text
-artifacts/fortexa/dist/public
+artifacts/fortexa/dist
 ```
 
-Activez une réécriture SPA vers `index.html` afin que les routes comme
-`/dashboard`, `/deposit` et `/profile` fonctionnent après un rafraîchissement.
+Ce dossier est créé automatiquement par le build. Activez une réécriture SPA
+vers `index.html` afin que les routes comme `/dashboard`, `/deposit` et
+`/profile` fonctionnent après un rafraîchissement.
 
 ## 3. API Node.js
 
@@ -24,12 +27,13 @@ Créez une application Node.js Plesk avec la racine du projet et le fichier de
 démarrage :
 
 ```text
-start-plesk.mjs
+app.js
 ```
 
 Plesk doit fournir un port à l'application via `PORT`. L'API écoute déjà cette
 variable. Le fichier démarre le bundle déjà compilé, sans dépendre de pnpm au
-moment de l'exécution.
+moment de l'exécution. `start-plesk.mjs` reste disponible comme ancien point
+d'entrée.
 
 Le proxy du domaine doit envoyer `/api` vers ce processus Node.js. Le frontend
 utilise volontairement des URLs relatives `/api/...`.
@@ -61,8 +65,8 @@ projet :
 pnpm --filter @workspace/db run push
 ```
 
-Cette commande applique le schéma Drizzle à la base Supabase existante. Elle
-ne doit pas être lancée avec une autre base par erreur.
+Cette commande applique le schéma Drizzle à la base Supabase existante. Elle ne
+doit pas être lancée avec une autre base par erreur.
 
 ## 6. Redémarrage
 
