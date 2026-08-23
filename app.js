@@ -12,6 +12,10 @@ process.env.DATABASE_URL ??= process.env.SUPABASE_DATABASE_URL;
 
 import("./artifacts/api-server/dist/index.mjs").catch((error) => {
   const reason = error instanceof Error ? error.message : String(error);
+  const safeReason = reason.replace(
+    /((?:postgres(?:ql)?):\/\/)([^@/\s]+)@/gi,
+    "$1***@",
+  );
   console.error("Fortexa API failed to start; serving frontend-only mode:", reason);
   console.error("Fortexa runtime checks:", {
     hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
@@ -53,6 +57,7 @@ import("./artifacts/api-server/dist/index.mjs").catch((error) => {
       res.end(JSON.stringify({
         status: "error",
         message: "Fortexa API failed to start. Check the Node.js application log.",
+        reason: safeReason,
       }));
       return;
     }
