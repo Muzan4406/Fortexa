@@ -25,7 +25,7 @@ export default defineConfig({
     runtimeErrorOverlay(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logo.jpg'],
+      includeAssets: ['fortexa-icon.svg', 'fortexa-og.svg'],
       manifest: {
         name: 'Fortexa',
         short_name: 'Fortexa',
