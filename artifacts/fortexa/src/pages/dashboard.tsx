@@ -80,7 +80,7 @@ export default function DashboardPage() {
   const dailyRate = snapshot?.dailyRatePercent ?? dashboard?.settings?.dailyRatePercent ?? 3;
 
   return (
-    <>
+    <div className="h-[100dvh] overflow-hidden overscroll-none bg-background">
       {/* ── Top bar ── */}
       <div className="bg-background px-4 pt-10 pb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -249,6 +249,6 @@ export default function DashboardPage() {
         </div>
 
       </div>
-    </>
+    </div>
   );
 }

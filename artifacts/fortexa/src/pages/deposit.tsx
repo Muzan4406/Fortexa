@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  useGetDeposits,
   useGetDashboard,
   useInitiateDeposit,
   useConfirmDeposit,
   useSubmitDepositOtp,
   useGetUsdtInfo,
   useCreateUsdtDeposit,
-  getGetDepositsQueryKey,
   getGetDashboardQueryKey,
 } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -36,8 +34,7 @@ import {
   ArrowLeft,
   Upload,
 } from 'lucide-react';
-import { formatCurrency, formatDate } from '@/lib/format';
-import type { TransactionStatus } from '@workspace/api-client-react';
+import { formatCurrency } from '@/lib/format';
 
 // ─── Country data ─────────────────────────────────────────────────────────────
 
@@ -91,12 +88,6 @@ interface XofSession {
   otpToken: string | null;
 }
 
-const STATUS_CONFIG: Record<TransactionStatus, { label: string; icon: typeof Clock; color: string }> = {
-  pending: { label: 'En attente', icon: Clock, color: 'text-amber-600' },
-  approved: { label: 'Approuvé', icon: CheckCircle, color: 'text-green-600' },
-  rejected: { label: 'Rejeté', icon: XCircle, color: 'text-red-600' },
-};
-
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function DepositPage() {
@@ -118,7 +109,6 @@ export default function DepositPage() {
 
   // ── Server data ───────────────────────────────────────────────────────────
   const { data: dashboard } = useGetDashboard();
-  const { data: deposits, isLoading: depositsLoading } = useGetDeposits();
   const { data: usdtInfo } = useGetUsdtInfo();
 
   // ── Mutations ─────────────────────────────────────────────────────────────
@@ -156,7 +146,6 @@ export default function DepositPage() {
           stopPolling();
           setPollingStatus('approved');
           setStep('success');
-          queryClient.invalidateQueries({ queryKey: getGetDepositsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetDashboardQueryKey() });
         } else if (data.status === 'rejected') {
           stopPolling();
@@ -303,7 +292,6 @@ export default function DepositPage() {
       {
         onSuccess: () => {
           setStep('usdt-pending');
-          queryClient.invalidateQueries({ queryKey: getGetDepositsQueryKey() });
         },
         onError: (e: any) => {
           toast({ title: 'Erreur', description: e.data?.error || 'Impossible d\'envoyer la demande', variant: 'destructive' });
@@ -834,86 +822,6 @@ export default function DepositPage() {
         {/* Step content */}
         {renderStep()}
 
-        {/* Deposit history — shown only on form step */}
-        {step === 'form' && (
-          <div className="bg-card rounded-2xl p-6 shadow-lg border border-border">
-            <h2 className="font-semibold text-foreground mb-4">Historique des dépôts</h2>
-
-            {depositsLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 bg-muted/50 rounded-lg animate-pulse" />
-                ))}
-              </div>
-            ) : deposits && deposits.length > 0 ? (
-              <div className="space-y-3">
-                {deposits.map((deposit) => {
-                  const statusInfo = STATUS_CONFIG[deposit.status];
-                  const StatusIcon = statusInfo.icon;
-
-                  return (
-                    <div
-                      key={deposit.id}
-                      className="bg-muted/30 rounded-lg p-4 border border-border"
-                    >
-                      <div className="flex items-start justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <StatusIcon className={`w-4 h-4 ${statusInfo.color}`} />
-                          <span className={`text-sm font-medium ${statusInfo.color}`}>
-                            {statusInfo.label}
-                          </span>
-                          {deposit.depositMethod && (
-                            <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-                              {deposit.depositMethod === 'mobile_money' ? '📱 Mobile Money' : '₿ USDT'}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-lg font-bold text-foreground">
-                          {formatCurrency(deposit.amount)}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{formatDate(deposit.createdAt)}</p>
-                      <div className="mt-3 rounded-xl bg-muted/40 border border-border p-3 space-y-1.5">
-                        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Informations du dépôt</p>
-                        <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-                          <p className="text-xs text-foreground">Montant : <span className="font-semibold">{formatCurrency(deposit.amount)}</span></p>
-                          <p className="text-xs text-foreground">Frais : <span className="font-semibold">{formatCurrency(deposit.fee)}</span></p>
-                          <p className="text-xs text-foreground">Net crédité : <span className="font-semibold">{formatCurrency(deposit.netAmount)}</span></p>
-                          <p className="text-xs text-foreground">Statut : <span className={`font-semibold ${statusInfo.color}`}>{statusInfo.label}</span></p>
-                        </div>
-                        {deposit.depositMethod === 'mobile_money' && (
-                          <>
-                            <p className="text-xs text-foreground">Méthode : <span className="font-semibold">Mobile Money</span></p>
-                            {deposit.payerCountry && <p className="text-xs text-foreground">Pays : <span className="font-semibold">{COUNTRIES.find(c => c.code === deposit.payerCountry)?.name ?? deposit.payerCountry}</span></p>}
-                            {deposit.payerPhone && <p className="text-xs text-foreground">Numéro : <span className="font-mono font-semibold">{deposit.payerPhone}</span></p>}
-                            {deposit.sendavapayRef && <p className="text-xs text-foreground break-all">Référence : <span className="font-mono font-semibold">{deposit.sendavapayRef}</span></p>}
-                          </>
-                        )}
-                        {deposit.depositMethod === 'usdt' && (
-                          <>
-                            <p className="text-xs text-foreground">Méthode : <span className="font-semibold">USDT BEP20</span></p>
-                            {deposit.payerCountry && <p className="text-xs text-foreground">Pays : <span className="font-semibold">{COUNTRIES.find(c => c.code === deposit.payerCountry)?.name ?? deposit.payerCountry}</span></p>}
-                            {deposit.txid && <p className="text-xs text-foreground break-all">TXID : <span className="font-mono font-semibold">{deposit.txid}</span></p>}
-                            {deposit.screenshotPath && <a href={deposit.screenshotPath} target="_blank" rel="noopener noreferrer" className="text-xs text-primary font-semibold">Voir la preuve de paiement</a>}
-                          </>
-                        )}
-                        {!deposit.depositMethod && <p className="text-xs text-muted-foreground">Dépôt manuel — en attente de traitement</p>}
-                      </div>
-                      {deposit.rejectionReason && (
-                        <p className="text-sm text-red-600 mt-1">{deposit.rejectionReason}</p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <ArrowDownCircle className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
-                <p className="text-muted-foreground">Aucun dépôt pour le moment</p>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </>
   );

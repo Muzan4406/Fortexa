@@ -60,7 +60,7 @@ export default function ReferralsPage() {
   const total = (referralInfo?.level1Count ?? 0) + (referralInfo?.level2Count ?? 0) + (referralInfo?.level3Count ?? 0);
 
   return (
-    <div className="min-h-screen bg-[#fffafb] pb-5 text-slate-900">
+    <div className="h-[100dvh] overflow-hidden overscroll-none bg-[#fffafb] pb-5 text-slate-900">
       <header className="flex items-center justify-between border-b border-rose-100 bg-white px-4 pb-3 pt-8">
         <div className="flex items-center gap-2">
           <img src="/logo.jpg" alt="Fortexa" className="h-8 w-8 rounded-full object-cover" />

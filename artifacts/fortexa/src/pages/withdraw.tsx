@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
-  useGetDashboard, useGetWithdrawals, useCreateWithdrawal,
-  getGetWithdrawalsQueryKey, getGetDashboardQueryKey,
+  useGetDashboard, useCreateWithdrawal,
+  getGetDashboardQueryKey,
 } from '@workspace/api-client-react';
 import { useAuth } from '@/lib/auth-context';
 import { useForm } from 'react-hook-form';
@@ -17,8 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowUpCircle, CheckCircle, Clock, XCircle, AlertCircle, Smartphone, Wallet } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { useQueryClient } from '@tanstack/react-query';
-import type { TransactionStatus } from '@workspace/api-client-react';
-
 // ── Mobile Money countries (same 4 as deposit) ─────────────────────────────
 const XOF_COUNTRY_CODES = new Set(['TG', 'BJ', 'BF', 'CI']);
 
@@ -37,18 +35,11 @@ const usdtSchema = z.object({
 
 type WithdrawalForm = z.infer<typeof mobileMoneySchema>;
 
-const STATUS_CONFIG: Record<TransactionStatus, { label: string; icon: any; color: string }> = {
-  pending:  { label: 'En attente', icon: Clock,        color: 'text-amber-500' },
-  approved: { label: 'Approuvé',   icon: CheckCircle,  color: 'text-emerald-500' },
-  rejected: { label: 'Rejeté',     icon: XCircle,      color: 'text-red-500' },
-};
-
 export default function WithdrawPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { data: dashboard } = useGetDashboard();
-  const { data: withdrawals, isLoading } = useGetWithdrawals();
   const createWithdrawalMutation = useCreateWithdrawal();
 
   // Detect country-based payment method
@@ -86,7 +77,6 @@ export default function WithdrawPage() {
         onSuccess: () => {
           toast({ title: 'Demande de retrait créée', description: 'Votre demande sera traitée sous peu' });
           form.reset();
-          queryClient.invalidateQueries({ queryKey: getGetWithdrawalsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetDashboardQueryKey() });
         },
         onError: (error: any) => {
@@ -259,68 +249,6 @@ export default function WithdrawPage() {
           </Form>
         </div>
 
-        {/* ── Withdrawal history ── */}
-        <div className="bg-card rounded-2xl p-6 shadow-lg border border-border">
-          <h2 className="font-semibold text-foreground mb-4">Historique des retraits</h2>
-
-          {isLoading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="h-20 bg-muted/50 rounded-lg animate-pulse" />
-              ))}
-            </div>
-          ) : withdrawals && withdrawals.length > 0 ? (
-            <div className="space-y-3">
-              {withdrawals.map(withdrawal => {
-                const statusInfo = STATUS_CONFIG[withdrawal.status];
-                const StatusIcon = statusInfo.icon;
-                return (
-                  <div
-                    key={withdrawal.id}
-                    className="bg-muted/30 rounded-lg p-4 border border-border"
-                    data-testid={`withdrawal-${withdrawal.id}`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <StatusIcon className={`w-4 h-4 ${statusInfo.color}`} />
-                        <span className={`text-sm font-medium ${statusInfo.color}`}>
-                          {statusInfo.label}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-foreground">{formatCurrency(withdrawal.amount)}</p>
-                        <p className="text-xs text-muted-foreground">Net : {formatCurrency(withdrawal.netAmount)}</p>
-                      </div>
-                    </div>
-                    {withdrawal.description && (
-                      <p className="text-xs text-muted-foreground mb-1 font-mono truncate">{withdrawal.description}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">{formatDate(withdrawal.createdAt)}</p>
-                    <div className="mt-3 space-y-1.5 rounded-xl border border-border bg-muted/40 p-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Informations du retrait</p>
-                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
-                        <p><span className="text-muted-foreground">Moyen :</span> <span className="font-semibold">{withdrawal.depositMethod === 'mobile_money' ? 'Mobile Money' : withdrawal.depositMethod === 'usdt' ? 'USDT BEP20' : 'Non renseigné'}</span></p>
-                        <p><span className="text-muted-foreground">Pays :</span> <span className="font-semibold">{withdrawal.payerCountry || country || 'Non renseigné'}</span></p>
-                        <p><span className="text-muted-foreground">Montant :</span> <span className="font-semibold">{formatCurrency(withdrawal.amount)}</span></p>
-                        <p><span className="text-muted-foreground">Frais :</span> <span className="font-semibold">{formatCurrency(withdrawal.fee)}</span></p>
-                        {withdrawal.payerPhone && <p className="col-span-2"><span className="text-muted-foreground">Numéro :</span> <span className="font-mono font-semibold">{withdrawal.payerPhone}</span></p>}
-                        {withdrawal.description && <p className="col-span-2 break-all text-muted-foreground"><span className="font-semibold">Détail :</span> {withdrawal.description}</p>}
-                      </div>
-                    </div>
-                    {withdrawal.rejectionReason && (
-                      <p className="text-sm text-red-600 mt-2">{withdrawal.rejectionReason}</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <ArrowUpCircle className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
-              <p className="text-muted-foreground">Aucun retrait pour le moment</p>
-            </div>
-          )}
-        </div>
       </div>
     </>
   );

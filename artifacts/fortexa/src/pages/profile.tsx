@@ -36,7 +36,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <>
+    <div className="h-[100dvh] overflow-hidden overscroll-none bg-background">
       {/* ── Header : logo + nom ── */}
       <div className="bg-background border-b border-border px-5 pt-4 pb-4 relative">
         {/* hamburger */}
@@ -172,6 +172,6 @@ export default function ProfilePage() {
           Se déconnecter
         </button>
       </div>
-    </>
+    </div>
   );
 }
