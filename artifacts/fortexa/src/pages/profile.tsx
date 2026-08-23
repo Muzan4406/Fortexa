@@ -77,6 +77,28 @@ export default function ProfilePage() {
           </div>
         )}
 
+        {/* ── Dépôt / Retrait ── */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => setLocation('/deposit')}
+            className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-green-500 flex items-center justify-center shadow-sm">
+              <img src="/investment-icon.png" alt="" className="w-8 h-8 object-contain" />
+            </div>
+            <span className="text-sm font-semibold text-foreground">Déposer</span>
+          </button>
+          <button
+            onClick={() => setLocation('/withdraw')}
+            className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-blue-500 flex items-center justify-center shadow-sm">
+              <img src="/withdrawal-icon.png" alt="" className="w-8 h-8 object-contain" />
+            </div>
+            <span className="text-sm font-semibold text-foreground">Retirer</span>
+          </button>
+        </div>
+
         {/* ── Admin ── */}
         {user?.role === 'admin' && (
           <button
