@@ -38,7 +38,9 @@ const MOBILE_MONEY_OPERATORS: Record<string, string[]> = {
 
 // ── Schemas ─────────────────────────────────────────────────────────────────
 const mobileMoneySchema = z.object({
-  country: z.string().min(2, 'Pays de retrait invalide'),
+  // The country is read-only and comes from the authenticated account.
+  // The API performs the authoritative country/method validation.
+  country: z.string().optional(),
   operator: z.string().min(2, 'Opérateur Mobile Money requis'),
   amount: z.coerce.number().min(3000, 'Montant minimum : 3 000 FCFA'),
   phone: z.string().min(8, 'Numéro de téléphone invalide (minimum 8 chiffres)'),
@@ -94,7 +96,7 @@ export default function WithdrawPage() {
     }
 
     const payload = isMobileMoney
-      ? { amount: data.amount, country: data.country, operator: data.operator, phone: data.phone }
+      ? { amount: data.amount, country, operator: data.operator, phone: data.phone }
       : { amount: data.amount, usdtAddress: data.usdtAddress };
 
     createWithdrawalMutation.mutate(
