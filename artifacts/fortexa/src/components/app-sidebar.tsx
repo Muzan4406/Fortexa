@@ -5,8 +5,8 @@ import { Home, FileText, Network, User, X, LogOut, Shield } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/dashboard',    icon: Home,     label: 'Accueil'                  },
-   { href: '/referrals',    icon: Network,  label: 'Communauté'               },
-  { href: '/transactions', icon: FileText, label: 'Historique de transaction' },
+  { href: '/referrals',    icon: Network,  image: '/team-icon.png', label: 'Communauté'               },
+  { href: '/transactions', icon: FileText, image: '/withdrawal-clock-icon.png', label: 'Historique de transaction' },
   { href: '/profile',      icon: User,     label: 'Compte'                   },
 ];
 
@@ -71,7 +71,7 @@ export function AppSidebar() {
           <div className="relative flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
               <img
-                src="/icon-192.png"
+                src="/logo.jpg"
                 alt="Fortexa"
                 className="h-12 w-12 shrink-0 rounded-full border-2 border-pink-300/70 bg-white object-cover shadow-lg shadow-blue-950/30"
               />
@@ -109,7 +109,7 @@ export function AppSidebar() {
           className="flex-1 px-3 py-4 space-y-1 overflow-y-auto"
           style={{ borderRight: '1px solid rgba(255,255,255,0.05)' }}
         >
-          {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
+          {NAV_ITEMS.map(({ href, icon: Icon, image, label }) => {
             const isActive = location === href;
             return (
               <button
@@ -124,7 +124,11 @@ export function AppSidebar() {
                    color: '#f9a8d4',
                 } : { color: 'rgba(255,255,255,0.5)', border: '1px solid transparent' }}
               >
-                <Icon className="w-5 h-5 shrink-0" strokeWidth={isActive ? 2.5 : 2} />
+                 {image ? (
+                   <img src={image} alt="" className="h-5 w-5 shrink-0 object-contain" />
+                 ) : (
+                   <Icon className="w-5 h-5 shrink-0" strokeWidth={isActive ? 2.5 : 2} />
+                 )}
                 <span className={`text-sm ${isActive ? 'font-semibold' : 'font-medium'}`}>{label}</span>
               </button>
             );

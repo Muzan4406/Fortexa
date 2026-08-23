@@ -1360,6 +1360,12 @@ components:
         phone:
           type: string
           description: Numéro de téléphone Mobile Money (TG, BJ, BF, CI)
+        country:
+          type: string
+          description: Code du pays Mobile Money du compte (TG, BJ, BF, CI)
+        operator:
+          type: string
+          description: Opérateur Mobile Money choisi pour le retrait
 
     # ── Referrals ──
 

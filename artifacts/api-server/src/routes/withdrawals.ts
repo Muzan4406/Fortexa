@@ -6,7 +6,19 @@ import { getSettings } from "../lib/settings";
 import { updateGainBalance } from "../lib/gains";
 
 const router: IRouter = Router();
-const MOBILE_MONEY_COUNTRIES = new Set(["TG", "BJ", "BF", "CI"]);
+const MOBILE_MONEY_COUNTRIES = new Set(["TG", "BJ", "BF", "CI", "Togo", "Bénin", "Burkina Faso", "Côte d'Ivoire"]);
+const COUNTRY_CODES: Record<string, string> = {
+  TG: "Togo",
+  BJ: "Bénin",
+  BF: "Burkina Faso",
+  CI: "Côte d'Ivoire",
+};
+const MOBILE_MONEY_OPERATORS: Record<string, Set<string>> = {
+  TG: new Set(["Togocel", "Moov Africa"]),
+  BJ: new Set(["MTN Mobile Money", "Moov Africa"]),
+  BF: new Set(["Orange Money", "Moov Africa"]),
+  CI: new Set(["Orange Money", "MTN MoMo", "Moov Money", "Wave"]),
+};
 
 function formatTx(t: typeof transactionsTable.$inferSelect) {
   return {
@@ -42,7 +54,7 @@ router.get("/withdrawals", requireAuth, async (req, res): Promise<void> => {
 
 router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
   const userId = req.userId!;
-  const { amount, usdtAddress, phone } = req.body;
+  const { amount, usdtAddress, phone, country, operator } = req.body;
 
   const numAmount = parseFloat(amount);
   if (!numAmount || isNaN(numAmount)) {
@@ -68,9 +80,20 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
   }
 
   const mobileMoneyUser = MOBILE_MONEY_COUNTRIES.has(user.country);
-  if (mobileMoneyUser && (!phone || typeof phone !== "string" || !/^\d{6,12}$/.test(phone.trim()))) {
-    res.status(400).json({ error: "Un numéro Mobile Money valide est requis pour votre pays" });
-    return;
+  const operatorCountry = COUNTRY_CODES[user.country] ?? user.country;
+  if (mobileMoneyUser) {
+    if (country !== user.country) {
+      res.status(400).json({ error: "Le pays du retrait doit correspondre au pays du compte" });
+      return;
+    }
+    if (!operator || typeof operator !== "string" || !MOBILE_MONEY_OPERATORS[operatorCountry]?.has(operator)) {
+      res.status(400).json({ error: "Un opérateur Mobile Money valide est requis pour votre pays" });
+      return;
+    }
+    if (!phone || typeof phone !== "string" || !/^\d{6,12}$/.test(phone.trim())) {
+      res.status(400).json({ error: "Un numéro Mobile Money valide est requis pour votre pays" });
+      return;
+    }
   }
   if (!mobileMoneyUser && (!usdtAddress || typeof usdtAddress !== "string" || usdtAddress.trim().length < 26)) {
     res.status(400).json({ error: "Une adresse USDT BEP20 valide est requise pour votre pays" });
@@ -102,10 +125,10 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
     netAmount: netAmount.toFixed(8),
     status: "pending",
     depositMethod: withdrawalMethod,
-    payerCountry: user.country,
+    payerCountry: mobileMoneyUser ? country : user.country,
     payerPhone: mobileMoneyUser ? phone.trim() : null,
     description: phone
-        ? `Retrait Mobile Money → ${phone}`
+        ? `Retrait Mobile Money — ${country} — ${operator} — ${phone}`
         : usdtAddress
           ? `Retrait → USDT BEP20 : ${usdtAddress}`
           : "Demande de retrait",

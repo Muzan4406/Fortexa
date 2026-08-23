@@ -358,7 +358,9 @@ export const createWithdrawalBodyAmountMin = 3000;
 export const CreateWithdrawalBody = zod.object({
   "amount": zod.number().min(createWithdrawalBodyAmountMin),
   "usdtAddress": zod.string().optional().describe('Adresse USDT BEP20 pour le virement (pays hors-XOF)'),
-  "phone": zod.string().optional().describe('Numéro de téléphone Mobile Money (TG, BJ, BF, CI)')
+  "phone": zod.string().optional().describe('Numéro de téléphone Mobile Money (TG, BJ, BF, CI)'),
+  "country": zod.string().optional().describe('Code du pays Mobile Money du compte (TG, BJ, BF, CI)'),
+  "operator": zod.string().optional().describe('Opérateur Mobile Money choisi pour le retrait')
 })
 
 export const CreateWithdrawalResponse = zod.object({

@@ -24,6 +24,9 @@ description: Key architectural decisions for the Fortexa investment platform
 - `phone` column on users is NOT NULL (pass empty string `''` for admin seed)
 - Run `pnpm run typecheck:libs` after schema changes to rebuild declarations
 
+## Country values
+- User country selections are stored as localized country names (for example `Togo` and `Bénin`), not ISO codes; payment rules should accept or normalize both forms.
+
 ## Admin user
 - Email: admin@fortexa.com / Password: admin123
 - Created via direct SQL with bcrypt hash (cost 10)

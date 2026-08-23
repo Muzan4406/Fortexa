@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useGetDashboard, useCreateWithdrawal,
   getGetDashboardQueryKey,
@@ -18,16 +18,36 @@ import { ArrowUpCircle, CheckCircle, Clock, XCircle, AlertCircle, Smartphone, Wa
 import { formatCurrency, formatDate } from '@/lib/format';
 import { useQueryClient } from '@tanstack/react-query';
 // ── Mobile Money countries (same 4 as deposit) ─────────────────────────────
-const XOF_COUNTRY_CODES = new Set(['TG', 'BJ', 'BF', 'CI']);
+const XOF_COUNTRY_CODES = new Set(['TG', 'BJ', 'BF', 'CI', 'Togo', 'Bénin', 'Burkina Faso', "Côte d'Ivoire"]);
+const COUNTRY_NAMES: Record<string, string> = {
+  TG: 'Togo',
+  BJ: 'Bénin',
+  BF: 'Burkina Faso',
+  CI: "Côte d'Ivoire",
+};
+const MOBILE_MONEY_OPERATORS: Record<string, string[]> = {
+  TG: ['Togocel', 'Moov Africa'],
+  BJ: ['MTN Mobile Money', 'Moov Africa'],
+  BF: ['Orange Money', 'Moov Africa'],
+  CI: ['Orange Money', 'MTN MoMo', 'Moov Money', 'Wave'],
+  Togo: ['Togocel', 'Moov Africa'],
+  Bénin: ['MTN Mobile Money', 'Moov Africa'],
+  'Burkina Faso': ['Orange Money', 'Moov Africa'],
+  "Côte d'Ivoire": ['Orange Money', 'MTN MoMo', 'Moov Money', 'Wave'],
+};
 
 // ── Schemas ─────────────────────────────────────────────────────────────────
 const mobileMoneySchema = z.object({
+  country: z.string().length(2, 'Pays de retrait invalide'),
+  operator: z.string().min(2, 'Opérateur Mobile Money requis'),
   amount: z.coerce.number().min(3000, 'Montant minimum : 3 000 FCFA'),
   phone: z.string().min(8, 'Numéro de téléphone invalide (minimum 8 chiffres)'),
   usdtAddress: z.string().optional(),
 });
 
 const usdtSchema = z.object({
+  country: z.string().optional(),
+  operator: z.string().optional(),
   amount: z.coerce.number().min(3000, 'Montant minimum : 3 000 FCFA'),
   usdtAddress: z.string().min(26, 'Adresse USDT invalide (minimum 26 caractères)'),
   phone: z.string().optional(),
@@ -49,11 +69,17 @@ export default function WithdrawPage() {
   const form = useForm<WithdrawalForm>({
     resolver: zodResolver(isMobileMoney ? mobileMoneySchema : usdtSchema),
     defaultValues: {
+      country,
+      operator: '',
       amount: 3000,
       phone: '',
       usdtAddress: '',
     },
   });
+
+  useEffect(() => {
+    if (country) form.setValue('country', country);
+  }, [country, form]);
 
   const watchAmount = form.watch('amount');
   const feePercent = dashboard?.settings.withdrawalFeePercent || 5;
@@ -68,7 +94,7 @@ export default function WithdrawPage() {
     }
 
     const payload = isMobileMoney
-      ? { amount: data.amount, phone: data.phone }
+      ? { amount: data.amount, country: data.country, operator: data.operator, phone: data.phone }
       : { amount: data.amount, usdtAddress: data.usdtAddress };
 
     createWithdrawalMutation.mutate(
@@ -143,33 +169,56 @@ export default function WithdrawPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 
-              {/* ── Mobile Money: phone field ── */}
+              {/* ── Mobile Money: country, operator and phone fields ── */}
               {isMobileMoney ? (
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Smartphone className="w-4 h-4 text-emerald-600" />
-                        Numéro Mobile Money
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Ex : 90123456"
-                          type="tel"
-                          {...field}
-                          data-testid="input-phone"
-                          className="h-12 text-base font-mono"
-                        />
-                      </FormControl>
-                      <FormDescription className="text-xs">
-                        Numéro de téléphone enregistré sur votre compte Mobile Money
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <>
+                  <FormField
+                    control={form.control}
+                    name="country"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pays du retrait</FormLabel>
+                        <FormControl>
+                          <select {...field} disabled className="flex h-12 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground">
+                            <option value={country}>{COUNTRY_NAMES[country] ?? country}</option>
+                          </select>
+                        </FormControl>
+                        <FormDescription className="text-xs">Pays enregistré sur votre compte</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="operator"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2"><Smartphone className="h-4 w-4 text-emerald-600" />Opérateur Mobile Money</FormLabel>
+                        <FormControl>
+                          <select {...field} className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground">
+                            <option value="">Sélectionnez votre opérateur</option>
+                            {(MOBILE_MONEY_OPERATORS[country] ?? []).map((operator) => <option key={operator} value={operator}>{operator}</option>)}
+                          </select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Numéro Mobile Money</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex : 90123456" type="tel" {...field} data-testid="input-phone" className="h-12 text-base font-mono" />
+                        </FormControl>
+                        <FormDescription className="text-xs">Numéro de téléphone enregistré sur votre compte Mobile Money</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
               ) : (
                 /* ── USDT: address field ── */
                 <FormField
