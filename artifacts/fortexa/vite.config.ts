@@ -25,7 +25,7 @@ export default defineConfig({
     runtimeErrorOverlay(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['fortexa-icon.svg', 'fortexa-og.svg'],
+      includeAssets: ['logo.jpg', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'apple-touch-icon.png', 'og-image.png'],
       manifest: {
         name: 'Fortexa',
         short_name: 'Fortexa',
@@ -40,19 +40,20 @@ export default defineConfig({
         categories: ['finance'],
         icons: [
           {
-      src: 'fortexa-icon.svg',
-      sizes: 'any',
-      type: 'image/svg+xml',
+            src: 'icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
           },
           {
-      src: 'fortexa-icon.svg',
-      sizes: 'any',
-      type: 'image/svg+xml',
+            src: 'icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
           },
           {
-      src: 'fortexa-icon.svg',
-      sizes: 'any',
-      type: 'image/svg+xml',
+            src: 'icon-512-maskable.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },
