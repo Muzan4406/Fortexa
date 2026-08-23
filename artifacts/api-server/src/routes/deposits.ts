@@ -305,7 +305,11 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
   });
 
   if (!result.success) {
-    res.status(400).json({ error: result.error ?? "Échec de l'initiation du paiement" });
+    logger.warn(
+      { transactionId: tx.id, payerCountry: tx.payerCountry, operatorId: String(operatorId), code: result.code, providerMessage: result.error ?? result.message },
+      "Sendavapay payment initiation failed",
+    );
+    res.status(400).json({ error: result.error ?? result.message ?? "Échec de l'initiation du paiement" });
     return;
   }
 

@@ -3,6 +3,7 @@ import { db, usersTable, referralCommissionsTable } from "@workspace/db";
 import { eq, count } from "drizzle-orm";
 import { requireAuth } from "../lib/auth";
 import { webPath } from "../lib/runtime-paths";
+import { getSettings } from "../lib/settings";
 
 const router: IRouter = Router();
 
@@ -79,6 +80,7 @@ router.get("/referrals", requireAuth, async (req, res): Promise<void> => {
   );
 
   const totalCommissions = commissionRecords.reduce((sum, c) => sum + c.amount, 0);
+  const settings = await getSettings();
   const configuredUrl = process.env.APP_URL?.trim().replace(/\/+$/, "");
   const forwardedProto = String(req.headers["x-forwarded-proto"] ?? "").split(",")[0].trim();
   const baseUrl = configuredUrl || `${forwardedProto || req.protocol}://${req.get("host")}`;
@@ -90,6 +92,9 @@ router.get("/referrals", requireAuth, async (req, res): Promise<void> => {
     level1Count: level1Users.length,
     level2Count,
     level3Count,
+    level1Percent: parseFloat(settings.level1Percent),
+    level2Percent: parseFloat(settings.level2Percent),
+    level3Percent: parseFloat(settings.level3Percent),
     commissions: commissionRecords,
   });
 });

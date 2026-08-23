@@ -19,6 +19,9 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     minWithdrawal,
     withdrawalFeePercent,
     gainsActive,
+    level1Percent,
+    level2Percent,
+    level3Percent,
     sendavapayKey,
     sendavapayWebhookSecret,
     usdtAddress,
@@ -37,6 +40,9 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
   if (minWithdrawal !== undefined) updates.minWithdrawal = String(minWithdrawal);
   if (withdrawalFeePercent !== undefined) updates.withdrawalFeePercent = String(withdrawalFeePercent);
   if (gainsActive !== undefined) updates.gainsActive = gainsActive;
+  if (level1Percent !== undefined) updates.level1Percent = String(level1Percent);
+  if (level2Percent !== undefined) updates.level2Percent = String(level2Percent);
+  if (level3Percent !== undefined) updates.level3Percent = String(level3Percent);
   // Only update payment keys if a non-empty value is provided (prevents accidental clearing)
   if (sendavapayKey && typeof sendavapayKey === "string" && sendavapayKey.trim().length > 0) {
     updates.sendavapayKey = sendavapayKey.trim();

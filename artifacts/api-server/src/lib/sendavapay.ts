@@ -154,7 +154,11 @@ export async function initiatePayment(params: InitiatePaymentParams): Promise<In
     headers: corsHeaders(),
     body: JSON.stringify(params),
   });
-  return res.json() as Promise<InitiatePaymentResult>;
+  const result = await res.json() as InitiatePaymentResult;
+  if (!result.success && !result.error && result.message) {
+    result.error = result.message;
+  }
+  return result;
 }
 
 export interface SubmitOtpResult {

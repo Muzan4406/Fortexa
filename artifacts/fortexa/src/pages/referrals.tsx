@@ -6,9 +6,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useSidebar } from '@/lib/sidebar-context';
 
 const LEVELS = [
-  { key: 'LV1', count: 'level1Count' as const, percent: 5, tone: 'from-rose-500 to-pink-500' },
-  { key: 'LV2', count: 'level2Count' as const, percent: 3, tone: 'from-pink-500 to-fuchsia-500' },
-  { key: 'LV3', count: 'level3Count' as const, percent: 2, tone: 'from-fuchsia-500 to-purple-500' },
+  { key: 'LV1', count: 'level1Count' as const, percent: 'level1Percent' as const, tone: 'from-rose-500 to-pink-500' },
+  { key: 'LV2', count: 'level2Count' as const, percent: 'level2Percent' as const, tone: 'from-pink-500 to-fuchsia-500' },
+  { key: 'LV3', count: 'level3Count' as const, percent: 'level3Percent' as const, tone: 'from-fuchsia-500 to-purple-500' },
 ];
 
 function ProgressRing({ percent }: { percent: number }) {
@@ -116,6 +116,7 @@ export default function ReferralsPage() {
           </div>
           {LEVELS.map((level) => {
             const count = referralInfo?.[level.count] ?? 0;
+            const percent = referralInfo?.[level.percent] ?? 0;
             return (
               <div key={level.key} className="grid grid-cols-[72px_52px_1fr_52px] items-center gap-2 border-b border-slate-50 px-3 py-2 last:border-0">
                 <div className={`rounded-xl bg-gradient-to-r ${level.tone} py-2.5 text-center text-sm font-black text-white shadow-sm`}>{level.key}</div>
