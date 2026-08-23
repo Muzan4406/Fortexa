@@ -5,6 +5,11 @@ Cette configuration déploie Fortexa directement sur le domaine principal
 application Node.js ne peut pas utiliser la même racine ou le même domaine
 principal en même temps.
 
+Le frontend est servi même si les variables de base de données ou de paiement
+ne sont pas encore configurées. Ces variables sont nécessaires pour la
+connexion, les dépôts, les retraits et l'administration, mais pas pour afficher
+la page d'accueil et la page de connexion.
+
 ## 1. Déploiement Git
 
 Dans le déploiement Git de Plesk, utilisez `deploy-plesk.sh` comme script après
