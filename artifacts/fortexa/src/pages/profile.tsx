@@ -1,7 +1,7 @@
 import { useAuth } from '@/lib/auth-context';
 import { useLocation } from 'wouter';
 import {
-  ChevronRight, Shield, Headphones, Info, LogOut, Menu, KeyRound, X, ArrowDownToLine, ArrowUpFromLine,
+  ChevronRight, Shield, Headphones, Info, LogOut, Menu, KeyRound, X,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useUpdatePassword } from '@workspace/api-client-react';
@@ -84,7 +84,7 @@ export default function ProfilePage() {
             className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="w-12 h-12 rounded-2xl bg-green-500 flex items-center justify-center shadow-sm">
-              <ArrowDownToLine className="h-7 w-7 text-white" strokeWidth={2} />
+              <img src="/investment-icon.png" alt="" className="h-8 w-8 object-contain" />
             </div>
             <span className="text-sm font-semibold text-foreground">Déposer</span>
           </button>
@@ -93,7 +93,7 @@ export default function ProfilePage() {
             className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="w-12 h-12 rounded-2xl bg-blue-500 flex items-center justify-center shadow-sm">
-              <ArrowUpFromLine className="h-7 w-7 text-white" strokeWidth={2} />
+              <img src="/withdrawal-icon.png" alt="" className="h-8 w-8 object-contain" />
             </div>
             <span className="text-sm font-semibold text-foreground">Retirer</span>
           </button>

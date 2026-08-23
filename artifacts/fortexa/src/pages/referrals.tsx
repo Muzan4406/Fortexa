@@ -77,9 +77,7 @@ export default function ReferralsPage() {
       <main className="space-y-3 px-3 pt-3">
         <section className="rounded-2xl border border-rose-100 bg-gradient-to-br from-white via-rose-50 to-pink-100 p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-rose-500 shadow-sm">
-              <UsersRound className="h-8 w-8" strokeWidth={1.8} />
-            </div>
+            <img src="/team-icon.png" alt="" className="h-14 w-14 rounded-2xl bg-white p-1.5 object-contain shadow-sm" />
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-rose-500">Votre communauté</p>
               <h1 className="mt-1 text-2xl font-black leading-tight text-slate-900">Votre équipe</h1>

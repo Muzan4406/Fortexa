@@ -4,7 +4,7 @@ import { useGetDashboard, useGetGainsSnapshot, useGetAnnouncements } from '@work
 import { formatCurrency } from '@/lib/format';
 import { useLocation } from 'wouter';
 import { useSidebar } from '@/lib/sidebar-context';
-import { Bell, Eye, EyeOff, ChevronRight, Menu, TrendingUp, Zap, BriefcaseBusiness } from 'lucide-react';
+import { Bell, Eye, EyeOff, ChevronRight, Menu, TrendingUp, Zap } from 'lucide-react';
 
 /* ── Constellation background SVG ── */
 function StarField({ className }: { className?: string }) {
@@ -239,9 +239,7 @@ export default function DashboardPage() {
         <div className="relative overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-[#eff6ff] via-[#f8fbff] to-[#e0e7ff] p-4 shadow-sm">
           <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-blue-300/20 blur-2xl" />
           <div className="relative flex items-center gap-4">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white/80 text-rose-500 shadow-sm">
-              <BriefcaseBusiness className="h-10 w-10" strokeWidth={1.8} />
-            </div>
+            <img src="/dashboard-investment-icon.png" alt="" className="h-20 w-20 shrink-0 object-contain drop-shadow-[0_0_18px_rgba(244,63,95,.2)]" />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-rose-500/80">Votre argent travaille</p>
               <p className="mt-1 text-sm font-semibold text-slate-900">Investissez avec confiance</p>
