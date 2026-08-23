@@ -49,7 +49,7 @@ export default function ProfilePage() {
 
         <div className="flex flex-col items-center pt-1">
           <img
-            src="/logo.jpg"
+            src="/fortexa-icon.svg"
             alt="Fortexa"
             className="w-14 h-14 rounded-full object-cover border-3 border-border shadow-lg mb-2"
           />

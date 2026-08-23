@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#eef6ff"/>
+  <circle cx="270" cy="315" r="150" fill="#fff" stroke="#b8e5df" stroke-width="14"/>
+  <circle cx="270" cy="315" r="105" fill="#142743" stroke="#ef3340" stroke-width="11"/>
+  <path d="M205 365v-58h25v58h20V270h25v95h20V240h25v125h25" fill="none" stroke="#fff" stroke-width="15" stroke-linejoin="round"/>
+  <path d="M190 352l48-38 30 16 67-68" fill="none" stroke="#ef3340" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="500" y="315" fill="#142743" font-family="Arial, sans-serif" font-size="82" font-weight="700">Fortexa</text>
+  <text x="505" y="385" fill="#52657d" font-family="Arial, sans-serif" font-size="34">Votre capital, nos résultats</text>
+</svg>

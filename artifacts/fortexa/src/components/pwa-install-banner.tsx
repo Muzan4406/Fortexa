@@ -70,7 +70,7 @@ export function PWAInstallBanner() {
           className="w-12 h-12 rounded-xl shrink-0 overflow-hidden flex items-center justify-center"
           style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}
         >
-          <img src="/logo.jpg" alt="Fortexa" className="w-10 h-10 rounded-lg object-cover" />
+          <img src="/fortexa-icon.svg" alt="Fortexa" className="w-10 h-10 rounded-lg object-cover" />
         </div>
 
         {/* Text */}

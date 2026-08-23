@@ -63,7 +63,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <div className="bg-background py-10 px-6 text-center flex flex-col items-center">
         <img
-          src="/logo.jpg"
+          src="/fortexa-icon.svg"
           alt="Fortexa"
           className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg mb-4"
         />
