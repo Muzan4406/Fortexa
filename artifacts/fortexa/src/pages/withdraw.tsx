@@ -38,7 +38,7 @@ const MOBILE_MONEY_OPERATORS: Record<string, string[]> = {
 
 // ── Schemas ─────────────────────────────────────────────────────────────────
 const mobileMoneySchema = z.object({
-  country: z.string().length(2, 'Pays de retrait invalide'),
+  country: z.string().min(2, 'Pays de retrait invalide'),
   operator: z.string().min(2, 'Opérateur Mobile Money requis'),
   amount: z.coerce.number().min(3000, 'Montant minimum : 3 000 FCFA'),
   phone: z.string().min(8, 'Numéro de téléphone invalide (minimum 8 chiffres)'),
