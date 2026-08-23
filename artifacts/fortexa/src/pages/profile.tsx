@@ -1,11 +1,10 @@
 import { useAuth } from '@/lib/auth-context';
 import { useLocation } from 'wouter';
 import {
-  ArrowDownCircle, ArrowUpCircle, ChevronRight,
-  Shield, Headphones, Info, LogOut, Menu, KeyRound, X, WalletCards, UsersRound,
+  ChevronRight, Shield, Headphones, Info, LogOut, Menu, KeyRound, X,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useGetDashboard, useUpdatePassword } from '@workspace/api-client-react';
+import { useUpdatePassword } from '@workspace/api-client-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -20,7 +19,6 @@ export default function ProfilePage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const passwordMutation = useUpdatePassword();
-  const { data: dashboard } = useGetDashboard();
 
   const handleLogout = () => {
     clearAuth();
@@ -40,23 +38,23 @@ export default function ProfilePage() {
   return (
     <>
       {/* ── Header : logo + nom ── */}
-      <div className="bg-background border-b border-border px-5 pt-10 pb-8 relative">
+      <div className="bg-background border-b border-border px-5 pt-4 pb-4 relative">
         {/* hamburger */}
         <button
           onClick={openSidebar}
-          className="absolute top-10 left-5 w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
+          className="absolute top-4 left-5 w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
         >
           <Menu className="w-5 h-5 text-foreground" />
         </button>
 
-        <div className="flex flex-col items-center pt-2">
+        <div className="flex flex-col items-center pt-1">
           <img
             src="/logo.jpg"
             alt="Fortexa"
-            className="w-20 h-20 rounded-full object-cover border-4 border-border shadow-lg mb-3"
+            className="w-14 h-14 rounded-full object-cover border-3 border-border shadow-lg mb-2"
           />
-          <h1 className="text-xl font-bold text-foreground">{user?.name ?? '...'}</h1>
-          <p className="text-muted-foreground text-sm">{user?.email ?? ''}</p>
+          <h1 className="text-lg font-bold text-foreground">{user?.name ?? '...'}</h1>
+          <p className="text-muted-foreground text-xs">{user?.email ?? ''}</p>
         </div>
       </div>
 
@@ -78,47 +76,6 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
-
-        <div className="rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50 to-white p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-700">Vue d’ensemble</p>
-              <p className="mt-1 text-lg font-bold text-foreground">
-                {dashboard ? `${dashboard.investmentBalance.toLocaleString('fr-FR')} FCFA` : 'Chargement…'}
-              </p>
-              <p className="text-xs text-muted-foreground">Capital investi</p>
-            </div>
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100">
-              <WalletCards className="h-5 w-5 text-blue-700" />
-            </div>
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2 border-t border-blue-100 pt-3 text-xs">
-            <span className="text-muted-foreground">Gains disponibles</span>
-            <span className="text-right font-semibold text-rose-600">{dashboard ? `${dashboard.gainBalance.toLocaleString('fr-FR')} FCFA` : '—'}</span>
-          </div>
-        </div>
-
-        {/* ── Dépôt / Retrait ── */}
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => setLocation('/deposit')}
-            className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="w-12 h-12 rounded-2xl bg-green-500 flex items-center justify-center shadow-sm">
-              <img src="/investment-icon.png" alt="" className="w-8 h-8 object-contain" />
-            </div>
-            <span className="text-sm font-semibold text-foreground">Déposer</span>
-          </button>
-          <button
-            onClick={() => setLocation('/withdraw')}
-            className="bg-card border border-border rounded-2xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="w-12 h-12 rounded-2xl bg-blue-500 flex items-center justify-center shadow-sm">
-              <img src="/withdrawal-icon.png" alt="" className="w-8 h-8 object-contain" />
-            </div>
-            <span className="text-sm font-semibold text-foreground">Retirer</span>
-          </button>
-        </div>
 
         {/* ── Admin ── */}
         {user?.role === 'admin' && (
@@ -148,22 +105,6 @@ export default function ProfilePage() {
             <div className="text-left"><p className="text-sm font-semibold text-foreground">Sécurité</p><p className="text-xs text-muted-foreground">Modifier votre mot de passe</p></div>
           </div>
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
-        </button>
-
-        <button
-          onClick={() => setLocation('/support')}
-          className="w-full rounded-2xl border border-sky-200 bg-sky-50 p-4 shadow-sm flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white">
-              <UsersRound className="h-5 w-5 text-sky-600" />
-            </div>
-            <div className="text-left">
-              <p className="text-sm font-semibold text-sky-950">Communauté Fortexa</p>
-              <p className="text-xs text-sky-700">Telegram et WhatsApp</p>
-            </div>
-          </div>
-          <ChevronRight className="h-4 w-4 text-sky-600" />
         </button>
 
         {/* ── Service client ── */}
