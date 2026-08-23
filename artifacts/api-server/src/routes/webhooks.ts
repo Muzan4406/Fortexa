@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { createHmac } from "crypto";
 import { db, usersTable, transactionsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { creditReferralCommissions } from "../lib/referral";
 import { logger } from "../lib/logger";
 import { getSettings } from "../lib/settings";
@@ -54,10 +54,13 @@ router.post("/webhooks/sendavapay", async (req, res): Promise<void> => {
 
   try {
     if (payload.event === "payment.completed") {
+      const references = [payload.reference, payload.externalReference].filter(
+        (value): value is string => Boolean(value),
+      );
       const [tx] = await db
         .select()
         .from(transactionsTable)
-        .where(eq(transactionsTable.sendavapayRef, payload.reference));
+        .where(or(...references.map((reference) => eq(transactionsTable.sendavapayRef, reference))));
 
       if (!tx) {
         logger.warn({ reference: payload.reference }, "Webhook: transaction not found");
@@ -65,53 +68,53 @@ router.post("/webhooks/sendavapay", async (req, res): Promise<void> => {
         return;
       }
 
-      // Idempotence: skip if already processed
-      if (tx.status !== "pending") {
-        logger.info({ txId: tx.id, status: tx.status }, "Webhook: transaction already processed");
-        res.json({ received: true });
-        return;
-      }
+      const credited = await db.transaction(async (trx) => {
+        // Conditional update makes repeated/concurrent webhooks idempotent.
+        const [approvedTx] = await trx
+          .update(transactionsTable)
+          .set({ status: "approved", description: "Dépôt Mobile Money confirmé automatiquement" })
+          .where(and(eq(transactionsTable.id, tx.id), eq(transactionsTable.status, "pending")))
+          .returning();
+        if (!approvedTx) return null;
 
-      // Approve transaction
-      await db
-        .update(transactionsTable)
-        .set({ status: "approved", description: "Dépôt Mobile Money confirmé automatiquement" })
-        .where(eq(transactionsTable.id, tx.id));
+        const [user] = await trx
+          .select()
+          .from(usersTable)
+          .where(eq(usersTable.id, approvedTx.userId));
+        if (!user) throw new Error(`User ${approvedTx.userId} not found for transaction ${approvedTx.id}`);
 
-      // Credit investment balance
-      const [user] = await db
-        .select()
-        .from(usersTable)
-        .where(eq(usersTable.id, tx.userId));
-
-      if (user) {
-        const effectiveAmount = parseFloat(tx.amount);
+        const effectiveAmount = parseFloat(approvedTx.amount);
         const newBalance = parseFloat(user.investmentBalance) + effectiveAmount;
-        await db
+        await trx
           .update(usersTable)
           .set({
             investmentBalance: newBalance.toFixed(8),
             // The earning clock begins at payment confirmation.
             lastGainUpdate: new Date(),
           })
-          .where(eq(usersTable.id, tx.userId));
+          .where(eq(usersTable.id, approvedTx.userId));
 
-        // Distribute referral commissions
-        await creditReferralCommissions(effectiveAmount, tx.userId, tx.id);
+        return { userId: approvedTx.userId, txId: approvedTx.id, amount: effectiveAmount };
+      });
 
-        logger.info(
-          { userId: tx.userId, txId: tx.id, amount: effectiveAmount },
-          "Deposit auto-approved via Sendavapay webhook"
-        );
+      if (credited) {
+        // Distribute referral commissions once the balance transaction commits.
+        await creditReferralCommissions(credited.amount, credited.userId, credited.txId);
+        logger.info(credited, "Deposit auto-approved via Sendavapay webhook");
+      } else {
+        logger.info({ txId: tx.id, status: tx.status }, "Webhook: transaction already processed");
       }
     } else if (
       payload.event === "payment.failed" ||
       payload.event === "payment.expired"
     ) {
+      const references = [payload.reference, payload.externalReference].filter(
+        (value): value is string => Boolean(value),
+      );
       const [tx] = await db
         .select()
         .from(transactionsTable)
-        .where(eq(transactionsTable.sendavapayRef, payload.reference));
+        .where(or(...references.map((reference) => eq(transactionsTable.sendavapayRef, reference))));
 
       if (tx && tx.status === "pending") {
         await db

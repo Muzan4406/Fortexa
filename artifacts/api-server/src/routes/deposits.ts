@@ -181,6 +181,7 @@ router.post("/deposits/initiate", requireAuth, async (req, res): Promise<void> =
 
   // Build webhook URL from runtime domain
   const domain =
+    process.env.APP_URL?.replace(/^https?:\/\//, "").replace(/\/+$/, "") ||
     process.env.REPLIT_DEV_DOMAIN ||
     process.env.REPLIT_DOMAINS?.split(",")[0]?.trim();
   const webhookUrl = domain
