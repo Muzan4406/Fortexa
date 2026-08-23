@@ -1371,7 +1371,7 @@ components:
 
     ReferralInfo:
       type: object
-      required: [referralCode, referralLink, totalCommissions, level1Count, level2Count, level3Count, commissions]
+      required: [referralCode, referralLink, totalCommissions, level1Count, level2Count, level3Count, level1Percent, level2Percent, level3Percent, commissions]
       properties:
         referralCode:
           type: string
@@ -1384,6 +1384,12 @@ components:
         level2Count:
           type: number
         level3Count:
+          type: number
+        level1Percent:
+          type: number
+        level2Percent:
+          type: number
+        level3Percent:
           type: number
         commissions:
           type: array

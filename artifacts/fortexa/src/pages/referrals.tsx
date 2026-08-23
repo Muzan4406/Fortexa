@@ -120,8 +120,8 @@ export default function ReferralsPage() {
             return (
               <div key={level.key} className="grid grid-cols-[72px_52px_1fr_52px] items-center gap-2 border-b border-slate-50 px-3 py-2 last:border-0">
                 <div className={`rounded-xl bg-gradient-to-r ${level.tone} py-2.5 text-center text-sm font-black text-white shadow-sm`}>{level.key}</div>
-                <ProgressRing percent={level.percent} />
-                <div><p className="text-sm font-extrabold text-rose-600">{level.percent}%</p><p className="text-[9px] text-slate-400">Commission</p></div>
+                <ProgressRing percent={percent} />
+                <div><p className="text-sm font-extrabold text-rose-600">{percent}%</p><p className="text-[9px] text-slate-400">Commission</p></div>
                 <div className="text-center"><p className="text-xs font-bold">{count}</p><p className="text-[9px] text-slate-400">Membres</p></div>
               </div>
             );

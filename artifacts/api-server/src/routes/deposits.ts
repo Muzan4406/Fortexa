@@ -6,6 +6,7 @@ import { join } from "path";
 import { requireAuth } from "../lib/auth";
 import { getSettings } from "../lib/settings";
 import { apiPath } from "../lib/runtime-paths";
+import { logger } from "../lib/logger";
 import {
   createPayment,
   getOperators,
