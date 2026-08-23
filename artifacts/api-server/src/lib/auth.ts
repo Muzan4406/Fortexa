@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import { db, usersTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
 
 const JWT_SECRET = process.env.SESSION_SECRET ?? "fortexa-secret-key";
 
@@ -47,10 +49,22 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
 
 export function requireAdmin(req: Request, res: Response, next: NextFunction): void {
   requireAuth(req, res, () => {
-    if (req.userRole !== "admin") {
-      res.status(403).json({ error: "Accès refusé" });
-      return;
-    }
-    next();
+    // Read the current role from the database instead of trusting a possibly
+    // stale JWT issued before an account was promoted to admin.
+    void db
+      .select({ role: usersTable.role, status: usersTable.status })
+      .from(usersTable)
+      .where(eq(usersTable.id, req.userId!))
+      .then(([user]) => {
+        if (!user || user.status !== "active" || user.role !== "admin") {
+          res.status(403).json({ error: "Accès refusé" });
+          return;
+        }
+        req.userRole = user.role;
+        next();
+      })
+      .catch(() => {
+        res.status(500).json({ error: "Impossible de vérifier les droits administrateur" });
+      });
   });
 }

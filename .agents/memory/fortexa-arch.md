@@ -7,6 +7,7 @@ description: Key architectural decisions for the Fortexa investment platform
 - JWT stored in `localStorage` as `fortexa_token`
 - `lib/api-client-react/src/custom-fetch.ts` already patched to read it automatically (no `setAuthTokenGetter` needed)
 - Backend: `lib/auth.ts` with `requireAuth` / `requireAdmin` middleware; extends `Request` via `artifacts/api-server/src/types/express.d.ts`
+- Admin authorization rechecks the current database role because a JWT can remain stale after an account is promoted.
 
 ## Gains Model
 - Server stores `gainBalance` + `lastGainUpdate` timestamp in users table
