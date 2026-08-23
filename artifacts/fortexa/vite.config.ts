@@ -109,8 +109,8 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    // Plesk's document root points directly to the production dist folder.
-    outDir: path.resolve(import.meta.dirname, 'dist'),
+    // Plesk already exposes the existing public folder as the document root.
+    outDir: path.resolve(import.meta.dirname, 'public'),
     emptyOutDir: true,
   },
   server: {

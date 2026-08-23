@@ -15,6 +15,6 @@ else
 fi
 
 # The frontend is published from:
-#   artifacts/fortexa/dist
+#   artifacts/fortexa/public
 # The API startup command is:
 #   app.js

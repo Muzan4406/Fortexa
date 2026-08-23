@@ -25,13 +25,13 @@ Le dépôt doit être déployé à la racine de l'application :
 Le build crée automatiquement :
 
 ```text
-/pplaystation.online/artifacts/fortexa/dist
+/pplaystation.online/artifacts/fortexa/public
 ```
 
 Configurez le Document Root vers :
 
 ```text
-/pplaystation.online/artifacts/fortexa/dist
+/pplaystation.online/artifacts/fortexa/public
 ```
 
 Activez une réécriture SPA vers `index.html` afin que les routes comme
@@ -90,7 +90,7 @@ Après chaque pull :
 
 1. cliquer sur **Pull + Deploy Now** ;
 2. attendre la fin de `deploy-plesk.sh` ;
-3. vérifier que `artifacts/fortexa/dist` existe ;
+3. vérifier que `artifacts/fortexa/public` existe ;
 4. configurer le Document Root vers ce dossier ;
 5. redémarrer l'application Node.js ;
 6. vérifier `https://pplaystation.online/api/healthz`.
