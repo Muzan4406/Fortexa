@@ -8,6 +8,7 @@ import { getSettings } from "../lib/settings";
 import { apiPath } from "../lib/runtime-paths";
 import { logger } from "../lib/logger";
 import { creditReferralCommissions } from "../lib/referral";
+import { formatTelegramAmount, sendTelegramNotification } from "../lib/telegram";
 import {
   createPayment,
   getPaymentToken,
@@ -232,6 +233,9 @@ router.post("/deposits/initiate", requireAuth, async (req, res): Promise<void> =
       requiresOtp: false,
       status: "online",
     }));
+    void sendTelegramNotification(
+      `💰 Nouveau dépôt Mobile Money AshtechPay\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(numAmount)}\nPays : ${payerCountry}\nStatut : en attente`,
+    );
     res.json({
       transactionId: tx.id,
       reference: externalReference,
@@ -296,6 +300,9 @@ router.post("/deposits/initiate", requireAuth, async (req, res): Promise<void> =
       ? operatorsResult.data.filter((op) => op.status === "online")
       : [];
 
+  void sendTelegramNotification(
+    `💰 Nouveau dépôt Mobile Money SendavaPay\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(numAmount)}\nPays : ${payerCountry}\nStatut : en attente`,
+  );
   res.json({
     transactionId: tx.id,
     reference,

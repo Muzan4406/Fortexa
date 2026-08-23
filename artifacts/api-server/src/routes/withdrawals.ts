@@ -4,6 +4,7 @@ import { eq, and, desc } from "drizzle-orm";
 import { requireAuth } from "../lib/auth";
 import { getSettings } from "../lib/settings";
 import { updateGainBalance } from "../lib/gains";
+import { formatTelegramAmount, sendTelegramNotification } from "../lib/telegram";
 
 const router: IRouter = Router();
 const MOBILE_MONEY_COUNTRIES = new Set(["TG", "BJ", "BF", "CI", "Togo", "Bénin", "Burkina Faso", "Côte d'Ivoire"]);
@@ -134,6 +135,9 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
           : "Demande de retrait",
   }).returning();
 
+  void sendTelegramNotification(
+    `💸 Nouvelle demande de retrait\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(numAmount)}\nNet à envoyer : ${formatTelegramAmount(netAmount)}\nStatut : en attente`,
+  );
   res.status(201).json(formatTx(tx));
 });
 

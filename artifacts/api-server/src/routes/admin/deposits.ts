@@ -3,6 +3,7 @@ import { db, usersTable, transactionsTable } from "@workspace/db";
 import { eq, and, desc, count } from "drizzle-orm";
 import { requireAdmin } from "../../lib/auth";
 import { creditReferralCommissions } from "../../lib/referral";
+import { formatTelegramAmount, sendTelegramNotification } from "../../lib/telegram";
 
 const router: IRouter = Router();
 
@@ -118,6 +119,11 @@ router.put("/admin/deposits/:id", requireAdmin, async (req, res): Promise<void> 
     }
   }
 
+  if (status === "approved" || status === "rejected") {
+    void sendTelegramNotification(
+      `${status === "approved" ? "✅" : "❌"} Dépôt ${status === "approved" ? "approuvé" : "rejeté"} par l’administrateur\nTransaction #${tx.id}\nUtilisateur #${tx.userId}\nMontant : ${formatTelegramAmount(effectiveAmount)}${status === "rejected" && rejectionReason ? `\nMotif : ${rejectionReason}` : ""}`,
+    );
+  }
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, tx.userId));
   res.json(formatAdminTx(updated, user));
 });

@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { db, usersTable, transactionsTable } from "@workspace/db";
 import { eq, and, desc, count } from "drizzle-orm";
 import { requireAdmin } from "../../lib/auth";
+import { formatTelegramAmount, sendTelegramNotification } from "../../lib/telegram";
 
 const router: IRouter = Router();
 
@@ -77,6 +78,11 @@ router.put("/admin/withdrawals/:id", requireAdmin, async (req, res): Promise<voi
     }
   }
 
+  if (status === "approved" || status === "rejected") {
+    void sendTelegramNotification(
+      `${status === "approved" ? "✅" : "❌"} Retrait ${status === "approved" ? "approuvé" : "rejeté"}\nTransaction #${tx.id}\nUtilisateur #${tx.userId}\nMontant : ${formatTelegramAmount(tx.amount)}${status === "rejected" && rejectionReason ? `\nMotif : ${rejectionReason}` : ""}`,
+    );
+  }
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, tx.userId));
   res.json(formatAdminTx(updated, user));
 });

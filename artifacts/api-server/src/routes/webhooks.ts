@@ -5,6 +5,7 @@ import { and, eq, or } from "drizzle-orm";
 import { creditReferralCommissions } from "../lib/referral";
 import { logger } from "../lib/logger";
 import { getSettings } from "../lib/settings";
+import { formatTelegramAmount, sendTelegramNotification } from "../lib/telegram";
 
 const router: IRouter = Router();
 
@@ -57,7 +58,12 @@ router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
           }).where(eq(usersTable.id, approvedTx.userId));
           return { userId: approvedTx.userId, txId: approvedTx.id, amount };
         });
-        if (credited) await creditReferralCommissions(credited.amount, credited.userId, credited.txId);
+        if (credited) {
+          await creditReferralCommissions(credited.amount, credited.userId, credited.txId);
+          void sendTelegramNotification(
+            `✅ Dépôt confirmé automatiquement\nTransaction #${credited.txId}\nUtilisateur #${credited.userId}\nMontant crédité : ${formatTelegramAmount(credited.amount)}`,
+          );
+        }
       }
     } else if (
       (payload.event === "payment.failed" ||
@@ -68,7 +74,7 @@ router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
       const references = [payload.reference, payload.transaction_id].filter(
         (value): value is string => Boolean(value),
       );
-      await db.update(transactionsTable)
+      const [rejectedTx] = await db.update(transactionsTable)
         .set({ status: "rejected", rejectionReason: "Paiement AshtechPay refusé ou expiré" })
         .where(and(
           or(
@@ -76,7 +82,13 @@ router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
             ...references.map((reference) => eq(transactionsTable.ashtechTransactionId, reference)),
           ),
           eq(transactionsTable.status, "pending"),
-        ));
+        ))
+        .returning();
+      if (rejectedTx) {
+        void sendTelegramNotification(
+          `❌ Dépôt AshtechPay rejeté\nTransaction #${rejectedTx.id}\nMontant : ${formatTelegramAmount(rejectedTx.amount)}`,
+        );
+      }
     }
   } catch (err) {
     logger.error({ err, reference: payload.reference }, "AshtechPay webhook processing error");

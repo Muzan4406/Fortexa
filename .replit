@@ -59,3 +59,8 @@ timeoutMs = 20000
 [nix]
 channel = "stable-25_05"
 packages = ["imagemagick"]
+
+[userenv]
+
+[userenv.shared]
+TELEGRAM_CHAT_ID = "-1003997139884"

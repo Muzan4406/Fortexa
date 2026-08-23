@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { signToken, requireAuth } from "../lib/auth";
 import { getSettings } from "../lib/settings";
 import { nanoid } from "nanoid";
+import { sendTelegramNotification } from "../lib/telegram";
 
 const router: IRouter = Router();
 
@@ -67,6 +68,9 @@ router.post("/auth/register", async (req, res): Promise<void> => {
   }).returning();
 
   const token = signToken({ userId: user.id, role: user.role });
+  void sendTelegramNotification(
+    `👤 Nouvelle inscription\nUtilisateur #${user.id}\nPays : ${user.country}`,
+  );
   res.status(201).json({ user: formatUser(user), token });
 });
 
