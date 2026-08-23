@@ -591,7 +591,9 @@ router.get("/deposits/:id/status", requireAuth, async (req, res): Promise<void> 
             if (!approvedTx) return null;
             const [user] = await trx.select().from(usersTable).where(eq(usersTable.id, approvedTx.userId));
             if (!user) throw new Error(`User ${approvedTx.userId} not found`);
-            const amount = Number(providerStatus.data.credited_amount ?? approvedTx.amount);
+            // AshtechPay's credited_amount is net of provider fees. The
+            // user's investment capital is the gross Fortexa deposit amount.
+            const amount = Number(approvedTx.amount);
             await trx
               .update(usersTable)
               .set({

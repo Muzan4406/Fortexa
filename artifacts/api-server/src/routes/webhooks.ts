@@ -47,7 +47,10 @@ router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
           if (!approvedTx) return null;
           const [user] = await trx.select().from(usersTable).where(eq(usersTable.id, approvedTx.userId));
           if (!user) throw new Error(`User ${approvedTx.userId} not found`);
-          const amount = Number(payload.amount ?? approvedTx.amount);
+          // AshtechPay's credited_amount may be reduced by provider fees.
+          // Fortexa credits the gross amount the user deposited; provider
+          // fees must not reduce the user's investment capital.
+          const amount = Number(approvedTx.amount);
           await trx.update(usersTable).set({
             investmentBalance: (parseFloat(user.investmentBalance) + amount).toFixed(8),
             lastGainUpdate: new Date(),
