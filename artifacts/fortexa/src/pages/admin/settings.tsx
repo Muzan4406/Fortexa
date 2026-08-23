@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
-import { Settings, Bell, Trash2, ToggleLeft, ToggleRight, CreditCard, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { Settings, Bell, Trash2, ToggleLeft, ToggleRight, CreditCard, Eye, EyeOff, CheckCircle2, MessageCircle, Send, UsersRound } from 'lucide-react';
 
 const settingsSchema = z.object({
   dailyRatePercent: z.coerce.number().min(0).max(100),
@@ -34,6 +34,13 @@ const paymentSchema = z.object({
   usdtAddress: z.string(),
 });
 
+const socialSchema = z.object({
+  telegramGroupUrl: z.string(),
+  telegramChannelUrl: z.string(),
+  whatsappGroupUrl: z.string(),
+  whatsappChannelUrl: z.string(),
+});
+
 const announcementSchema = z.object({
   title: z.string().min(2, 'Titre requis'),
   message: z.string().min(5, 'Message requis'),
@@ -41,6 +48,7 @@ const announcementSchema = z.object({
 
 type SettingsForm = z.infer<typeof settingsSchema>;
 type PaymentForm = z.infer<typeof paymentSchema>;
+type SocialForm = z.infer<typeof socialSchema>;
 type AnnouncementForm = z.infer<typeof announcementSchema>;
 
 function SecretInput({ placeholder, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
@@ -97,6 +105,10 @@ export default function AdminSettingsPage() {
     resolver: zodResolver(paymentSchema),
     defaultValues: { sendavapayKey: '', sendavapayWebhookSecret: '', usdtAddress: '' },
   });
+  const socialForm = useForm<SocialForm>({
+    resolver: zodResolver(socialSchema),
+    defaultValues: { telegramGroupUrl: '', telegramChannelUrl: '', whatsappGroupUrl: '', whatsappChannelUrl: '' },
+  });
 
   useEffect(() => {
     if (settings) {
@@ -116,8 +128,14 @@ export default function AdminSettingsPage() {
         sendavapayWebhookSecret: '',
         usdtAddress: settings.usdtAddress ?? '',
       });
+      socialForm.reset({
+        telegramGroupUrl: settings.telegramGroupUrl ?? '',
+        telegramChannelUrl: settings.telegramChannelUrl ?? '',
+        whatsappGroupUrl: settings.whatsappGroupUrl ?? '',
+        whatsappChannelUrl: settings.whatsappChannelUrl ?? '',
+      });
     }
-  }, [settings, form, paymentForm]);
+  }, [settings, form, paymentForm, socialForm]);
 
   const announcementForm = useForm<AnnouncementForm>({
     resolver: zodResolver(announcementSchema),
@@ -156,6 +174,19 @@ export default function AdminSettingsPage() {
         },
         onError: (err: any) => toast({ title: 'Erreur', description: err.data?.error, variant: 'destructive' }),
       }
+    );
+  };
+
+  const onSocialSubmit = (data: SocialForm) => {
+    updateSettingsMutation.mutate(
+      { data: Object.fromEntries(Object.entries(data).map(([key, value]) => [key, value.trim()])) },
+      {
+        onSuccess: () => {
+          toast({ title: 'Liens sociaux mis à jour' });
+          queryClient.invalidateQueries({ queryKey: getGetAdminSettingsQueryKey() });
+        },
+        onError: (err: any) => toast({ title: 'Erreur', description: err.data?.error || 'Impossible de sauvegarder les liens', variant: 'destructive' }),
+      },
     );
   };
 
@@ -384,6 +415,53 @@ export default function AdminSettingsPage() {
               </form>
             </Form>
           )}
+        </div>
+
+        <div className="bg-card rounded-2xl p-6 border border-border shadow-sm">
+          <div className="flex items-center gap-2 mb-1">
+            <MessageCircle className="w-5 h-5 text-primary" />
+            <h2 className="font-bold text-foreground">Communautés</h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-5">
+            Configurez les liens qui seront affichés aux utilisateurs dans leur espace Compte et le support.
+          </p>
+          <Form {...socialForm}>
+            <form onSubmit={socialForm.handleSubmit(onSocialSubmit)} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField control={socialForm.control} name="telegramGroupUrl" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2"><UsersRound className="w-4 h-4 text-[#229ED9]" /> Groupe Telegram</FormLabel>
+                    <FormControl><Input placeholder="https://t.me/..." {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={socialForm.control} name="telegramChannelUrl" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2"><Send className="w-4 h-4 text-[#229ED9]" /> Chaîne Telegram</FormLabel>
+                    <FormControl><Input placeholder="https://t.me/..." {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={socialForm.control} name="whatsappGroupUrl" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2"><UsersRound className="w-4 h-4 text-[#25D366]" /> Groupe WhatsApp</FormLabel>
+                    <FormControl><Input placeholder="https://chat.whatsapp.com/..." {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={socialForm.control} name="whatsappChannelUrl" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2"><MessageCircle className="w-4 h-4 text-[#25D366]" /> Chaîne WhatsApp</FormLabel>
+                    <FormControl><Input placeholder="https://whatsapp.com/channel/..." {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+              <Button type="submit" className="w-full h-11" disabled={updateSettingsMutation.isPending}>
+                {updateSettingsMutation.isPending ? 'Enregistrement...' : 'Enregistrer les liens sociaux'}
+              </Button>
+            </form>
+          </Form>
         </div>
 
         {/* Announcements */}

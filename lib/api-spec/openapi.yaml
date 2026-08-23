@@ -1708,6 +1708,10 @@ components:
         - sendavapayKeySet
         - sendavapayWebhookSecretSet
         - usdtAddress
+        - telegramGroupUrl
+        - telegramChannelUrl
+        - whatsappGroupUrl
+        - whatsappChannelUrl
       properties:
         dailyRatePercent:
           type: number
@@ -1736,6 +1740,14 @@ components:
         usdtAddress:
           type: string
           description: USDT BEP20 wallet address for deposits
+        telegramGroupUrl:
+          type: string
+        telegramChannelUrl:
+          type: string
+        whatsappGroupUrl:
+          type: string
+        whatsappChannelUrl:
+          type: string
 
     PlatformSettingsUpdate:
       type: object
@@ -1761,6 +1773,14 @@ components:
         usdtAddress:
           type: string
           description: USDT BEP20 wallet address for deposits
+        telegramGroupUrl:
+          type: string
+        telegramChannelUrl:
+          type: string
+        whatsappGroupUrl:
+          type: string
+        whatsappChannelUrl:
+          type: string
 
     ReferralSettings:
       type: object

@@ -22,6 +22,10 @@ export function formatSettings(s: Awaited<ReturnType<typeof getSettings>>) {
     level1Percent: parseFloat(s.level1Percent),
     level2Percent: parseFloat(s.level2Percent),
     level3Percent: parseFloat(s.level3Percent),
+    telegramGroupUrl: s.telegramGroupUrl,
+    telegramChannelUrl: s.telegramChannelUrl,
+    whatsappGroupUrl: s.whatsappGroupUrl,
+    whatsappChannelUrl: s.whatsappChannelUrl,
   };
 }
 
@@ -35,5 +39,9 @@ export function formatAdminSettings(s: Awaited<ReturnType<typeof getSettings>>) 
     sendavapayKeySet: s.sendavapayKey.length > 0,
     sendavapayWebhookSecretSet: s.sendavapayWebhookSecret.length > 0,
     usdtAddress: s.usdtAddress,
+    telegramGroupUrl: s.telegramGroupUrl,
+    telegramChannelUrl: s.telegramChannelUrl,
+    whatsappGroupUrl: s.whatsappGroupUrl,
+    whatsappChannelUrl: s.whatsappChannelUrl,
   };
 }

@@ -22,6 +22,10 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     sendavapayKey,
     sendavapayWebhookSecret,
     usdtAddress,
+    telegramGroupUrl,
+    telegramChannelUrl,
+    whatsappGroupUrl,
+    whatsappChannelUrl,
   } = req.body;
 
   const settings = await getSettings();
@@ -41,6 +45,21 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     updates.sendavapayWebhookSecret = sendavapayWebhookSecret.trim();
   }
   if (usdtAddress !== undefined) updates.usdtAddress = String(usdtAddress).trim();
+  for (const [key, value] of Object.entries({
+    telegramGroupUrl,
+    telegramChannelUrl,
+    whatsappGroupUrl,
+    whatsappChannelUrl,
+  })) {
+    if (value !== undefined) {
+      const normalized = String(value).trim();
+      if (normalized && !/^https:\/\/(t\.me|telegram\.me|chat\.whatsapp\.com|whatsapp\.com)\//i.test(normalized)) {
+        res.status(400).json({ error: "Les liens sociaux doivent être des URLs Telegram ou WhatsApp valides" });
+        return;
+      }
+      updates[key] = normalized;
+    }
+  }
 
   const [updated] = await db
     .update(platformSettingsTable)

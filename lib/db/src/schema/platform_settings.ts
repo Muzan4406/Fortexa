@@ -18,6 +18,10 @@ export const platformSettingsTable = pgTable("platform_settings", {
   sendavapayKey: text("sendavapay_key").notNull().default(""),
   sendavapayWebhookSecret: text("sendavapay_webhook_secret").notNull().default(""),
   usdtAddress: text("usdt_address").notNull().default(""),
+  telegramGroupUrl: text("telegram_group_url").notNull().default(""),
+  telegramChannelUrl: text("telegram_channel_url").notNull().default(""),
+  whatsappGroupUrl: text("whatsapp_group_url").notNull().default(""),
+  whatsappChannelUrl: text("whatsapp_channel_url").notNull().default(""),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 

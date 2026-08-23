@@ -893,7 +893,11 @@ export const GetAdminSettingsResponse = zod.object({
   "level3Percent": zod.number(),
   "sendavapayKeySet": zod.boolean().describe('Whether a Sendavapay SDK key has been configured'),
   "sendavapayWebhookSecretSet": zod.boolean().describe('Whether a Sendavapay webhook secret has been configured'),
-  "usdtAddress": zod.string().describe('USDT BEP20 wallet address for deposits')
+  "usdtAddress": zod.string().describe('USDT BEP20 wallet address for deposits'),
+  "telegramGroupUrl": zod.string(),
+  "telegramChannelUrl": zod.string(),
+  "whatsappGroupUrl": zod.string(),
+  "whatsappChannelUrl": zod.string()
 })
 
 
@@ -909,7 +913,11 @@ export const UpdateAdminSettingsBody = zod.object({
   "gainsActive": zod.boolean().optional(),
   "sendavapayKey": zod.string().optional().describe('Sendavapay SDK key (write-only — never returned in GET)'),
   "sendavapayWebhookSecret": zod.string().optional().describe('Sendavapay webhook HMAC secret (write-only — never returned in GET)'),
-  "usdtAddress": zod.string().optional().describe('USDT BEP20 wallet address for deposits')
+  "usdtAddress": zod.string().optional().describe('USDT BEP20 wallet address for deposits'),
+  "telegramGroupUrl": zod.string().optional(),
+  "telegramChannelUrl": zod.string().optional(),
+  "whatsappGroupUrl": zod.string().optional(),
+  "whatsappChannelUrl": zod.string().optional()
 })
 
 export const UpdateAdminSettingsResponse = zod.object({
@@ -924,7 +932,11 @@ export const UpdateAdminSettingsResponse = zod.object({
   "level3Percent": zod.number(),
   "sendavapayKeySet": zod.boolean().describe('Whether a Sendavapay SDK key has been configured'),
   "sendavapayWebhookSecretSet": zod.boolean().describe('Whether a Sendavapay webhook secret has been configured'),
-  "usdtAddress": zod.string().describe('USDT BEP20 wallet address for deposits')
+  "usdtAddress": zod.string().describe('USDT BEP20 wallet address for deposits'),
+  "telegramGroupUrl": zod.string(),
+  "telegramChannelUrl": zod.string(),
+  "whatsappGroupUrl": zod.string(),
+  "whatsappChannelUrl": zod.string()
 })
 
 

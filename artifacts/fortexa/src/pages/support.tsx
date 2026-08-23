@@ -1,11 +1,17 @@
-import { ChevronLeft, Send, Headphones, ExternalLink, Clock3, ShieldCheck, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Send, Headphones, ExternalLink, Clock3, ShieldCheck, MessageCircle, UsersRound } from 'lucide-react';
 import { useLocation } from 'wouter';
-
-const TELEGRAM_CANAL = 'https://t.me/fortexa_officiel';
-const TELEGRAM_SUPPORT = 'https://t.me/fortexa_support';
+import { useGetDashboard } from '@workspace/api-client-react';
 
 export default function SupportPage() {
   const [, setLocation] = useLocation();
+  const { data: dashboard } = useGetDashboard();
+  const links = dashboard?.settings;
+  const communities = [
+    { href: links?.telegramGroupUrl, label: 'Groupe Telegram', description: 'Échangez avec la communauté', icon: UsersRound, color: '#229ED9' },
+    { href: links?.telegramChannelUrl, label: 'Chaîne Telegram', description: 'Annonces et actualités', icon: Send, color: '#229ED9' },
+    { href: links?.whatsappGroupUrl, label: 'Groupe WhatsApp', description: 'Discutez avec les membres', icon: UsersRound, color: '#25D366' },
+    { href: links?.whatsappChannelUrl, label: 'Chaîne WhatsApp', description: 'Recevez les nouveautés', icon: MessageCircle, color: '#25D366' },
+  ].filter((item) => item.href);
 
   return (
     <>
@@ -36,39 +42,28 @@ export default function SupportPage() {
            <p className="text-white/65 text-sm">Une équipe humaine pour vous accompagner à chaque étape.</p>
         </div>
 
-        {/* Canal officiel */}
-        <a
-          href={TELEGRAM_CANAL}
-          target="_blank"
-          rel="noopener noreferrer"
-           className="w-full bg-card/80 rounded-2xl border border-white/10 p-4 flex items-center gap-4 shadow-lg hover:border-sky-400/30 transition-all block"
-        >
-          <div className="w-12 h-12 rounded-2xl bg-[#229ED9]/10 flex items-center justify-center shrink-0">
-             <MessageCircle className="w-6 h-6 text-[#229ED9]" />
-          </div>
-          <div className="flex-1">
-            <p className="font-semibold text-foreground">Canal officiel</p>
-            <p className="text-sm text-muted-foreground">Annonces, actualités et mises à jour</p>
-          </div>
-          <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
-        </a>
-
-        {/* Service client */}
-        <a
-          href={TELEGRAM_SUPPORT}
-          target="_blank"
-          rel="noopener noreferrer"
-           className="w-full bg-card/80 rounded-2xl border border-white/10 p-4 flex items-center gap-4 shadow-lg hover:border-emerald-400/30 transition-all block"
-        >
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-             <Headphones className="w-6 h-6 text-emerald-400" />
-          </div>
-          <div className="flex-1">
-            <p className="font-semibold text-foreground">Service client Telegram</p>
-            <p className="text-sm text-muted-foreground">Contactez un agent en direct</p>
-          </div>
-          <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
-        </a>
+         {communities.length > 0 ? (
+           <div className="grid gap-3 sm:grid-cols-2">
+             {communities.map(({ href, label, description, icon: Icon, color }) => (
+               <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="w-full bg-card/80 rounded-2xl border border-border p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
+                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: `${color}18` }}>
+                   <Icon className="w-6 h-6" style={{ color }} />
+                 </div>
+                 <div className="flex-1">
+                   <p className="font-semibold text-foreground">{label}</p>
+                   <p className="text-sm text-muted-foreground">{description}</p>
+                 </div>
+                 <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
+               </a>
+             ))}
+           </div>
+         ) : (
+           <div className="rounded-2xl border border-border bg-card p-5 text-center">
+             <Headphones className="mx-auto mb-2 h-7 w-7 text-muted-foreground" />
+             <p className="font-semibold text-foreground">Communautés bientôt disponibles</p>
+             <p className="mt-1 text-sm text-muted-foreground">Les liens seront ajoutés par l’administrateur.</p>
+           </div>
+         )}
 
         {/* Info */}
          <div className="bg-white/[0.04] rounded-2xl p-4 border border-white/10">

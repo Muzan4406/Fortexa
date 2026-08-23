@@ -821,6 +821,16 @@ export default function DepositPage() {
       </div>
 
       <div className="px-6 py-6 space-y-6">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-700">Minimum</p>
+            <p className="mt-1 text-sm font-bold text-blue-950">{formatCurrency(minDeposit)}</p>
+          </div>
+          <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-rose-700">Crédit</p>
+            <p className="mt-1 text-sm font-bold text-rose-950">Après validation</p>
+          </div>
+        </div>
         {/* Step content */}
         {renderStep()}
 

@@ -19,4 +19,8 @@ export interface PlatformSettingsUpdate {
   sendavapayWebhookSecret?: string;
   /** USDT BEP20 wallet address for deposits */
   usdtAddress?: string;
+  telegramGroupUrl?: string;
+  telegramChannelUrl?: string;
+  whatsappGroupUrl?: string;
+  whatsappChannelUrl?: string;
 }
