@@ -45,7 +45,17 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 
 // Serve screenshot uploads (USDT deposit proofs) through Fortexa's API prefix.
-app.use(`${API_PREFIX}/uploads`, express.static(join(process.cwd(), "uploads")));
+// Plesk can start app.js from either the project root or the API artifact
+// directory, so keep both locations readable for proofs created before a
+// restart/rebuild.
+const uploadDirectories = [
+  join(process.cwd(), "uploads"),
+  join(process.cwd(), "artifacts", "api-server", "uploads"),
+];
+app.use(
+  `${API_PREFIX}/uploads`,
+  ...uploadDirectories.map((directory) => express.static(directory)),
+);
 
 app.use(API_PREFIX, router);
 
