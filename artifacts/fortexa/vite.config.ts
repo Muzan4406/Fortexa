@@ -110,8 +110,10 @@ export default defineConfig({
   root: path.resolve(import.meta.dirname),
   build: {
     // Plesk already exposes the existing public folder as the document root.
+    // Keep its branded images/icons while Vite writes the compiled bundle there.
+    publicDir: false,
     outDir: path.resolve(import.meta.dirname, 'public'),
-    emptyOutDir: true,
+    emptyOutDir: false,
   },
   server: {
     port,
