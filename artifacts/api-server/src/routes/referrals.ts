@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { db, usersTable, referralCommissionsTable } from "@workspace/db";
 import { eq, count } from "drizzle-orm";
 import { requireAuth } from "../lib/auth";
+import { webPath } from "../lib/runtime-paths";
 
 const router: IRouter = Router();
 
@@ -84,7 +85,7 @@ router.get("/referrals", requireAuth, async (req, res): Promise<void> => {
 
   res.json({
     referralCode: user.referralCode,
-    referralLink: `${baseUrl}/register?ref=${user.referralCode}`,
+    referralLink: `${baseUrl}${webPath(`/register?ref=${user.referralCode}`)}`,
     totalCommissions,
     level1Count: level1Users.length,
     level2Count,

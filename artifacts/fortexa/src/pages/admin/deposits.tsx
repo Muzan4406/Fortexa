@@ -14,7 +14,9 @@ import { formatCurrency, formatDate } from '@/lib/format';
 import { CheckCircle, XCircle, Clock, ExternalLink, Smartphone, Wallet } from 'lucide-react';
 
 function proofUrl(path: string) {
-  return path.startsWith('/uploads/') ? `/api${path}` : path;
+  if (!path.startsWith('/uploads/')) return path;
+  const basePath = import.meta.env.BASE_URL.replace(/\/+$/, '');
+  return `${basePath}/api${path}`;
 }
 
 const STATUS_CONFIG: Record<TransactionStatus, { label: string; color: string }> = {

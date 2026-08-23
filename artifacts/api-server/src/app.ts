@@ -4,6 +4,7 @@ import { join } from "path";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { API_PREFIX } from "./lib/runtime-paths";
 
 const app: Express = express();
 
@@ -42,11 +43,9 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true }));
 
-// Serve screenshot uploads (USDT deposit proofs)
-app.use("/uploads", express.static(join(process.cwd(), "uploads")));
-// Expose uploads through the API proxy used by the web artifact.
-app.use("/api/uploads", express.static(join(process.cwd(), "uploads")));
+// Serve screenshot uploads (USDT deposit proofs) through Fortexa's API prefix.
+app.use(`${API_PREFIX}/uploads`, express.static(join(process.cwd(), "uploads")));
 
-app.use("/api", router);
+app.use(API_PREFIX, router);
 
 export default app;

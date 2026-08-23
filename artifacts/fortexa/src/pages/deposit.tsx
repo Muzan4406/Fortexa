@@ -137,7 +137,8 @@ export default function DepositPage() {
     pollingRef.current = setInterval(async () => {
       try {
         const token = localStorage.getItem('fortexa_token');
-        const res = await fetch(`/api/deposits/${transactionId}/status`, {
+        const apiBasePath = import.meta.env.BASE_URL.replace(/\/+$/, '');
+        const res = await fetch(`${apiBasePath}/api/deposits/${transactionId}/status`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (!res.ok) return;
