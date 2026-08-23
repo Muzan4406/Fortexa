@@ -101,6 +101,25 @@ export interface PaymentStatusResult {
   error?: string;
 }
 
+export interface PaymentTokenResult {
+  success: boolean;
+  data?: {
+    reference: string;
+    amount: number;
+    currency: string;
+    description?: string;
+    ownerName?: string;
+    status: string;
+  };
+  error?: string;
+  code?: string;
+}
+
+export function getPaymentToken(paymentToken: string): Promise<PaymentTokenResult> {
+  return fetch(`${BASE_URL}/payment-token/${encodeURIComponent(paymentToken)}`)
+    .then((res) => res.json() as Promise<PaymentTokenResult>);
+}
+
 export function getPaymentStatus(key: string, reference: string): Promise<PaymentStatusResult> {
   return sdkFetch(key, `/payment-status/${reference}`);
 }

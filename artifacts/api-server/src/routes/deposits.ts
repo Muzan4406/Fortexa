@@ -9,6 +9,7 @@ import { apiPath } from "../lib/runtime-paths";
 import { logger } from "../lib/logger";
 import {
   createPayment,
+  getPaymentToken,
   getOperators,
   initiatePayment,
   submitOtp,
@@ -287,6 +288,25 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
 
   if (tx.status !== "pending") {
     res.status(400).json({ error: "Cette transaction a déjà été traitée" });
+    return;
+  }
+
+  // Validate the temporary client token against Sendavapay before attempting
+  // the operator push. This produces a precise error when the 30-minute token
+  // is expired or was not persisted correctly.
+  const tokenCheck = await getPaymentToken(tx.sendavapayPaymentToken);
+  if (!tokenCheck.success || !tokenCheck.data) {
+    logger.warn(
+      {
+        transactionId: tx.id,
+        tokenStatus: tokenCheck.code ?? tokenCheck.error ?? "invalid",
+      },
+      "Sendavapay payment token rejected before initiation",
+    );
+    res.status(400).json({
+      error: tokenCheck.error ?? "Le paiement a expiré. Recommencez le dépôt.",
+      code: tokenCheck.code,
+    });
     return;
   }
 
