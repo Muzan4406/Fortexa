@@ -6,6 +6,9 @@ import { extname, join, resolve } from "node:path";
 
 process.env.FORTEXA_API_PREFIX ??= "/api";
 process.env.FORTEXA_WEB_PREFIX ??= "/";
+// Some Plesk Passenger configurations do not inject PORT. The fallback and
+// the Node.js application must still bind to the same local port.
+process.env.PORT ??= "8080";
 // Accept the secure Replit secret name as a fallback when the same project is
 // deployed to Plesk without renaming it manually.
 process.env.DATABASE_URL ??= process.env.SUPABASE_DATABASE_URL;
