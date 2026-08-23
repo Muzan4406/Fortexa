@@ -53,6 +53,10 @@ type PaymentForm = z.infer<typeof paymentSchema>;
 type SocialForm = z.infer<typeof socialSchema>;
 type AnnouncementForm = z.infer<typeof announcementSchema>;
 
+function getSettingsErrorMessage(error: any, fallback = 'Impossible de sauvegarder les paramètres') {
+  return error?.data?.error || error?.message || fallback;
+}
+
 function SecretInput({ placeholder, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   const [show, setShow] = useState(false);
   return (
@@ -160,7 +164,7 @@ export default function AdminSettingsPage() {
           toast({ title: 'Paramètres mis à jour' });
           queryClient.invalidateQueries({ queryKey: getGetAdminSettingsQueryKey() });
         },
-        onError: (err: any) => toast({ title: 'Erreur', description: err.data?.error, variant: 'destructive' }),
+        onError: (err: any) => toast({ title: 'Erreur', description: getSettingsErrorMessage(err), variant: 'destructive' }),
       }
     );
   };
@@ -185,7 +189,7 @@ export default function AdminSettingsPage() {
           paymentForm.setValue('ashtechpayKey', '');
           queryClient.invalidateQueries({ queryKey: getGetAdminSettingsQueryKey() });
         },
-        onError: (err: any) => toast({ title: 'Erreur', description: err.data?.error, variant: 'destructive' }),
+        onError: (err: any) => toast({ title: 'Erreur', description: getSettingsErrorMessage(err), variant: 'destructive' }),
       }
     );
   };
@@ -198,7 +202,7 @@ export default function AdminSettingsPage() {
           toast({ title: 'Liens sociaux mis à jour' });
           queryClient.invalidateQueries({ queryKey: getGetAdminSettingsQueryKey() });
         },
-        onError: (err: any) => toast({ title: 'Erreur', description: err.data?.error || 'Impossible de sauvegarder les liens', variant: 'destructive' }),
+        onError: (err: any) => toast({ title: 'Erreur', description: getSettingsErrorMessage(err, 'Impossible de sauvegarder les liens'), variant: 'destructive' }),
       },
     );
   };

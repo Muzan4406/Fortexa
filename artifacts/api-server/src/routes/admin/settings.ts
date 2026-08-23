@@ -79,13 +79,24 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     }
   }
 
-  const [updated] = await db
-    .update(platformSettingsTable)
-    .set(updates)
-    .where(eq(platformSettingsTable.id, settings.id))
-    .returning();
+  try {
+    const [updated] = await db
+      .update(platformSettingsTable)
+      .set(updates)
+      .where(eq(platformSettingsTable.id, settings.id))
+      .returning();
 
-  res.json(formatAdminSettings(updated));
+    if (!updated) {
+      res.status(500).json({ error: "Paramètres introuvables" });
+      return;
+    }
+    res.json(formatAdminSettings(updated));
+  } catch (error) {
+    req.log.error({ err: error }, "Admin settings update failed");
+    res.status(500).json({
+      error: "Impossible d'enregistrer les paramètres. Vérifiez que la base de production contient les colonnes AshtechPay.",
+    });
+  }
 });
 
 router.get("/admin/referral-settings", requireAdmin, async (_req, res): Promise<void> => {
