@@ -45,6 +45,17 @@ import("./artifacts/api-server/dist/index.mjs").catch((error) => {
     }
 
     const requestedPath = decodeURIComponent((req.url ?? "/").split("?")[0]);
+    if (requestedPath === "/api/healthz" || requestedPath.startsWith("/api/")) {
+      res.writeHead(503, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+      });
+      res.end(JSON.stringify({
+        status: "error",
+        message: "Fortexa API failed to start. Check the Node.js application log.",
+      }));
+      return;
+    }
     const candidate = resolve(publicDir, `.${requestedPath}`);
     const insidePublicDir = candidate === publicDir || candidate.startsWith(`${publicDir}/`);
     const filePath = insidePublicDir && existsSync(candidate) && statSync(candidate).isFile()
