@@ -63,7 +63,7 @@ export default function RegisterPage() {
             title: 'Compte créé avec succès',
             description: `Bienvenue ${response.user.name}!`,
           });
-          setLocation('/dashboard');
+          window.setTimeout(() => setLocation('/dashboard'), 350);
         },
         onError: (error: any) => {
           toast({

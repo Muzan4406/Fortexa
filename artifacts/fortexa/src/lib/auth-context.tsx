@@ -16,6 +16,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => 
     localStorage.getItem('fortexa_token')
   );
+  const [authenticatedUser, setAuthenticatedUser] = useState<User | null>(null);
   
   const { data: user, isLoading, error } = useGetMe({
     query: {
@@ -30,21 +31,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Token is invalid, clear it
       localStorage.removeItem('fortexa_token');
       setToken(null);
+      setAuthenticatedUser(null);
     }
   }, [error, token]);
 
   const setAuth = (newUser: User, newToken: string) => {
     localStorage.setItem('fortexa_token', newToken);
+    setAuthenticatedUser(newUser);
     setToken(newToken);
   };
 
   const clearAuth = () => {
     localStorage.removeItem('fortexa_token');
+    setAuthenticatedUser(null);
     setToken(null);
   };
 
+  const currentUser = authenticatedUser ?? user ?? null;
+
   return (
-    <AuthContext.Provider value={{ user: user || null, token, isLoading, setAuth, clearAuth }}>
+    <AuthContext.Provider value={{ user: currentUser, token, isLoading, setAuth, clearAuth }}>
       {children}
     </AuthContext.Provider>
   );

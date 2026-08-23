@@ -46,7 +46,7 @@ export default function LoginPage() {
             title: 'Connexion réussie',
             description: `Bienvenue ${response.user.name}`,
           });
-          setLocation('/dashboard');
+          window.setTimeout(() => setLocation('/dashboard'), 350);
         },
         onError: (error: any) => {
           toast({
