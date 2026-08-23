@@ -1728,7 +1728,6 @@ components:
         - sendavapayKeySet
         - sendavapayWebhookSecretSet
         - ashtechpayKeySet
-        - ashtechpayWebhookSecretSet
         - activeDepositProvider
         - usdtAddress
         - telegramGroupUrl
@@ -1763,9 +1762,6 @@ components:
         ashtechpayKeySet:
           type: boolean
           description: Whether an AshtechPay API key has been configured
-        ashtechpayWebhookSecretSet:
-          type: boolean
-          description: Whether an AshtechPay webhook secret has been configured
         activeDepositProvider:
           type: string
           enum: [sendavapay, ashtechpay]
@@ -1802,8 +1798,6 @@ components:
         sendavapayWebhookSecret:
           type: string
         ashtechpayKey:
-          type: string
-        ashtechpayWebhookSecret:
           type: string
         activeDepositProvider:
           type: string

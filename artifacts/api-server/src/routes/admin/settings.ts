@@ -25,7 +25,6 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     sendavapayKey,
     sendavapayWebhookSecret,
     ashtechpayKey,
-    ashtechpayWebhookSecret,
     activeDepositProvider,
     usdtAddress,
     telegramGroupUrl,
@@ -55,9 +54,6 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
   }
   if (ashtechpayKey && typeof ashtechpayKey === "string" && ashtechpayKey.trim().length > 0) {
     updates.ashtechpayKey = ashtechpayKey.trim();
-  }
-  if (ashtechpayWebhookSecret && typeof ashtechpayWebhookSecret === "string" && ashtechpayWebhookSecret.trim().length > 0) {
-    updates.ashtechpayWebhookSecret = ashtechpayWebhookSecret.trim();
   }
   if (activeDepositProvider !== undefined) {
     if (!["sendavapay", "ashtechpay"].includes(String(activeDepositProvider))) {

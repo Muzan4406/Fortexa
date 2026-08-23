@@ -46,6 +46,5 @@ export function formatAdminSettings(s: Awaited<ReturnType<typeof getSettings>>) 
     whatsappChannelUrl: s.whatsappChannelUrl,
     activeDepositProvider: s.activeDepositProvider,
     ashtechpayKeySet: s.ashtechpayKey.length > 0,
-    ashtechpayWebhookSecretSet: s.ashtechpayWebhookSecret.length > 0,
   };
 }

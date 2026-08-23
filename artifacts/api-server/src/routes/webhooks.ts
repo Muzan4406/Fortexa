@@ -1,5 +1,4 @@
 import { Router, type IRouter } from "express";
-import { createHmac, timingSafeEqual } from "crypto";
 import { db, usersTable, transactionsTable } from "@workspace/db";
 import { and, eq, or } from "drizzle-orm";
 import { creditReferralCommissions } from "../lib/referral";
@@ -9,28 +8,6 @@ import { getSettings } from "../lib/settings";
 const router: IRouter = Router();
 
 router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
-  const settings = await getSettings();
-  const secret = settings.ashtechpayWebhookSecret || process.env.ASHTECHPAY_WEBHOOK_SECRET;
-  const signature = String(req.headers["x-ashtech-signature"] ?? "");
-  const timestamp = String(req.headers["x-ashtech-timestamp"] ?? "");
-  const rawBody: Buffer | undefined = (req as any).rawBody;
-
-  if (secret) {
-    if (!signature || !timestamp || !rawBody) {
-      res.status(401).json({ error: "Signature AshtechPay manquante" });
-      return;
-    }
-    const expected = "sha256=" + createHmac("sha256", secret)
-      .update(`${timestamp}.${rawBody.toString("utf8")}`)
-      .digest("hex");
-    const valid = signature.length === expected.length &&
-      timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
-    if (!valid) {
-      res.status(401).json({ error: "Signature AshtechPay invalide" });
-      return;
-    }
-  }
-
   const payload = req.body as {
     event?: string;
     transaction_id?: string;
