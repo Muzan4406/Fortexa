@@ -344,8 +344,10 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
   // Validate the temporary client token against Sendavapay before attempting
   // the operator push. This produces a precise error when the 30-minute token
   // is expired or was not persisted correctly.
-  const tokenCheck = await getPaymentToken(tx.sendavapayPaymentToken);
-  if (!tokenCheck.success || !tokenCheck.data) {
+  const tokenCheck = tx.sendavapayPaymentToken.startsWith("ashtech:")
+    ? null
+    : await getPaymentToken(tx.sendavapayPaymentToken);
+  if (tokenCheck && (!tokenCheck.success || !tokenCheck.data)) {
     logger.warn(
       {
         transactionId: tx.id,
