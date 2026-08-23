@@ -126,7 +126,11 @@ export const GetDashboardResponse = zod.object({
   "gainsActive": zod.boolean(),
   "level1Percent": zod.number(),
   "level2Percent": zod.number(),
-  "level3Percent": zod.number()
+  "level3Percent": zod.number(),
+  "telegramGroupUrl": zod.string(),
+  "telegramChannelUrl": zod.string(),
+  "whatsappGroupUrl": zod.string(),
+  "whatsappChannelUrl": zod.string()
 })
 })
 

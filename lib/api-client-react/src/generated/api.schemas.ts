@@ -84,6 +84,10 @@ export interface PublicSettings {
   level1Percent: number;
   level2Percent: number;
   level3Percent: number;
+  telegramGroupUrl: string;
+  telegramChannelUrl: string;
+  whatsappGroupUrl: string;
+  whatsappChannelUrl: string;
 }
 
 export interface Dashboard {

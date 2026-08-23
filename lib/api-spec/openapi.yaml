@@ -1120,7 +1120,7 @@ components:
 
     PublicSettings:
       type: object
-      required: [dailyRatePercent, maxCapital, minDeposit, minWithdrawal, withdrawalFeePercent, gainsActive, level1Percent, level2Percent, level3Percent]
+      required: [dailyRatePercent, maxCapital, minDeposit, minWithdrawal, withdrawalFeePercent, gainsActive, level1Percent, level2Percent, level3Percent, telegramGroupUrl, telegramChannelUrl, whatsappGroupUrl, whatsappChannelUrl]
       properties:
         dailyRatePercent:
           type: number
@@ -1140,6 +1140,14 @@ components:
           type: number
         level3Percent:
           type: number
+        telegramGroupUrl:
+          type: string
+        telegramChannelUrl:
+          type: string
+        whatsappGroupUrl:
+          type: string
+        whatsappChannelUrl:
+          type: string
 
     # ── Transactions ──
 
