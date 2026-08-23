@@ -1727,6 +1727,9 @@ components:
         - level3Percent
         - sendavapayKeySet
         - sendavapayWebhookSecretSet
+        - ashtechpayKeySet
+        - ashtechpayWebhookSecretSet
+        - activeDepositProvider
         - usdtAddress
         - telegramGroupUrl
         - telegramChannelUrl
@@ -1757,6 +1760,15 @@ components:
         sendavapayWebhookSecretSet:
           type: boolean
           description: Whether a Sendavapay webhook secret has been configured
+        ashtechpayKeySet:
+          type: boolean
+          description: Whether an AshtechPay API key has been configured
+        ashtechpayWebhookSecretSet:
+          type: boolean
+          description: Whether an AshtechPay webhook secret has been configured
+        activeDepositProvider:
+          type: string
+          enum: [sendavapay, ashtechpay]
         usdtAddress:
           type: string
           description: USDT BEP20 wallet address for deposits
@@ -1789,6 +1801,13 @@ components:
           description: Sendavapay SDK key (write-only — never returned in GET)
         sendavapayWebhookSecret:
           type: string
+        ashtechpayKey:
+          type: string
+        ashtechpayWebhookSecret:
+          type: string
+        activeDepositProvider:
+          type: string
+          enum: [sendavapay, ashtechpay]
           description: Sendavapay webhook HMAC secret (write-only — never returned in GET)
         usdtAddress:
           type: string

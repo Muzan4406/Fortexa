@@ -17,6 +17,9 @@ export const platformSettingsTable = pgTable("platform_settings", {
   // Payment integration keys — stored in DB so admin can configure from the panel
   sendavapayKey: text("sendavapay_key").notNull().default(""),
   sendavapayWebhookSecret: text("sendavapay_webhook_secret").notNull().default(""),
+  ashtechpayKey: text("ashtechpay_key").notNull().default(""),
+  ashtechpayWebhookSecret: text("ashtechpay_webhook_secret").notNull().default(""),
+  activeDepositProvider: text("active_deposit_provider").notNull().default("sendavapay"),
   usdtAddress: text("usdt_address").notNull().default(""),
   telegramGroupUrl: text("telegram_group_url").notNull().default(""),
   telegramChannelUrl: text("telegram_channel_url").notNull().default(""),

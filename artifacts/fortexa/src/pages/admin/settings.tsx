@@ -31,6 +31,9 @@ const settingsSchema = z.object({
 const paymentSchema = z.object({
   sendavapayKey: z.string(),
   sendavapayWebhookSecret: z.string(),
+  ashtechpayKey: z.string(),
+  ashtechpayWebhookSecret: z.string(),
+  activeDepositProvider: z.enum(['sendavapay', 'ashtechpay']),
   usdtAddress: z.string(),
 });
 
@@ -103,7 +106,14 @@ export default function AdminSettingsPage() {
 
   const paymentForm = useForm<PaymentForm>({
     resolver: zodResolver(paymentSchema),
-    defaultValues: { sendavapayKey: '', sendavapayWebhookSecret: '', usdtAddress: '' },
+    defaultValues: {
+      sendavapayKey: '',
+      sendavapayWebhookSecret: '',
+      ashtechpayKey: '',
+      ashtechpayWebhookSecret: '',
+      activeDepositProvider: 'sendavapay',
+      usdtAddress: '',
+    },
   });
   const socialForm = useForm<SocialForm>({
     resolver: zodResolver(socialSchema),
@@ -126,6 +136,9 @@ export default function AdminSettingsPage() {
       paymentForm.reset({
         sendavapayKey: '',
         sendavapayWebhookSecret: '',
+        ashtechpayKey: '',
+        ashtechpayWebhookSecret: '',
+        activeDepositProvider: settings.activeDepositProvider === 'ashtechpay' ? 'ashtechpay' : 'sendavapay',
         usdtAddress: settings.usdtAddress ?? '',
       });
       socialForm.reset({
@@ -160,6 +173,9 @@ export default function AdminSettingsPage() {
     const payload: Record<string, string> = {};
     if (data.sendavapayKey.trim()) payload.sendavapayKey = data.sendavapayKey.trim();
     if (data.sendavapayWebhookSecret.trim()) payload.sendavapayWebhookSecret = data.sendavapayWebhookSecret.trim();
+    if (data.ashtechpayKey.trim()) payload.ashtechpayKey = data.ashtechpayKey.trim();
+    if (data.ashtechpayWebhookSecret.trim()) payload.ashtechpayWebhookSecret = data.ashtechpayWebhookSecret.trim();
+    payload.activeDepositProvider = data.activeDepositProvider;
     payload.usdtAddress = data.usdtAddress.trim();
 
     updateSettingsMutation.mutate(
@@ -170,6 +186,8 @@ export default function AdminSettingsPage() {
           // Clear sensitive fields after save
           paymentForm.setValue('sendavapayKey', '');
           paymentForm.setValue('sendavapayWebhookSecret', '');
+          paymentForm.setValue('ashtechpayKey', '');
+          paymentForm.setValue('ashtechpayWebhookSecret', '');
           queryClient.invalidateQueries({ queryKey: getGetAdminSettingsQueryKey() });
         },
         onError: (err: any) => toast({ title: 'Erreur', description: err.data?.error, variant: 'destructive' }),
@@ -370,6 +388,62 @@ export default function AdminSettingsPage() {
                         onChange={field.onChange}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <FormField control={paymentForm.control} name="ashtechpayKey" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      Clé API AshtechPay
+                      {settings?.ashtechpayKeySet && (
+                        <span className="flex items-center gap-1 text-xs text-emerald-600 font-normal">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Configurée
+                        </span>
+                      )}
+                    </FormLabel>
+                    <FormControl>
+                      <SecretInput
+                        placeholder={settings?.ashtechpayKeySet ? '••••••••••••• (laisser vide pour conserver)' : 'Entrez votre clé API AshtechPay'}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <FormField control={paymentForm.control} name="ashtechpayWebhookSecret" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      Secret Webhook AshtechPay
+                      {settings?.ashtechpayWebhookSecretSet && (
+                        <span className="flex items-center gap-1 text-xs text-emerald-600 font-normal">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Configuré
+                        </span>
+                      )}
+                    </FormLabel>
+                    <FormControl>
+                      <SecretInput
+                        placeholder={settings?.ashtechpayWebhookSecretSet ? '••••••••••••• (laisser vide pour conserver)' : 'Entrez le secret webhook AshtechPay'}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <FormField control={paymentForm.control} name="activeDepositProvider" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fournisseur Mobile Money actif</FormLabel>
+                    <FormControl>
+                      <select {...field} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                        <option value="sendavapay">SendavaPay</option>
+                        <option value="ashtechpay">AshtechPay</option>
+                      </select>
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">Le changement s’applique aux nouveaux dépôts Mobile Money.</p>
                     <FormMessage />
                   </FormItem>
                 )} />

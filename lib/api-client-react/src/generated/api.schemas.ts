@@ -547,6 +547,11 @@ export interface PlatformSettings {
   sendavapayKeySet: boolean;
   /** Whether a Sendavapay webhook secret has been configured */
   sendavapayWebhookSecretSet: boolean;
+  /** Whether an AshtechPay API key has been configured */
+  ashtechpayKeySet: boolean;
+  /** Whether an AshtechPay webhook secret has been configured */
+  ashtechpayWebhookSecretSet: boolean;
+  activeDepositProvider: string;
   /** USDT BEP20 wallet address for deposits */
   usdtAddress: string;
   telegramGroupUrl: string;
@@ -566,6 +571,9 @@ export interface PlatformSettingsUpdate {
   sendavapayKey?: string;
   /** Sendavapay webhook HMAC secret (write-only — never returned in GET) */
   sendavapayWebhookSecret?: string;
+  ashtechpayKey?: string;
+  ashtechpayWebhookSecret?: string;
+  activeDepositProvider?: string;
   /** USDT BEP20 wallet address for deposits */
   usdtAddress?: string;
   telegramGroupUrl?: string;

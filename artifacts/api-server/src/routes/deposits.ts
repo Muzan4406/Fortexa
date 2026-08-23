@@ -14,6 +14,7 @@ import {
   initiatePayment,
   submitOtp,
 } from "../lib/sendavapay";
+import { collect as ashtechCollect, getCountries as getAshtechCountries } from "../lib/ashtechpay";
 
 const router: IRouter = Router();
 
@@ -193,6 +194,55 @@ router.post("/deposits/initiate", requireAuth, async (req, res): Promise<void> =
 
   const externalReference = `fortexa_dep_${userId}_${Date.now()}`;
 
+  if (settings.activeDepositProvider === "ashtechpay") {
+    const key = settings.ashtechpayKey || process.env.ASHTECHPAY_API_KEY || "";
+    if (!key) {
+      res.status(503).json({ error: "Paiement AshtechPay non configuré — contactez l'administrateur" });
+      return;
+    }
+    const countriesResponse = await getAshtechCountries(key);
+    const country = Array.isArray(countriesResponse.data)
+      ? countriesResponse.data.find((item) => item.code === payerCountry)
+      : undefined;
+    if (!country || country.currency !== "XOF" || country.operators.length === 0) {
+      res.status(400).json({ error: "Aucun opérateur AshtechPay disponible pour ce pays" });
+      return;
+    }
+    const [tx] = await db
+      .insert(transactionsTable)
+      .values({
+        userId,
+        type: "deposit",
+        amount: numAmount.toFixed(8),
+        fee: "0",
+        netAmount: numAmount.toFixed(8),
+        status: "pending",
+        depositMethod: "mobile_money",
+        payerCountry,
+        payerPhone: fullPhone,
+        sendavapayRef: externalReference,
+        sendavapayPaymentToken: `ashtech:${country.operators.join("|")}`,
+        description: "Dépôt Mobile Money AshtechPay — en attente",
+      })
+      .returning();
+    const operators = country.operators.map((name) => ({
+      id: name,
+      name,
+      requiresOtp: false,
+      status: "online",
+    }));
+    res.json({
+      transactionId: tx.id,
+      reference: externalReference,
+      amount: numAmount,
+      payerCountry,
+      payerPhone: fullPhone,
+      operators,
+      provider: "ashtechpay",
+    });
+    return;
+  }
+
   // Read SDK key from DB settings (admin-configurable)
   const sendavapayKey = settings.sendavapayKey || process.env.SENDAVAPAY_SDK_KEY || "";
   if (!sendavapayKey) {
@@ -316,6 +366,53 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
     return;
   }
 
+  const settings = await getSettings();
+  if (settings.activeDepositProvider === "ashtechpay") {
+    const key = settings.ashtechpayKey || process.env.ASHTECHPAY_API_KEY || "";
+    const storedOperators = tx.sendavapayPaymentToken?.startsWith("ashtech:")
+      ? tx.sendavapayPaymentToken.slice("ashtech:".length).split("|")
+      : [];
+    const operator = String(operatorId);
+    if (!key || !storedOperators.includes(operator)) {
+      res.status(400).json({ error: "Opérateur AshtechPay invalide" });
+      return;
+    }
+    const domain =
+      process.env.APP_URL?.replace(/^https?:\/\//, "").replace(/\/+$/, "") ||
+      process.env.REPLIT_DEV_DOMAIN ||
+      process.env.REPLIT_DOMAINS?.split(",")[0]?.trim();
+    const notifyUrl = domain ? `https://${domain}${apiPath("/webhooks/ashtechpay")}` : "";
+    const result = await ashtechCollect(key, {
+      amount: parseFloat(tx.amount),
+      currency: "XOF",
+      phone: tx.payerPhone!.replace(/^\+228/, ""),
+      operator,
+      country_code: tx.payerCountry!,
+      reference: tx.sendavapayRef!,
+      notify_url: notifyUrl,
+    });
+    if (result.status === 202) {
+      res.json({
+        requiresOtp: false,
+        requiresRedirect: result.data.flow === "wave",
+        redirectUrl: result.data.wave_url ?? null,
+        reference: result.data.reference ?? tx.sendavapayRef,
+      });
+      return;
+    }
+    if (result.data.error === "otp_required" || result.data.code === "otp_required") {
+      res.json({
+        requiresOtp: true,
+        otpToken: result.data.reference ?? tx.sendavapayRef,
+        ussdCode: result.data.ussd_code ?? null,
+        reference: result.data.reference ?? tx.sendavapayRef,
+      });
+      return;
+    }
+    res.status(400).json({ error: result.data.message ?? result.data.error ?? "Échec de l'initiation AshtechPay" });
+    return;
+  }
+
   const result = await initiatePayment({
     paymentToken: tx.sendavapayPaymentToken,
     payerName: user.name,
@@ -352,6 +449,40 @@ router.post("/deposits/submit-otp", requireAuth, async (req, res): Promise<void>
 
   if (!otpToken || !otp) {
     res.status(400).json({ error: "otpToken et otp requis" });
+    return;
+  }
+
+  const settings = await getSettings();
+  if (settings.activeDepositProvider === "ashtechpay") {
+    const key = settings.ashtechpayKey || process.env.ASHTECHPAY_API_KEY || "";
+    const [tx] = await db
+      .select()
+      .from(transactionsTable)
+      .where(and(eq(transactionsTable.userId, req.userId!), eq(transactionsTable.sendavapayRef, String(otpToken))));
+    if (!tx || !tx.sendavapayPaymentToken?.startsWith("ashtech:")) {
+      res.status(404).json({ error: "Paiement AshtechPay introuvable" });
+      return;
+    }
+    const operator = tx.sendavapayPaymentToken.slice("ashtech:".length).split("|")[0];
+    const domain =
+      process.env.APP_URL?.replace(/^https?:\/\//, "").replace(/\/+$/, "") ||
+      process.env.REPLIT_DEV_DOMAIN ||
+      process.env.REPLIT_DOMAINS?.split(",")[0]?.trim();
+    const ashtechResult = await ashtechCollect(key, {
+      amount: parseFloat(tx.amount),
+      currency: "XOF",
+      phone: tx.payerPhone!.replace(/^\+228/, ""),
+      operator,
+      country_code: tx.payerCountry!,
+      reference: String(otpToken),
+      notify_url: domain ? `https://${domain}${apiPath("/webhooks/ashtechpay")}` : "",
+      otp: String(otp),
+    });
+    if (ashtechResult.status === 202) {
+      res.json({ success: true, reference: ashtechResult.data.reference ?? String(otpToken) });
+      return;
+    }
+    res.status(400).json({ error: ashtechResult.data.message ?? ashtechResult.data.error ?? "Code OTP AshtechPay invalide" });
     return;
   }
 

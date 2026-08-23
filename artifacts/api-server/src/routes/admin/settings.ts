@@ -24,6 +24,9 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     level3Percent,
     sendavapayKey,
     sendavapayWebhookSecret,
+    ashtechpayKey,
+    ashtechpayWebhookSecret,
+    activeDepositProvider,
     usdtAddress,
     telegramGroupUrl,
     telegramChannelUrl,
@@ -49,6 +52,19 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
   }
   if (sendavapayWebhookSecret && typeof sendavapayWebhookSecret === "string" && sendavapayWebhookSecret.trim().length > 0) {
     updates.sendavapayWebhookSecret = sendavapayWebhookSecret.trim();
+  }
+  if (ashtechpayKey && typeof ashtechpayKey === "string" && ashtechpayKey.trim().length > 0) {
+    updates.ashtechpayKey = ashtechpayKey.trim();
+  }
+  if (ashtechpayWebhookSecret && typeof ashtechpayWebhookSecret === "string" && ashtechpayWebhookSecret.trim().length > 0) {
+    updates.ashtechpayWebhookSecret = ashtechpayWebhookSecret.trim();
+  }
+  if (activeDepositProvider !== undefined) {
+    if (!["sendavapay", "ashtechpay"].includes(String(activeDepositProvider))) {
+      res.status(400).json({ error: "Fournisseur de dépôt invalide" });
+      return;
+    }
+    updates.activeDepositProvider = String(activeDepositProvider);
   }
   if (usdtAddress !== undefined) updates.usdtAddress = String(usdtAddress).trim();
   for (const [key, value] of Object.entries({
