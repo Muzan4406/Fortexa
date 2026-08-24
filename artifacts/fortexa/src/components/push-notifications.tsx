@@ -27,7 +27,11 @@ export function PushNotifications() {
   async function syncSubscription() {
     if (!token || !("serviceWorker" in navigator)) return;
     const registration = await navigator.serviceWorker.register(`${(import.meta.env.BASE_URL || "/").replace(/\/$/, "")}/push-sw.js`);
+    await registration.update();
     const response = await fetch(apiUrl("/push/vapid-public-key"), { headers: { Authorization: `Bearer ${token}` } });
+    if (!response.ok) {
+      throw new Error(`Impossible de récupérer la clé push (${response.status})`);
+    }
     const { publicKey } = await response.json();
     if (!publicKey) {
       setStatus("unsupported");
@@ -40,11 +44,14 @@ export function PushNotifications() {
         applicationServerKey: urlBase64ToUint8Array(publicKey),
       });
     }
-    await fetch(apiUrl("/push/subscribe"), {
+    const subscribeResponse = await fetch(apiUrl("/push/subscribe"), {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(subscription.toJSON()),
     });
+    if (!subscribeResponse.ok) {
+      throw new Error(`Impossible d'enregistrer l'abonnement (${subscribeResponse.status})`);
+    }
     setStatus("on");
   }
 
