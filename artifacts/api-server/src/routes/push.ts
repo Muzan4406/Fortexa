@@ -1,0 +1,48 @@
+import { Router, type IRouter } from "express";
+import { db, pushSubscriptionsTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
+import { requireAuth } from "../lib/auth";
+import { getVapidPublicKey } from "../lib/push";
+
+const router: IRouter = Router();
+
+router.get("/push/vapid-public-key", requireAuth, (_req, res) => {
+  res.json({ publicKey: getVapidPublicKey() });
+});
+
+router.post("/push/subscribe", requireAuth, async (req, res): Promise<void> => {
+  const { endpoint, keys, expirationTime } = req.body ?? {};
+  if (typeof endpoint !== "string" || !endpoint || !keys?.p256dh || !keys?.auth) {
+    res.status(400).json({ error: "Abonnement push invalide" });
+    return;
+  }
+
+  await db.insert(pushSubscriptionsTable).values({
+    userId: req.userId!,
+    endpoint,
+    p256dh: String(keys.p256dh),
+    auth: String(keys.auth),
+    expirationTime: expirationTime == null ? null : String(expirationTime),
+  }).onConflictDoUpdate({
+    target: pushSubscriptionsTable.endpoint,
+    set: {
+      userId: req.userId!,
+      p256dh: String(keys.p256dh),
+      auth: String(keys.auth),
+      expirationTime: expirationTime == null ? null : String(expirationTime),
+      updatedAt: new Date(),
+    },
+  });
+
+  res.status(204).send();
+});
+
+router.delete("/push/subscribe", requireAuth, async (req, res): Promise<void> => {
+  const endpoint = typeof req.body?.endpoint === "string" ? req.body.endpoint : "";
+  if (endpoint) {
+    await db.delete(pushSubscriptionsTable).where(eq(pushSubscriptionsTable.endpoint, endpoint));
+  }
+  res.status(204).send();
+});
+
+export default router;

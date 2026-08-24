@@ -10,6 +10,7 @@ import profileRouter from "./profile";
 import announcementsRouter from "./announcements";
 import adminRouter from "./admin";
 import webhooksRouter from "./webhooks";
+import pushRouter from "./push";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(profileRouter);
 router.use(announcementsRouter);
 router.use(adminRouter);
 router.use(webhooksRouter);
+router.use(pushRouter);
 
 export default router;

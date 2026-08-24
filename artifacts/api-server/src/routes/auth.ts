@@ -6,6 +6,7 @@ import { signToken, requireAuth } from "../lib/auth";
 import { getSettings } from "../lib/settings";
 import { nanoid } from "nanoid";
 import { sendTelegramNotification } from "../lib/telegram";
+import { sendPushToUsers } from "../lib/push";
 import { createHash, randomInt, randomBytes } from "crypto";
 
 const adminChallenges = new Map<string, {
@@ -98,6 +99,14 @@ router.post("/auth/register", async (req, res): Promise<void> => {
   void sendTelegramNotification(
     `👤 Nouvelle inscription\nUtilisateur #${user.id}\nPays : ${user.country}`,
   );
+  if (referredById) {
+    void sendPushToUsers([referredById], {
+      title: "Nouveau filleul inscrit",
+      body: `${name} vient de s'inscrire avec votre lien de parrainage.`,
+      url: "/referrals",
+      tag: `referral-signup-${user.id}`,
+    });
+  }
   res.status(201).json({ user: formatUser(user), token });
 });
 

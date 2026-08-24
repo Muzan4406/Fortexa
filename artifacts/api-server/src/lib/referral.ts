@@ -2,6 +2,7 @@ import { db, usersTable, referralCommissionsTable, transactionsTable } from "@wo
 import { eq } from "drizzle-orm";
 import { getSettings } from "./settings";
 import { logger } from "./logger";
+import { sendPushToUsers } from "./push";
 
 /**
  * When a deposit is approved, credit referral commissions to the upline chain (up to 3 levels).
@@ -67,6 +68,12 @@ export async function creditReferralCommissions(
     });
 
     logger.info({ referrerId, userId, level, commissionAmount }, "Referral commission credited");
+    void sendPushToUsers([referrerId], {
+      title: "Commission de parrainage reçue",
+      body: `Vous avez reçu ${commissionAmount.toFixed(0)} FCFA de commission (niveau ${level}).`,
+      url: "/referrals",
+      tag: `commission-${transactionId}-${level}`,
+    });
     currentUserId = referrerId;
   }
 }
