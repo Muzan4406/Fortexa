@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowUpCircle, CheckCircle, Clock, XCircle, AlertCircle, Smartphone, Wallet } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { useQueryClient } from '@tanstack/react-query';
+import { ALL_COUNTRIES, getCurrencyForCountry } from '@/lib/countries';
 // ── Mobile Money countries (same 4 as deposit) ─────────────────────────────
 const XOF_COUNTRY_CODES = new Set(['TG', 'BJ', 'BF', 'CI', 'Togo', 'Bénin', 'Burkina Faso', "Côte d'Ivoire"]);
 const COUNTRY_NAMES: Record<string, string> = {
@@ -56,7 +57,15 @@ const usdtSchema = z.object({
   phone: z.string().optional(),
 });
 
-type WithdrawalForm = z.infer<typeof mobileMoneySchema>;
+const withdrawalSchema = z.object({
+  country: z.string().min(1, 'Pays requis'),
+  operator: z.string().optional(),
+  amount: z.coerce.number().min(0.000001, 'Montant invalide'),
+  phone: z.string().optional(),
+  usdtAddress: z.string().optional(),
+});
+
+type WithdrawalForm = z.infer<typeof withdrawalSchema>;
 
 export default function WithdrawPage() {
   const { toast } = useToast();
@@ -67,16 +76,18 @@ export default function WithdrawPage() {
 
   // Detect country-based payment method
   const country = (user as any)?.country ?? '';
-  const isMobileMoney = XOF_COUNTRY_CODES.has(country);
+  const accountCountry = COUNTRY_NAMES[country] ?? country;
+  const [selectedCountry, setSelectedCountry] = useState(accountCountry);
+  const isMobileMoney = getCurrencyForCountry(selectedCountry) === 'FCFA (XOF)';
   const { data: usdtInfo } = useGetUsdtInfo({ query: { enabled: !!user && !isMobileMoney, queryKey: getGetUsdtInfoQueryKey() } });
   const usdtRate = usdtInfo?.usdtRate || 655;
   const minimumXof = dashboard?.settings.minWithdrawal || 3000;
   const minimumUsdt = minimumXof / usdtRate;
 
   const form = useForm<WithdrawalForm>({
-    resolver: zodResolver(isMobileMoney ? mobileMoneySchema : usdtSchema),
+    resolver: zodResolver(withdrawalSchema),
     defaultValues: {
-      country,
+      country: selectedCountry,
       operator: '',
       amount: isMobileMoney ? minimumXof : Number(minimumUsdt.toFixed(6)),
       phone: '',
@@ -85,12 +96,17 @@ export default function WithdrawPage() {
   });
 
   useEffect(() => {
-    if (country) form.setValue('country', country);
-  }, [country, form]);
+    if (accountCountry) {
+      setSelectedCountry(accountCountry);
+      form.setValue('country', accountCountry);
+    }
+  }, [accountCountry, form]);
 
   const watchAmount = form.watch('amount');
   const feePercent = dashboard?.settings.withdrawalFeePercent || 5;
-  const displayAmount = watchAmount || 0;
+  // Native number inputs emit strings while the user is editing. Normalize
+  // before calling numeric methods such as toFixed or formatCurrency.
+  const displayAmount = Number(watchAmount) || 0;
   const fee = displayAmount * (feePercent / 100);
   const netAmount = displayAmount - fee;
 
@@ -107,8 +123,8 @@ export default function WithdrawPage() {
     }
 
     const payload = isMobileMoney
-      ? { amount: data.amount, country, operator: data.operator, phone: data.phone }
-      : { amount: requestedXof, usdtAddress: data.usdtAddress };
+      ? { amount: data.amount, country: selectedCountry, operator: data.operator, phone: data.phone }
+      : { amount: requestedXof, country: selectedCountry, usdtAddress: data.usdtAddress };
 
     createWithdrawalMutation.mutate(
       { data: payload as any },
@@ -193,8 +209,10 @@ export default function WithdrawPage() {
                       <FormItem>
                         <FormLabel>Pays du retrait</FormLabel>
                         <FormControl>
-                          <select {...field} disabled className="flex h-12 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground">
-                            <option value={country}>{COUNTRY_NAMES[country] ?? country}</option>
+                           <select {...field} onChange={(event) => { field.onChange(event); setSelectedCountry(event.target.value); }} className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground">
+                             {ALL_COUNTRIES.map((availableCountry) => (
+                               <option key={availableCountry.name} value={availableCountry.name}>{availableCountry.name}</option>
+                             ))}
                           </select>
                         </FormControl>
                         <FormDescription className="text-xs">Pays enregistré sur votre compte</FormDescription>
@@ -211,7 +229,7 @@ export default function WithdrawPage() {
                         <FormControl>
                           <select {...field} className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground">
                             <option value="">Sélectionnez votre opérateur</option>
-                            {(MOBILE_MONEY_OPERATORS[country] ?? []).map((operator) => <option key={operator} value={operator}>{operator}</option>)}
+                             {(MOBILE_MONEY_OPERATORS[selectedCountry] ?? []).map((operator) => <option key={operator} value={operator}>{operator}</option>)}
                           </select>
                         </FormControl>
                         <FormMessage />

@@ -112,8 +112,6 @@ export interface GainsSnapshot {
   /** ISO timestamp when this snapshot was taken, for client-side interpolation */
   snapshotTime: string;
   gainsActive: boolean;
-  maintenanceMode: boolean;
-  maintenanceMessage: string;
 }
 
 export type TransactionType = typeof TransactionType[keyof typeof TransactionType];
@@ -545,6 +543,8 @@ export interface PlatformSettings {
   minWithdrawal: number;
   withdrawalFeePercent: number;
   gainsActive: boolean;
+  maintenanceMode: boolean;
+  maintenanceMessage: string;
   level1Percent: number;
   level2Percent: number;
   level3Percent: number;

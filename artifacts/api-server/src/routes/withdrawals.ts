@@ -80,13 +80,10 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
-  const mobileMoneyUser = MOBILE_MONEY_COUNTRIES.has(user.country);
-  const operatorCountry = COUNTRY_CODES[user.country] ?? user.country;
+  const requestedCountry = typeof country === "string" && country.trim() ? country.trim() : user.country;
+  const mobileMoneyUser = MOBILE_MONEY_COUNTRIES.has(requestedCountry);
+  const operatorCountry = COUNTRY_CODES[requestedCountry] ?? requestedCountry;
   if (mobileMoneyUser) {
-    if (country !== user.country) {
-      res.status(400).json({ error: "Le pays du retrait doit correspondre au pays du compte" });
-      return;
-    }
     if (!operator || typeof operator !== "string" || !MOBILE_MONEY_OPERATORS[operatorCountry]?.has(operator)) {
       res.status(400).json({ error: "Un opérateur Mobile Money valide est requis pour votre pays" });
       return;
@@ -126,10 +123,10 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
     netAmount: netAmount.toFixed(8),
     status: "pending",
     depositMethod: withdrawalMethod,
-    payerCountry: mobileMoneyUser ? country : user.country,
+     payerCountry: requestedCountry,
     payerPhone: mobileMoneyUser ? phone.trim() : null,
     description: phone
-        ? `Retrait Mobile Money — ${country} — ${operator} — ${phone}`
+         ? `Retrait Mobile Money — ${requestedCountry} — ${operator} — ${phone}`
         : usdtAddress
           ? `Retrait → USDT BEP20 : ${usdtAddress}`
           : "Demande de retrait",

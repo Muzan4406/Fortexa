@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
-import { Settings, Bell, Trash2, ToggleLeft, ToggleRight, CreditCard, Eye, EyeOff, CheckCircle2, MessageCircle, Send, UsersRound } from 'lucide-react';
+import { Settings, Bell, Trash2, ToggleLeft, ToggleRight, CreditCard, Eye, EyeOff, CheckCircle2, MessageCircle, UsersRound, Wrench } from 'lucide-react';
 
 const settingsSchema = z.object({
   dailyRatePercent: z.coerce.number().min(0).max(100),
@@ -23,6 +23,8 @@ const settingsSchema = z.object({
   minWithdrawal: z.coerce.number().min(1),
   withdrawalFeePercent: z.coerce.number().min(0).max(100),
   gainsActive: z.boolean(),
+  maintenanceMode: z.boolean(),
+  maintenanceMessage: z.string().min(5).max(500),
   level1Percent: z.coerce.number().min(0).max(100),
   level2Percent: z.coerce.number().min(0).max(100),
   level3Percent: z.coerce.number().min(0).max(100),
@@ -37,8 +39,6 @@ const paymentSchema = z.object({
 });
 
 const socialSchema = z.object({
-  telegramGroupUrl: z.string(),
-  telegramChannelUrl: z.string(),
   whatsappGroupUrl: z.string(),
   whatsappChannelUrl: z.string(),
   whatsappSupportUrl: z.string(),
@@ -102,6 +102,8 @@ export default function AdminSettingsPage() {
       minWithdrawal: 3000,
       withdrawalFeePercent: 5,
       gainsActive: true,
+      maintenanceMode: false,
+      maintenanceMessage: 'Le site est temporairement en maintenance. Merci de revenir bientôt.',
       level1Percent: 5,
       level2Percent: 2,
       level3Percent: 1,
@@ -120,7 +122,7 @@ export default function AdminSettingsPage() {
   });
   const socialForm = useForm<SocialForm>({
     resolver: zodResolver(socialSchema),
-    defaultValues: { telegramGroupUrl: '', telegramChannelUrl: '', whatsappGroupUrl: '', whatsappChannelUrl: '', whatsappSupportUrl: '' },
+    defaultValues: { whatsappGroupUrl: '', whatsappChannelUrl: '', whatsappSupportUrl: '' },
   });
 
   useEffect(() => {
@@ -132,6 +134,8 @@ export default function AdminSettingsPage() {
         minWithdrawal: settings.minWithdrawal,
         withdrawalFeePercent: settings.withdrawalFeePercent,
         gainsActive: settings.gainsActive,
+        maintenanceMode: settings.maintenanceMode ?? false,
+        maintenanceMessage: settings.maintenanceMessage ?? 'Le site est temporairement en maintenance. Merci de revenir bientôt.',
         level1Percent: settings.level1Percent,
         level2Percent: settings.level2Percent,
         level3Percent: settings.level3Percent,
@@ -144,8 +148,6 @@ export default function AdminSettingsPage() {
         usdtAddress: settings.usdtAddress ?? '',
       });
       socialForm.reset({
-        telegramGroupUrl: settings.telegramGroupUrl ?? '',
-        telegramChannelUrl: settings.telegramChannelUrl ?? '',
         whatsappGroupUrl: settings.whatsappGroupUrl ?? '',
         whatsappChannelUrl: settings.whatsappChannelUrl ?? '',
         whatsappSupportUrl: settings.whatsappSupportUrl ?? '',
@@ -244,6 +246,7 @@ export default function AdminSettingsPage() {
   };
 
   const gainsActive = form.watch('gainsActive');
+  const maintenanceMode = form.watch('maintenanceMode');
 
   return (
     <AdminLayout title="Paramètres">
@@ -298,6 +301,26 @@ export default function AdminSettingsPage() {
                       <FormMessage />
                     </FormItem>
                   )} />
+                </div>
+                <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50/60 p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="flex items-center gap-2 font-semibold text-foreground"><Wrench className="h-4 w-4 text-amber-600" /> Mode maintenance</p>
+                      <p className="mt-1 text-xs text-muted-foreground">Les utilisateurs verront la page de maintenance après connexion. Les administrateurs gardent l’accès.</p>
+                    </div>
+                    <button type="button" onClick={() => form.setValue('maintenanceMode', !maintenanceMode)} className="shrink-0" aria-label="Activer ou désactiver le mode maintenance">
+                      {maintenanceMode ? <ToggleRight className="h-9 w-9 text-amber-600" /> : <ToggleLeft className="h-9 w-9 text-muted-foreground" />}
+                    </button>
+                  </div>
+                  {maintenanceMode && (
+                    <FormField control={form.control} name="maintenanceMessage" render={({ field }) => (
+                      <FormItem className="mt-4">
+                        <FormLabel>Message affiché aux utilisateurs</FormLabel>
+                        <FormControl><Input placeholder="Le site est temporairement en maintenance..." {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  )}
                 </div>
 
                 {/* Gains toggle */}
@@ -482,20 +505,6 @@ export default function AdminSettingsPage() {
           <Form {...socialForm}>
             <form onSubmit={socialForm.handleSubmit(onSocialSubmit)} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
-                <FormField control={socialForm.control} name="telegramGroupUrl" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2"><UsersRound className="w-4 h-4 text-[#229ED9]" /> Groupe Telegram</FormLabel>
-                    <FormControl><Input placeholder="https://t.me/..." {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={socialForm.control} name="telegramChannelUrl" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2"><Send className="w-4 h-4 text-[#229ED9]" /> Chaîne Telegram</FormLabel>
-                    <FormControl><Input placeholder="https://t.me/..." {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
                 <FormField control={socialForm.control} name="whatsappGroupUrl" render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2"><UsersRound className="w-4 h-4 text-[#25D366]" /> Groupe WhatsApp</FormLabel>
