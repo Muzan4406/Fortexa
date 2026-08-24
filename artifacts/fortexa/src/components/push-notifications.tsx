@@ -8,7 +8,7 @@ function apiUrl(path: string) {
   return `${base}/api${path}`;
 }
 
-export function PushNotifications() {
+export function PushNotifications({ showControl = true }: { showControl?: boolean }) {
   const { token } = useAuth();
   const { toast } = useToast();
   const [status, setStatus] = useState<"unsupported" | "blocked" | "off" | "on" | "error" | "loading">("loading");
@@ -32,7 +32,7 @@ export function PushNotifications() {
     if (!token || !("serviceWorker" in navigator)) return;
     const registration = await navigator.serviceWorker.register(`${(import.meta.env.BASE_URL || "/").replace(/\/$/, "")}/push-sw.js`);
     await registration.update();
-    const response = await fetch(apiUrl("/push/vapid-public-key"), { headers: { Authorization: `Bearer ${token}` } });
+    const response = await fetch(apiUrl("/push/vapid-public-key"));
     if (!response.ok) {
       throw new Error(`Impossible de récupérer la clé push (${response.status})`);
     }
@@ -81,6 +81,7 @@ export function PushNotifications() {
   }
 
   if (status === "loading" || status === "unsupported") return null;
+  if (!showControl) return null;
   if (status === "on") {
     return <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4"><CheckCircle2 className="h-5 w-5 text-emerald-600" /><div><p className="text-sm font-semibold text-foreground">Notifications push activées</p><p className="text-xs text-muted-foreground">Commissions, filleuls et annonces vous seront signalés.</p></div></div>;
   }

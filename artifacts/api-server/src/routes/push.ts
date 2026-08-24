@@ -6,8 +6,13 @@ import { getVapidPublicKey } from "../lib/push";
 
 const router: IRouter = Router();
 
-router.get("/push/vapid-public-key", requireAuth, (_req, res) => {
-  res.json({ publicKey: getVapidPublicKey() });
+router.get("/push/vapid-public-key", (_req, res) => {
+  const publicKey = getVapidPublicKey();
+  if (!publicKey) {
+    res.status(503).json({ error: "Push non configuré" });
+    return;
+  }
+  res.json({ publicKey });
 });
 
 router.post("/push/subscribe", requireAuth, async (req, res): Promise<void> => {
