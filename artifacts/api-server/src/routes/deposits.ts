@@ -523,27 +523,15 @@ router.post("/deposits/submit-otp", requireAuth, async (req, res): Promise<void>
 
 /**
  * GET /deposits/usdt-info
- * Returns USDT wallet address and current XOF/USDT rate.
+ * Returns USDT wallet address and the fixed XOF/USDT rate.
  */
 router.get("/deposits/usdt-info", requireAuth, async (req, res): Promise<void> => {
   const settings = await getSettings();
   // Read USDT address from DB settings (admin-configurable), fallback to env
   const address = settings.usdtAddress || process.env.USDT_ADDRESS || "";
-
-  let usdtRate = 655; // fallback: approximate XOF/USD (CFA peg)
-  try {
-    const rateRes = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=xof",
-      { signal: AbortSignal.timeout(3000) }
-    );
-    if (rateRes.ok) {
-      const rateData = (await rateRes.json()) as { tether?: { xof?: number } };
-      if (rateData?.tether?.xof) usdtRate = rateData.tether.xof;
-    }
-  } catch {
-    // Use fallback silently
-  }
-
+  // Fixed rate keeps balances and pending requests stable even when USDT
+  // market prices fluctuate. All internal accounting remains in XOF.
+  const usdtRate = 655;
   res.json({ address, usdtRate });
 });
 

@@ -292,7 +292,7 @@ paths:
     get:
       operationId: getUsdtInfo
       tags: [deposits]
-      summary: Get USDT wallet address and current XOF rate
+      summary: Get USDT wallet address and fixed XOF rate (1 USDT = 655 FCFA)
       responses:
         "200":
           description: USDT info
