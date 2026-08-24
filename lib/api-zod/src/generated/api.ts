@@ -130,7 +130,8 @@ export const GetDashboardResponse = zod.object({
   "telegramGroupUrl": zod.string(),
   "telegramChannelUrl": zod.string(),
   "whatsappGroupUrl": zod.string(),
-  "whatsappChannelUrl": zod.string()
+  "whatsappChannelUrl": zod.string(),
+  "whatsappSupportUrl": zod.string()
 })
 })
 
@@ -927,7 +928,8 @@ export const UpdateAdminSettingsBody = zod.object({
   "telegramGroupUrl": zod.string().optional(),
   "telegramChannelUrl": zod.string().optional(),
   "whatsappGroupUrl": zod.string().optional(),
-  "whatsappChannelUrl": zod.string().optional()
+  "whatsappChannelUrl": zod.string().optional(),
+  "whatsappSupportUrl": zod.string().optional()
 })
 
 export const UpdateAdminSettingsResponse = zod.object({
@@ -948,7 +950,8 @@ export const UpdateAdminSettingsResponse = zod.object({
   "telegramGroupUrl": zod.string(),
   "telegramChannelUrl": zod.string(),
   "whatsappGroupUrl": zod.string(),
-  "whatsappChannelUrl": zod.string()
+  "whatsappChannelUrl": zod.string(),
+  "whatsappSupportUrl": zod.string()
 })
 
 

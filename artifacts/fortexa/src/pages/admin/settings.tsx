@@ -41,6 +41,7 @@ const socialSchema = z.object({
   telegramChannelUrl: z.string(),
   whatsappGroupUrl: z.string(),
   whatsappChannelUrl: z.string(),
+  whatsappSupportUrl: z.string(),
 });
 
 const announcementSchema = z.object({
@@ -119,7 +120,7 @@ export default function AdminSettingsPage() {
   });
   const socialForm = useForm<SocialForm>({
     resolver: zodResolver(socialSchema),
-    defaultValues: { telegramGroupUrl: '', telegramChannelUrl: '', whatsappGroupUrl: '', whatsappChannelUrl: '' },
+    defaultValues: { telegramGroupUrl: '', telegramChannelUrl: '', whatsappGroupUrl: '', whatsappChannelUrl: '', whatsappSupportUrl: '' },
   });
 
   useEffect(() => {
@@ -147,6 +148,7 @@ export default function AdminSettingsPage() {
         telegramChannelUrl: settings.telegramChannelUrl ?? '',
         whatsappGroupUrl: settings.whatsappGroupUrl ?? '',
         whatsappChannelUrl: settings.whatsappChannelUrl ?? '',
+        whatsappSupportUrl: settings.whatsappSupportUrl ?? '',
       });
     }
   }, [settings, form, paymentForm, socialForm]);
@@ -505,6 +507,13 @@ export default function AdminSettingsPage() {
                   <FormItem>
                     <FormLabel className="flex items-center gap-2"><MessageCircle className="w-4 h-4 text-[#25D366]" /> Chaîne WhatsApp</FormLabel>
                     <FormControl><Input placeholder="https://whatsapp.com/channel/..." {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={socialForm.control} name="whatsappSupportUrl" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2"><MessageCircle className="w-4 h-4 text-[#25D366]" /> Service client WhatsApp</FormLabel>
+                    <FormControl><Input placeholder="https://wa.me/..." {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />

@@ -140,7 +140,7 @@ export default function ProfilePage() {
             </div>
             <div className="text-left">
               <p className="text-sm font-semibold text-foreground">Service client</p>
-              <p className="text-xs text-muted-foreground">Canal & support Telegram</p>
+              <p className="text-xs text-muted-foreground">Chaîne, groupe et service client WhatsApp</p>
             </div>
           </div>
           <ChevronRight className="w-4 h-4 text-muted-foreground" />

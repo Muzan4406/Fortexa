@@ -24,6 +24,7 @@ export const platformSettingsTable = pgTable("platform_settings", {
   telegramChannelUrl: text("telegram_channel_url").notNull().default(""),
   whatsappGroupUrl: text("whatsapp_group_url").notNull().default(""),
   whatsappChannelUrl: text("whatsapp_channel_url").notNull().default(""),
+  whatsappSupportUrl: text("whatsapp_support_url").notNull().default(""),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 

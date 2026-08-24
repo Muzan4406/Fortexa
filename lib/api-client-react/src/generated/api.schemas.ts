@@ -88,6 +88,7 @@ export interface PublicSettings {
   telegramChannelUrl: string;
   whatsappGroupUrl: string;
   whatsappChannelUrl: string;
+  whatsappSupportUrl: string;
 }
 
 export interface Dashboard {
@@ -556,6 +557,7 @@ export interface PlatformSettings {
   telegramChannelUrl: string;
   whatsappGroupUrl: string;
   whatsappChannelUrl: string;
+  whatsappSupportUrl: string;
 }
 
 export interface PlatformSettingsUpdate {
@@ -577,6 +579,7 @@ export interface PlatformSettingsUpdate {
   telegramChannelUrl?: string;
   whatsappGroupUrl?: string;
   whatsappChannelUrl?: string;
+  whatsappSupportUrl?: string;
 }
 
 export interface ReferralSettings {

@@ -20,4 +20,5 @@ export interface PublicSettings {
   telegramChannelUrl: string;
   whatsappGroupUrl: string;
   whatsappChannelUrl: string;
+  whatsappSupportUrl: string;
 }

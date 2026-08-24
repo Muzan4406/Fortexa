@@ -26,4 +26,5 @@ export interface PlatformSettings {
   telegramChannelUrl: string;
   whatsappGroupUrl: string;
   whatsappChannelUrl: string;
+  whatsappSupportUrl: string;
 }

@@ -1,4 +1,5 @@
-import { ChevronLeft, Send, Headphones, ExternalLink, Clock3, ShieldCheck, MessageCircle, UsersRound } from 'lucide-react';
+import { ChevronLeft, Headphones, ExternalLink, Clock3, ShieldCheck, UsersRound } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import { useLocation } from 'wouter';
 import { useGetDashboard } from '@workspace/api-client-react';
 
@@ -7,10 +8,9 @@ export default function SupportPage() {
   const { data: dashboard } = useGetDashboard();
   const links = dashboard?.settings;
   const communities = [
-    { href: links?.telegramGroupUrl, label: 'Groupe Telegram', description: 'Échangez avec la communauté', icon: UsersRound, color: '#229ED9' },
-    { href: links?.telegramChannelUrl, label: 'Chaîne Telegram', description: 'Annonces et actualités', icon: Send, color: '#229ED9' },
-    { href: links?.whatsappGroupUrl, label: 'Groupe WhatsApp', description: 'Discutez avec les membres', icon: UsersRound, color: '#25D366' },
-    { href: links?.whatsappChannelUrl, label: 'Chaîne WhatsApp', description: 'Recevez les nouveautés', icon: MessageCircle, color: '#25D366' },
+    { href: links?.whatsappChannelUrl, label: 'Chaîne WhatsApp', description: 'Recevez les nouveautés', icon: FaWhatsapp, color: '#25D366' },
+    { href: links?.whatsappGroupUrl, label: 'Groupe de discussion WhatsApp', description: 'Discutez avec les membres', icon: FaWhatsapp, color: '#25D366' },
+    { href: links?.whatsappSupportUrl, label: 'Service client WhatsApp', description: 'Contactez directement notre équipe', icon: FaWhatsapp, color: '#25D366' },
   ].filter((item) => item.href);
 
   return (

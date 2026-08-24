@@ -38,6 +38,7 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     telegramChannelUrl,
     whatsappGroupUrl,
     whatsappChannelUrl,
+    whatsappSupportUrl,
   } = req.body;
 
   const updates: any = {};
@@ -74,10 +75,11 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     telegramChannelUrl,
     whatsappGroupUrl,
     whatsappChannelUrl,
+    whatsappSupportUrl,
   })) {
     if (value !== undefined) {
       const normalized = String(value).trim();
-      if (normalized && !/^https:\/\/(t\.me|telegram\.me|chat\.whatsapp\.com|whatsapp\.com)\//i.test(normalized)) {
+      if (normalized && !/^https:\/\/(t\.me|telegram\.me|chat\.whatsapp\.com|whatsapp\.com|wa\.me)\//i.test(normalized)) {
         res.status(400).json({ error: "Les liens sociaux doivent être des URLs Telegram ou WhatsApp valides" });
         return;
       }

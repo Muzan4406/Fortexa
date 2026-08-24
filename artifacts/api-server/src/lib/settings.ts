@@ -26,6 +26,7 @@ export function formatSettings(s: Awaited<ReturnType<typeof getSettings>>) {
     telegramChannelUrl: s.telegramChannelUrl,
     whatsappGroupUrl: s.whatsappGroupUrl,
     whatsappChannelUrl: s.whatsappChannelUrl,
+    whatsappSupportUrl: s.whatsappSupportUrl,
     activeDepositProvider: s.activeDepositProvider,
   };
 }
@@ -44,6 +45,7 @@ export function formatAdminSettings(s: Awaited<ReturnType<typeof getSettings>>) 
     telegramChannelUrl: s.telegramChannelUrl,
     whatsappGroupUrl: s.whatsappGroupUrl,
     whatsappChannelUrl: s.whatsappChannelUrl,
+    whatsappSupportUrl: s.whatsappSupportUrl,
     activeDepositProvider: s.activeDepositProvider,
     ashtechpayKeySet: s.ashtechpayKey.length > 0,
   };
