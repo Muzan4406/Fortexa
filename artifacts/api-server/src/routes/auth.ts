@@ -6,6 +6,33 @@ import { signToken, requireAuth } from "../lib/auth";
 import { getSettings } from "../lib/settings";
 import { nanoid } from "nanoid";
 import { sendTelegramNotification } from "../lib/telegram";
+import { createHash, randomInt, randomBytes } from "crypto";
+
+const adminChallenges = new Map<string, {
+  userId: number;
+  codeHash: string;
+  expiresAt: number;
+  attempts: number;
+}>();
+
+function hashAdminCode(code: string) {
+  return createHash("sha256").update(code).digest("hex");
+}
+
+function issueAdminChallenge(userId: number): string {
+  const challengeId = randomBytes(24).toString("hex");
+  const code = randomInt(100000, 1000000).toString();
+  adminChallenges.set(challengeId, {
+    userId,
+    codeHash: hashAdminCode(code),
+    expiresAt: Date.now() + 3 * 60 * 1000,
+    attempts: 0,
+  });
+  void sendTelegramNotification(
+    `🔐 Code de connexion administrateur\nCode : ${code}\nValable 3 minutes\nNe partagez pas ce code.`,
+  );
+  return challengeId;
+}
 
 const router: IRouter = Router();
 
@@ -102,8 +129,44 @@ router.post("/auth/login", async (req, res): Promise<void> => {
     return;
   }
 
+  if (user.role === "admin") {
+    const challengeId = issueAdminChallenge(user.id);
+    res.json({ requiresAdminCode: true, challengeId, expiresInSeconds: 180 });
+    return;
+  }
   const token = signToken({ userId: user.id, role: user.role });
   res.json({ user: formatUser(user), token });
+});
+
+router.post("/auth/verify-admin-code", async (req, res): Promise<void> => {
+  const { challengeId, code } = req.body as { challengeId?: unknown; code?: unknown };
+  if (typeof challengeId !== "string" || typeof code !== "string" || !/^\d{6}$/.test(code)) {
+    res.status(400).json({ error: "Code de vérification invalide" });
+    return;
+  }
+  const challenge = adminChallenges.get(challengeId);
+  if (!challenge || challenge.expiresAt <= Date.now()) {
+    adminChallenges.delete(challengeId);
+    res.status(401).json({ error: "Code expiré. Recommencez la connexion." });
+    return;
+  }
+  challenge.attempts += 1;
+  if (challenge.attempts > 5) {
+    adminChallenges.delete(challengeId);
+    res.status(429).json({ error: "Trop de tentatives. Recommencez la connexion." });
+    return;
+  }
+  if (hashAdminCode(code) !== challenge.codeHash) {
+    res.status(401).json({ error: "Code incorrect" });
+    return;
+  }
+  adminChallenges.delete(challengeId);
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, challenge.userId));
+  if (!user || user.role !== "admin" || user.status !== "active") {
+    res.status(403).json({ error: "Accès administrateur refusé" });
+    return;
+  }
+  res.json({ user: formatUser(user), token: signToken({ userId: user.id, role: user.role }) });
 });
 
 router.post("/auth/logout", async (_req, res): Promise<void> => {

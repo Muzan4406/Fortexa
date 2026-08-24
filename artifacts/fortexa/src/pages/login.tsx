@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useLogin } from '@workspace/api-client-react';
 import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +19,9 @@ export default function LoginPage() {
   const [, setLocation] = useLocation();
   const { setAuth, user } = useAuth();
   const { toast } = useToast();
-  const loginMutation = useLogin();
+  const [adminChallenge, setAdminChallenge] = useState<{ challengeId: string; expiresAt: number } | null>(null);
+  const [adminCode, setAdminCode] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -36,27 +37,52 @@ export default function LoginPage() {
     }
   }, [user, setLocation]);
 
-  const onSubmit = (data: LoginForm) => {
-    loginMutation.mutate(
-      { data },
-      {
-        onSuccess: (response) => {
-          setAuth(response.user, response.token);
-          toast({
-            title: 'Connexion réussie',
-            description: `Bienvenue ${response.user.name}`,
-          });
-          window.setTimeout(() => setLocation('/dashboard'), 350);
-        },
-        onError: (error: any) => {
-          toast({
-            title: 'Erreur de connexion',
-            description: error.data?.error || 'Email ou mot de passe incorrect',
-            variant: 'destructive',
-          });
-        },
+  const onSubmit = async (data: LoginForm) => {
+    setIsSubmitting(true);
+    try {
+      const apiBase = import.meta.env.BASE_URL.replace(/\/+$/, '');
+      const response = await fetch(`${apiBase}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || 'Email ou mot de passe incorrect');
+      if (payload.requiresAdminCode) {
+        setAdminChallenge({ challengeId: payload.challengeId, expiresAt: Date.now() + (payload.expiresInSeconds ?? 180) * 1000 });
+        toast({ title: 'Code envoyé', description: 'Consultez le groupe Telegram administrateur.' });
+        return;
       }
-    );
+      setAuth(payload.user, payload.token);
+      toast({ title: 'Connexion réussie', description: `Bienvenue ${payload.user.name}` });
+      window.setTimeout(() => setLocation('/dashboard'), 350);
+    } catch (error: any) {
+      toast({ title: 'Erreur de connexion', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const verifyAdminCode = async () => {
+    if (!adminChallenge || !/^\d{6}$/.test(adminCode)) return;
+    setIsSubmitting(true);
+    try {
+      const apiBase = import.meta.env.BASE_URL.replace(/\/+$/, '');
+      const response = await fetch(`${apiBase}/api/auth/verify-admin-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ challengeId: adminChallenge.challengeId, code: adminCode }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || 'Code incorrect');
+      setAuth(payload.user, payload.token);
+      toast({ title: 'Connexion administrateur réussie' });
+      window.setTimeout(() => setLocation('/admin'), 350);
+    } catch (error: any) {
+      toast({ title: 'Vérification refusée', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -78,7 +104,27 @@ export default function LoginPage() {
             <p className="text-sm text-muted-foreground">Accédez à votre compte</p>
           </div>
 
-          <Form {...form}>
+          {adminChallenge ? (
+            <div className="space-y-4">
+              <div className="rounded-xl bg-primary/10 p-4 text-sm text-foreground">
+                Un code à 6 chiffres a été envoyé dans le groupe Telegram administrateur. Il est valable 3 minutes.
+              </div>
+              <Input
+                value={adminCode}
+                onChange={(event) => setAdminCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                inputMode="numeric"
+                className="h-14 text-center text-2xl font-bold tracking-[0.4em]"
+                autoComplete="one-time-code"
+              />
+              <Button type="button" onClick={verifyAdminCode} className="w-full h-12" disabled={isSubmitting || adminCode.length !== 6}>
+                {isSubmitting ? 'Vérification...' : 'Valider le code'}
+              </Button>
+              <button type="button" className="w-full text-sm text-muted-foreground hover:text-foreground" onClick={() => { setAdminChallenge(null); setAdminCode(''); }}>
+                Recommencer
+              </button>
+            </div>
+          ) : <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
@@ -123,13 +169,13 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 className="w-full h-12 text-base font-semibold"
-                disabled={loginMutation.isPending}
+                disabled={isSubmitting}
                 data-testid="button-submit"
               >
-                {loginMutation.isPending ? 'Connexion...' : 'Se connecter'}
+                {isSubmitting ? 'Connexion...' : 'Se connecter'}
               </Button>
             </form>
-          </Form>
+          </Form>}
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
