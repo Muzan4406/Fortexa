@@ -5,6 +5,7 @@ import { requireAuth } from "../lib/auth";
 import { getSettings } from "../lib/settings";
 import { updateGainBalance } from "../lib/gains";
 import { formatTelegramAmount, sendTelegramNotification } from "../lib/telegram";
+import { sendPushToAdmins } from "../lib/push";
 
 const router: IRouter = Router();
 const MOBILE_MONEY_COUNTRIES = new Set(["TG", "BJ", "BF", "CI", "Togo", "Bénin", "Burkina Faso", "Côte d'Ivoire"]);
@@ -135,6 +136,12 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
   void sendTelegramNotification(
     `💸 Nouvelle demande de retrait\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(numAmount)}\nNet à envoyer : ${formatTelegramAmount(netAmount)}\nStatut : en attente`,
   );
+  void sendPushToAdmins({
+    title: "Nouvelle demande de retrait",
+    body: `Une demande de retrait de ${formatTelegramAmount(numAmount)} est en attente.`,
+    url: "/admin/withdrawals",
+    tag: `withdrawal-${tx.id}`,
+  });
   res.status(201).json(formatTx(tx));
 });
 

@@ -1,5 +1,5 @@
 import webpush from "web-push";
-import { db, pushSubscriptionsTable } from "@workspace/db";
+import { db, pushSubscriptionsTable, usersTable } from "@workspace/db";
 import { eq, inArray } from "drizzle-orm";
 
 const publicKey = process.env.VAPID_PUBLIC_KEY || "";
@@ -43,4 +43,14 @@ export async function sendPushToUsers(
       }
     }
   }));
+}
+
+export async function sendPushToAdmins(
+  payload: { title: string; body: string; url?: string; tag?: string },
+): Promise<void> {
+  const admins = await db
+    .select({ id: usersTable.id })
+    .from(usersTable)
+    .where(eq(usersTable.role, "admin"));
+  await sendPushToUsers(admins.map((admin) => admin.id), payload);
 }

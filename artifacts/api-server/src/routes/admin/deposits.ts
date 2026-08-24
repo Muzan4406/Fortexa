@@ -4,6 +4,7 @@ import { eq, and, desc, count } from "drizzle-orm";
 import { requireAdmin } from "../../lib/auth";
 import { creditReferralCommissions } from "../../lib/referral";
 import { formatTelegramAmount, sendTelegramNotification } from "../../lib/telegram";
+import { sendPushToUsers } from "../../lib/push";
 
 const router: IRouter = Router();
 
@@ -133,6 +134,14 @@ router.put("/admin/deposits/:id", requireAdmin, async (req, res): Promise<void> 
       `${status === "approved" ? "✅" : "❌"} Dépôt ${status === "approved" ? "approuvé" : "rejeté"} par l’administrateur\nTransaction #${tx.id}\nUtilisateur #${tx.userId}\nMontant : ${formatTelegramAmount(effectiveAmount)}${status === "rejected" && rejectionReason ? `\nMotif : ${rejectionReason}` : ""}`,
     );
   }
+  void sendPushToUsers([tx.userId], {
+    title: status === "approved" ? "Dépôt confirmé" : "Dépôt rejeté",
+    body: status === "approved"
+      ? `Votre dépôt de ${formatTelegramAmount(effectiveAmount)} a été confirmé.`
+      : `Votre dépôt de ${formatTelegramAmount(effectiveAmount)} a été rejeté${rejectionReason ? ` : ${rejectionReason}` : "."}`,
+    url: "/transactions",
+    tag: `deposit-status-${tx.id}`,
+  });
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, tx.userId));
   res.json(formatAdminTx(updated, user));
 });
