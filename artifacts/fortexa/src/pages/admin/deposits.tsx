@@ -15,9 +15,9 @@ import { CheckCircle, XCircle, Clock, ExternalLink, Smartphone, Wallet } from 'l
 
 function proofUrl(path: string) {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  if (normalizedPath.startsWith('/api/uploads/')) return normalizedPath;
-  if (!normalizedPath.startsWith('/uploads/')) return path;
   const basePath = import.meta.env.BASE_URL.replace(/\/+$/, '');
+  if (normalizedPath.startsWith('/api/uploads/')) return `${basePath}${normalizedPath}`;
+  if (!normalizedPath.startsWith('/uploads/')) return path;
   return `${basePath}/api${normalizedPath}`;
 }
 

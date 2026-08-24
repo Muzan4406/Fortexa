@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import {
   useGetDashboard, useCreateWithdrawal,
-  getGetDashboardQueryKey,
+  useGetUsdtInfo,
+  getGetDashboardQueryKey, getGetUsdtInfoQueryKey,
 } from '@workspace/api-client-react';
 import { useAuth } from '@/lib/auth-context';
 import { useForm } from 'react-hook-form';
@@ -67,13 +68,17 @@ export default function WithdrawPage() {
   // Detect country-based payment method
   const country = (user as any)?.country ?? '';
   const isMobileMoney = XOF_COUNTRY_CODES.has(country);
+  const { data: usdtInfo } = useGetUsdtInfo({ query: { enabled: !!user && !isMobileMoney, queryKey: getGetUsdtInfoQueryKey() } });
+  const usdtRate = usdtInfo?.usdtRate || 655;
+  const minimumXof = dashboard?.settings.minWithdrawal || 3000;
+  const minimumUsdt = minimumXof / usdtRate;
 
   const form = useForm<WithdrawalForm>({
     resolver: zodResolver(isMobileMoney ? mobileMoneySchema : usdtSchema),
     defaultValues: {
       country,
       operator: '',
-      amount: 3000,
+      amount: isMobileMoney ? minimumXof : Number(minimumUsdt.toFixed(6)),
       phone: '',
       usdtAddress: '',
     },
@@ -85,19 +90,25 @@ export default function WithdrawPage() {
 
   const watchAmount = form.watch('amount');
   const feePercent = dashboard?.settings.withdrawalFeePercent || 5;
-  const fee = (watchAmount || 0) * (feePercent / 100);
-  const netAmount = (watchAmount || 0) - fee;
+  const displayAmount = watchAmount || 0;
+  const fee = displayAmount * (feePercent / 100);
+  const netAmount = displayAmount - fee;
 
   const onSubmit = (data: WithdrawalForm) => {
     const totalAvailable = dashboard?.gainBalance || 0;
-    if (data.amount > totalAvailable) {
+    const requestedXof = isMobileMoney ? data.amount : data.amount * usdtRate;
+    if (requestedXof < minimumXof) {
+      toast({ title: 'Montant minimum non atteint', description: `Le minimum est ${minimumUsdt.toFixed(2)} USDT`, variant: 'destructive' });
+      return;
+    }
+    if (requestedXof > totalAvailable) {
       toast({ title: 'Solde insuffisant', description: 'Votre solde de gains est insuffisant', variant: 'destructive' });
       return;
     }
 
     const payload = isMobileMoney
       ? { amount: data.amount, country, operator: data.operator, phone: data.phone }
-      : { amount: data.amount, usdtAddress: data.usdtAddress };
+      : { amount: requestedXof, usdtAddress: data.usdtAddress };
 
     createWithdrawalMutation.mutate(
       { data: payload as any },
@@ -154,9 +165,10 @@ export default function WithdrawPage() {
           {/* Available balance */}
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-4">
             <p className="text-sm text-muted-foreground mb-1">Solde disponible (gains)</p>
-            <p className="text-2xl font-bold text-primary" data-testid="text-available-balance">
-              {formatCurrency(dashboard?.gainBalance || 0, 2)}
+             <p className="text-2xl font-bold text-primary" data-testid="text-available-balance">
+               {isMobileMoney ? formatCurrency(dashboard?.gainBalance || 0, 2) : `${((dashboard?.gainBalance || 0) / usdtRate).toFixed(6)} USDT`}
             </p>
+             {!isMobileMoney && <p className="text-xs text-muted-foreground mt-1">Équivalent : {formatCurrency(dashboard?.gainBalance || 0, 2)} · 1 USDT ≈ {formatCurrency(usdtRate, 2)}</p>}
           </div>
 
           {/* Fee notice */}
@@ -255,11 +267,11 @@ export default function WithdrawPage() {
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Montant (FCFA)</FormLabel>
+                    <FormLabel>Montant ({isMobileMoney ? 'FCFA' : 'USDT'})</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="3000"
+                         placeholder={isMobileMoney ? '3000' : minimumUsdt.toFixed(2)}
                         {...field}
                         data-testid="input-amount"
                         className="h-12 text-lg font-semibold"
@@ -275,15 +287,15 @@ export default function WithdrawPage() {
                 <div className="bg-muted/50 rounded-lg p-4 space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Montant demandé</span>
-                    <span className="font-semibold">{formatCurrency(watchAmount)}</span>
+                     <span className="font-semibold">{isMobileMoney ? formatCurrency(displayAmount) : `${displayAmount.toFixed(6)} USDT`}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Frais ({feePercent}%)</span>
-                    <span className="font-semibold text-amber-600">-{formatCurrency(fee)}</span>
+                     <span className="font-semibold text-amber-600">-{isMobileMoney ? formatCurrency(fee) : `${fee.toFixed(6)} USDT`}</span>
                   </div>
                   <div className="pt-2 border-t border-border flex justify-between">
                     <span className="font-semibold">Montant net</span>
-                    <span className="font-bold text-primary">{formatCurrency(netAmount)}</span>
+                   <span className="font-bold text-primary">{isMobileMoney ? formatCurrency(netAmount) : `${netAmount.toFixed(6)} USDT`}</span>
                   </div>
                 </div>
               )}
