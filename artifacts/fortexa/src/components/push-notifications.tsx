@@ -11,7 +11,8 @@ function apiUrl(path: string) {
 export function PushNotifications() {
   const { token } = useAuth();
   const { toast } = useToast();
-  const [status, setStatus] = useState<"unsupported" | "blocked" | "off" | "on" | "loading">("loading");
+  const [status, setStatus] = useState<"unsupported" | "blocked" | "off" | "on" | "error" | "loading">("loading");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -20,7 +21,10 @@ export function PushNotifications() {
     }
     setStatus(Notification.permission === "denied" ? "blocked" : "off");
     if (Notification.permission === "granted") {
-      void syncSubscription();
+      void syncSubscription().catch((error) => {
+        setStatus("error");
+        setErrorMessage(error instanceof Error ? error.message : "Impossible de synchroniser les notifications");
+      });
     }
   }, [token]);
 
@@ -34,16 +38,19 @@ export function PushNotifications() {
     }
     const { publicKey } = await response.json();
     if (!publicKey) {
-      setStatus("unsupported");
-      return;
+      throw new Error("Le service de notifications push n'est pas configuré sur le serveur");
     }
-    let subscription = await registration.pushManager.getSubscription();
-    if (!subscription) {
-      subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(publicKey),
-      });
+    const applicationServerKey = urlBase64ToUint8Array(publicKey);
+    const existingSubscription = await registration.pushManager.getSubscription();
+    // Recreate the subscription so browsers do not keep using an old VAPID key
+    // after a deployment or a key rotation.
+    if (existingSubscription) {
+      await existingSubscription.unsubscribe();
     }
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey,
+    });
     const subscribeResponse = await fetch(apiUrl("/push/subscribe"), {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -53,6 +60,7 @@ export function PushNotifications() {
       throw new Error(`Impossible d'enregistrer l'abonnement (${subscribeResponse.status})`);
     }
     setStatus("on");
+    setErrorMessage("");
   }
 
   async function enable() {
@@ -64,8 +72,11 @@ export function PushNotifications() {
       }
       await syncSubscription();
       toast({ title: "Notifications activées", description: "Vous recevrez les nouvelles commissions et annonces." });
-    } catch {
-      toast({ title: "Activation impossible", description: "Vérifiez que le site est ouvert en HTTPS.", variant: "destructive" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Impossible d'activer les notifications";
+      setStatus("error");
+      setErrorMessage(message);
+      toast({ title: "Activation impossible", description: message, variant: "destructive" });
     }
   }
 
@@ -73,7 +84,7 @@ export function PushNotifications() {
   if (status === "on") {
     return <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4"><CheckCircle2 className="h-5 w-5 text-emerald-600" /><div><p className="text-sm font-semibold text-foreground">Notifications push activées</p><p className="text-xs text-muted-foreground">Commissions, filleuls et annonces vous seront signalés.</p></div></div>;
   }
-  return <button onClick={enable} disabled={status === "blocked"} className="flex w-full items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left disabled:opacity-60"><BellOff className="h-5 w-5 text-primary" /><div><p className="text-sm font-semibold text-foreground">{status === "blocked" ? "Notifications bloquées par le navigateur" : "Activer les notifications push"}</p><p className="text-xs text-muted-foreground">{status === "blocked" ? "Autorisez-les dans les réglages du navigateur." : "Soyez averti de vos commissions, filleuls et annonces."}</p></div></button>;
+  return <button onClick={enable} disabled={status === "blocked"} className="flex w-full items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left disabled:opacity-60"><BellOff className="h-5 w-5 text-primary" /><div><p className="text-sm font-semibold text-foreground">{status === "blocked" ? "Notifications bloquées par le navigateur" : status === "error" ? "Réessayer les notifications" : "Activer les notifications push"}</p><p className="text-xs text-muted-foreground">{status === "blocked" ? "Autorisez-les dans les réglages du navigateur." : status === "error" ? errorMessage : "Soyez averti de vos commissions, filleuls et annonces."}</p></div></button>;
 }
 
 function urlBase64ToUint8Array(value: string) {

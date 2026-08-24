@@ -36,7 +36,7 @@ export async function sendPushToUsers(
         JSON.stringify(payload),
       );
     } catch (error: any) {
-      if (error?.statusCode === 404 || error?.statusCode === 410) {
+      if (error?.statusCode === 401 || error?.statusCode === 403 || error?.statusCode === 404 || error?.statusCode === 410) {
         await db.delete(pushSubscriptionsTable).where(eq(pushSubscriptionsTable.id, subscription.id));
       } else {
         console.warn("Push notification failed", error?.statusCode || error?.message);

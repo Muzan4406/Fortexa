@@ -3,3 +3,4 @@
 - [Fortexa admin seeding](fortexa-admin-seed.md) — admin user (admin@fortexa.com / admin123) created via direct SQL; phone column is NOT NULL so must pass empty string
 - [Plesk deployment](plesk-deployment.md) — Plesk serves Fortexa from the domain root, proxies /api, starts app.js, and needs APP_URL
 - [AshtechPay confirmation](ashtechpay-confirmation.md) — persist provider transaction IDs and poll status when webhooks are delayed
+- [Push VAPID rotation](push-vapid-rotation.md) — recreate browser subscriptions after key changes to avoid silent delivery failures
