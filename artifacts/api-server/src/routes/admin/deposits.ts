@@ -93,6 +93,10 @@ router.put("/admin/deposits/:id", requireAdmin, async (req, res): Promise<void> 
   const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const id = parseInt(rawId, 10);
   const { status, amount, rejectionReason } = req.body;
+  if (!["approved", "rejected", "pending"].includes(status)) {
+    res.status(400).json({ error: "Statut de dépôt invalide" });
+    return;
+  }
 
   const [tx] = await db.select().from(transactionsTable).where(eq(transactionsTable.id, id));
   if (!tx || tx.type !== "deposit") { res.status(404).json({ error: "Dépôt non trouvé" }); return; }
@@ -105,7 +109,12 @@ router.put("/admin/deposits/:id", requireAdmin, async (req, res): Promise<void> 
     updates.netAmount = effectiveAmount.toFixed(8);
   }
 
-  const [updated] = await db.update(transactionsTable).set(updates).where(eq(transactionsTable.id, id)).returning();
+  const [updated] = await db.update(transactionsTable).set(updates)
+    .where(and(eq(transactionsTable.id, id), eq(transactionsTable.status, "pending"))).returning();
+  if (!updated) {
+    res.status(409).json({ error: "Ce dépôt a déjà été traité" });
+    return;
+  }
 
   if (status === "approved" && tx.status !== "approved") {
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, tx.userId));

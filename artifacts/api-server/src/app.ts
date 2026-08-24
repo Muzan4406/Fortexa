@@ -29,7 +29,24 @@ app.use(
   }),
 );
 
-app.use(cors());
+const allowedOrigins = new Set(
+  [
+    process.env.APP_URL,
+    ...(process.env.REPLIT_DOMAINS?.split(",") ?? []).map((domain) => `https://${domain.trim()}`),
+    "http://localhost:5173",
+    "http://localhost:19420",
+  ].filter(Boolean),
+);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error("Origin non autorisée"));
+  },
+  credentials: true,
+}));
 
 // Store raw body buffer on the request for webhook HMAC verification
 app.use(

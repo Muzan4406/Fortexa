@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 import { db, usersTable, transactionsTable } from "@workspace/db";
 import { and, eq, or } from "drizzle-orm";
 import { creditReferralCommissions } from "../lib/referral";
@@ -10,6 +10,21 @@ import { formatTelegramAmount, sendTelegramNotification } from "../lib/telegram"
 const router: IRouter = Router();
 
 router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
+  const secret = process.env.ASHTECHPAY_WEBHOOK_SECRET;
+  const signature = req.headers["x-ashtechpay-signature"] as string | undefined;
+  const rawBody: Buffer | undefined = (req as any).rawBody;
+  if (!secret || !signature || !rawBody) {
+    logger.warn("AshtechPay webhook rejected: signature configuration missing");
+    res.status(401).json({ error: "Signature webhook requise" });
+    return;
+  }
+  const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
+  const received = signature.startsWith("sha256=") ? signature.slice(7) : signature;
+  if (received.length !== expected.length || !timingSafeEqual(Buffer.from(received), Buffer.from(expected))) {
+    logger.warn("AshtechPay webhook rejected: invalid signature");
+    res.status(401).json({ error: "Signature invalide" });
+    return;
+  }
   const payload = req.body as {
     event?: string;
     transaction_id?: string;

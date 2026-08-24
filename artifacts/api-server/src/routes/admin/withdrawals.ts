@@ -59,6 +59,10 @@ router.put("/admin/withdrawals/:id", requireAdmin, async (req, res): Promise<voi
   const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const id = parseInt(rawId, 10);
   const { status, rejectionReason } = req.body;
+  if (!["approved", "rejected", "pending"].includes(status)) {
+    res.status(400).json({ error: "Statut de retrait invalide" });
+    return;
+  }
 
   const [tx] = await db.select().from(transactionsTable).where(eq(transactionsTable.id, id));
   if (!tx || tx.type !== "withdrawal") { res.status(404).json({ error: "Retrait non trouvé" }); return; }
@@ -66,7 +70,12 @@ router.put("/admin/withdrawals/:id", requireAdmin, async (req, res): Promise<voi
   const updates: any = { status };
   if (rejectionReason) updates.rejectionReason = rejectionReason;
 
-  const [updated] = await db.update(transactionsTable).set(updates).where(eq(transactionsTable.id, id)).returning();
+  const [updated] = await db.update(transactionsTable).set(updates)
+    .where(and(eq(transactionsTable.id, id), eq(transactionsTable.status, "pending"))).returning();
+  if (!updated) {
+    res.status(409).json({ error: "Ce retrait a déjà été traité" });
+    return;
+  }
 
   // If rejected, refund the amount back to gain balance
   if (status === "rejected" && tx.status === "pending") {
