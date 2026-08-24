@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { useGetDashboard, useGetGainsSnapshot, useGetAnnouncements } from '@workspace/api-client-react';
+import { useGetDashboard, useGetGainsSnapshot, useGetAnnouncements, useGetUsdtInfo, getGetUsdtInfoQueryKey } from '@workspace/api-client-react';
 import { formatCurrency } from '@/lib/format';
+import { isFcfaCountry } from '@/lib/countries';
 import { useLocation } from 'wouter';
 import { useSidebar } from '@/lib/sidebar-context';
 import { Bell, Eye, EyeOff, ChevronRight, Menu, TrendingUp, Zap } from 'lucide-react';
@@ -25,7 +26,7 @@ function StarField({ className }: { className?: string }) {
 }
 
 /* ── Live gains counter (server snapshot + local interpolation) ── */
-function LiveGains({ snapshot }: {
+function LiveGains({ snapshot, currency = 'xof', usdtRate }: {
   snapshot: {
     gainBalance: number;
     investmentBalance: number;
@@ -33,6 +34,8 @@ function LiveGains({ snapshot }: {
     gainsActive: boolean;
     snapshotTime: string;
   };
+  currency?: 'xof' | 'usdt';
+  usdtRate?: number;
 }) {
   const [gains, setGains] = useState(snapshot.gainBalance);
   const [flipping, setFlipping] = useState(false);
@@ -53,12 +56,13 @@ function LiveGains({ snapshot }: {
     return () => clearInterval(interval);
   }, [snapshot]);
 
+  const displayGains = currency === 'usdt' ? `${(gains / (usdtRate || 655)).toFixed(6)} USDT` : formatCurrency(gains, 5);
   return (
     <span
       className={`text-3xl font-bold text-rose-500 drop-shadow-[0_0_12px_rgba(244,63,94,0.25)] ${flipping ? 'animate-number-flip' : ''}`}
       data-testid="text-gains-live"
     >
-      {formatCurrency(gains, 5)}
+      {displayGains}
     </span>
   );
 }
@@ -72,12 +76,19 @@ export default function DashboardPage() {
   const { data: dashboard, isLoading } = useGetDashboard();
   const { data: snapshot } = useGetGainsSnapshot();
   const { data: announcements } = useGetAnnouncements();
+  const isXof = isFcfaCountry(user?.country ?? '');
+  const { data: usdtInfo } = useGetUsdtInfo({
+    query: { enabled: !!user && !isXof, queryKey: getGetUsdtInfoQueryKey() },
+  });
+  const usdtRate = usdtInfo?.usdtRate || 655;
 
   if (!user) return null;
 
   const maxCapital = dashboard?.settings?.maxCapital ?? 200000;
   const unreadCount = announcements?.length ?? 0;
   const dailyRate = snapshot?.dailyRatePercent ?? dashboard?.settings?.dailyRatePercent ?? 3;
+  const displayAmount = (amount: number, decimals = 2) =>
+    isXof ? formatCurrency(amount, decimals) : `${(amount / usdtRate).toFixed(6)} USDT`;
 
   return (
     <div className="h-[100dvh] overflow-hidden overscroll-none bg-background">
@@ -156,7 +167,7 @@ export default function DashboardPage() {
                 style={{ color: '#be123c' }}
               data-testid="text-investment-balance"
             >
-              {isLoading ? '...' : hideBalance ? '••••••' : formatCurrency(dashboard?.investmentBalance ?? 0)}
+               {isLoading ? '...' : hideBalance ? '••••••' : displayAmount(dashboard?.investmentBalance ?? 0)}
             </div>
              <p className="text-blue-800/70 text-xs mb-3">Capital qui travaille pour vous</p>
 
@@ -165,7 +176,7 @@ export default function DashboardPage() {
                 style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.18)' }}
             >
                  <span className="text-blue-800/80 text-xs">Maximum autorisé :</span>
-                 <span className="text-blue-900 font-bold text-xs">{formatCurrency(maxCapital)}</span>
+                  <span className="text-blue-900 font-bold text-xs">{displayAmount(maxCapital, 0)}</span>
             </div>
           </div>
         </div>
@@ -200,10 +211,10 @@ export default function DashboardPage() {
             </div>
 
             {snapshot ? (
-              <LiveGains snapshot={snapshot} />
+               <LiveGains snapshot={snapshot} currency={isXof ? 'xof' : 'usdt'} usdtRate={usdtRate} />
             ) : (
                 <span className="text-3xl font-bold text-rose-600" data-testid="text-gains-live">
-                {formatCurrency(dashboard?.referralEarnings ?? 0, 5)}
+                {displayAmount(dashboard?.referralEarnings ?? 0, 5)}
               </span>
             )}
              <p className="text-rose-700/70 text-xs mt-0.5 mb-4">Solde retirable à tout moment</p>
