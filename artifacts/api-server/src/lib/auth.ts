@@ -8,18 +8,23 @@ if (!JWT_SECRET) {
   throw new Error("SESSION_SECRET must be configured before starting the API");
 }
 
+function getJwtSecret(): string {
+  if (!JWT_SECRET) throw new Error("SESSION_SECRET must be configured before using authentication");
+  return JWT_SECRET;
+}
+
 export interface JwtPayload {
   userId: number;
   role: string;
 }
 
 export function signToken(payload: JwtPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "30d" });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: "30d" });
 }
 
 export function verifyToken(token: string): JwtPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as JwtPayload;
+    return jwt.verify(token, getJwtSecret()) as unknown as JwtPayload;
   } catch {
     return null;
   }
