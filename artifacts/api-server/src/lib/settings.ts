@@ -19,6 +19,8 @@ export function formatSettings(s: Awaited<ReturnType<typeof getSettings>>) {
     minWithdrawal: parseFloat(s.minWithdrawal),
     withdrawalFeePercent: parseFloat(s.withdrawalFeePercent),
     gainsActive: s.gainsActive,
+    maintenanceMode: s.maintenanceMode,
+    maintenanceMessage: s.maintenanceMessage,
     level1Percent: parseFloat(s.level1Percent),
     level2Percent: parseFloat(s.level2Percent),
     level3Percent: parseFloat(s.level3Percent),

@@ -26,6 +26,8 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     minWithdrawal,
     withdrawalFeePercent,
     gainsActive,
+    maintenanceMode,
+    maintenanceMessage,
     level1Percent,
     level2Percent,
     level3Percent,
@@ -34,8 +36,6 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     ashtechpayKey,
     activeDepositProvider,
     usdtAddress,
-    telegramGroupUrl,
-    telegramChannelUrl,
     whatsappGroupUrl,
     whatsappChannelUrl,
     whatsappSupportUrl,
@@ -49,6 +49,15 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
   if (minWithdrawal !== undefined) updates.minWithdrawal = String(minWithdrawal);
   if (withdrawalFeePercent !== undefined) updates.withdrawalFeePercent = String(withdrawalFeePercent);
   if (gainsActive !== undefined) updates.gainsActive = gainsActive;
+  if (maintenanceMode !== undefined) updates.maintenanceMode = Boolean(maintenanceMode);
+  if (maintenanceMessage !== undefined) {
+    const message = String(maintenanceMessage).trim();
+    if (message.length < 5 || message.length > 500) {
+      res.status(400).json({ error: "Le message de maintenance doit contenir entre 5 et 500 caractères" });
+      return;
+    }
+    updates.maintenanceMessage = message;
+  }
   if (level1Percent !== undefined) updates.level1Percent = String(level1Percent);
   if (level2Percent !== undefined) updates.level2Percent = String(level2Percent);
   if (level3Percent !== undefined) updates.level3Percent = String(level3Percent);
@@ -71,8 +80,6 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
   }
   if (usdtAddress !== undefined) updates.usdtAddress = String(usdtAddress).trim();
   for (const [key, value] of Object.entries({
-    telegramGroupUrl,
-    telegramChannelUrl,
     whatsappGroupUrl,
     whatsappChannelUrl,
     whatsappSupportUrl,

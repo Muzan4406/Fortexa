@@ -1117,6 +1117,10 @@ components:
           description: ISO timestamp when this snapshot was taken, for client-side interpolation
         gainsActive:
           type: boolean
+        maintenanceMode:
+          type: boolean
+        maintenanceMessage:
+          type: string
 
     PublicSettings:
       type: object
@@ -1134,6 +1138,10 @@ components:
           type: number
         gainsActive:
           type: boolean
+        maintenanceMode:
+          type: boolean
+        maintenanceMessage:
+          type: string
         level1Percent:
           type: number
         level2Percent:

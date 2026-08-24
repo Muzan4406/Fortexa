@@ -118,8 +118,8 @@ export default function AdminWithdrawalsPage() {
                   <p className="font-bold text-foreground">{formatCurrency(wd.amount)}</p>
                   <p className="text-xs text-muted-foreground">Net: {formatCurrency(wd.netAmount)}</p>
                   <p className="text-xs text-muted-foreground">Frais: {formatCurrency(wd.fee)}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_CONFIG[wd.status as TransactionStatus].color}`}>
-                    {STATUS_CONFIG[wd.status as TransactionStatus].label}
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${(STATUS_CONFIG[wd.status as TransactionStatus] ?? STATUS_CONFIG.pending).color}`}>
+                    {(STATUS_CONFIG[wd.status as TransactionStatus] ?? STATUS_CONFIG.pending).label}
                   </span>
                 </div>
               </div>

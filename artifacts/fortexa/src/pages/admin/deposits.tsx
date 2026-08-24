@@ -123,8 +123,8 @@ export default function AdminDepositsPage() {
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-foreground">{formatCurrency(dep.amount)}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_CONFIG[dep.status as TransactionStatus].color}`}>
-                    {STATUS_CONFIG[dep.status as TransactionStatus].label}
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${(STATUS_CONFIG[dep.status as TransactionStatus] ?? STATUS_CONFIG.pending).color}`}>
+                    {(STATUS_CONFIG[dep.status as TransactionStatus] ?? STATUS_CONFIG.pending).label}
                   </span>
                 </div>
               </div>

@@ -11,6 +11,8 @@ export const platformSettingsTable = pgTable("platform_settings", {
   minWithdrawal: numeric("min_withdrawal", { precision: 20, scale: 2 }).notNull().default("3000"),
   withdrawalFeePercent: numeric("withdrawal_fee_percent", { precision: 10, scale: 4 }).notNull().default("5"),
   gainsActive: boolean("gains_active").notNull().default(true),
+  maintenanceMode: boolean("maintenance_mode").notNull().default(false),
+  maintenanceMessage: text("maintenance_message").notNull().default("Le site est temporairement en maintenance. Merci de revenir bientôt."),
   level1Percent: numeric("level1_percent", { precision: 10, scale: 4 }).notNull().default("5"),
   level2Percent: numeric("level2_percent", { precision: 10, scale: 4 }).notNull().default("2"),
   level3Percent: numeric("level3_percent", { precision: 10, scale: 4 }).notNull().default("1"),

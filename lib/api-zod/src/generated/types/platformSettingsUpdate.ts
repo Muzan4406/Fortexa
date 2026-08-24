@@ -13,6 +13,8 @@ export interface PlatformSettingsUpdate {
   minWithdrawal?: number;
   withdrawalFeePercent?: number;
   gainsActive?: boolean;
+  maintenanceMode?: boolean;
+  maintenanceMessage?: string;
   /** Sendavapay SDK key (write-only — never returned in GET) */
   sendavapayKey?: string;
   /** Sendavapay webhook HMAC secret (write-only — never returned in GET) */

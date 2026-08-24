@@ -56,6 +56,11 @@ app.use(
   `${API_PREFIX}/uploads`,
   ...uploadDirectories.map((directory) => express.static(directory)),
 );
+// Keep the legacy path working for proofs created or linked by older builds.
+app.use(
+  "/uploads",
+  ...uploadDirectories.map((directory) => express.static(directory)),
+);
 
 app.use(API_PREFIX, router);
 

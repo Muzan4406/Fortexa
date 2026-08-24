@@ -13,6 +13,8 @@ export interface PublicSettings {
   minWithdrawal: number;
   withdrawalFeePercent: number;
   gainsActive: boolean;
+  maintenanceMode: boolean;
+  maintenanceMessage: string;
   level1Percent: number;
   level2Percent: number;
   level3Percent: number;
