@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useGetReferrals } from '@workspace/api-client-react';
 import { formatCurrency, formatDate } from '@/lib/format';
-import { ArrowRight, CheckCircle, ChevronDown, ChevronUp, Copy, Gift, Link2, Menu, Share2, TrendingUp, UsersRound } from 'lucide-react';
+import { ArrowRight, CheckCircle, ChevronDown, ChevronUp, Copy, Gift, Link2, Share2, TrendingUp, UsersRound } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useSidebar } from '@/lib/sidebar-context';
 
 const LEVELS = [
   { key: 'LV1', count: 'level1Count' as const, percent: 'level1Percent' as const, tone: 'from-rose-500 to-pink-500' },
@@ -27,7 +26,6 @@ function ProgressRing({ percent }: { percent: number }) {
 export default function ReferralsPage() {
   const { data: referralInfo, isLoading } = useGetReferrals();
   const { toast } = useToast();
-  const { open: openSidebar } = useSidebar();
   const [copied, setCopied] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -72,7 +70,7 @@ export default function ReferralsPage() {
             <p className="text-[8px] uppercase tracking-[0.18em] text-slate-400">Investir. Grandir. Réussir.</p>
           </div>
         </div>
-        <button onClick={openSidebar} className="flex items-center gap-1 rounded-full border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600">
+        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-1 rounded-full border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600">
           Mon espace <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </header>

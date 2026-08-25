@@ -1,19 +1,17 @@
 import { useAuth } from '@/lib/auth-context';
 import { useLocation } from 'wouter';
 import {
-  ChevronRight, Shield, Headphones, Info, LogOut, Menu, KeyRound, X,
+  ChevronRight, Shield, Headphones, Info, LogOut, KeyRound, X,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useUpdatePassword } from '@workspace/api-client-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useSidebar } from '@/lib/sidebar-context';
 
 export default function ProfilePage() {
   const { clearAuth, user } = useAuth();
   const [, setLocation] = useLocation();
-  const { open: openSidebar } = useSidebar();
   const { toast } = useToast();
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -43,15 +41,6 @@ export default function ProfilePage() {
       {/* ── Header : logo + nom ── */}
       <div className="relative overflow-hidden border-b border-blue-100 bg-gradient-to-br from-[#eff6ff] via-[#f8fbff] to-[#eef2ff] px-5 py-3">
         <div className="pointer-events-none absolute -right-16 -top-20 h-40 w-40 rounded-full bg-blue-300/20 blur-3xl" />
-        {/* hamburger */}
-        <button
-          onClick={openSidebar}
-          className="absolute left-5 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-xl border border-white/80 bg-white/75 shadow-sm backdrop-blur"
-          aria-label="Ouvrir le menu"
-        >
-          <Menu className="h-4 w-4 text-foreground" />
-        </button>
-
         <div className="relative flex flex-col items-center pt-1">
           <img
             src="/logo.jpg"

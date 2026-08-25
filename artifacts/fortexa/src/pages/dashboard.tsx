@@ -4,8 +4,7 @@ import { useGetDashboard, useGetGainsSnapshot, useGetAnnouncements, useGetUsdtIn
 import { formatCurrency } from '@/lib/format';
 import { isFcfaCountry } from '@/lib/countries';
 import { useLocation } from 'wouter';
-import { useSidebar } from '@/lib/sidebar-context';
-import { Bell, Eye, EyeOff, ChevronRight, Menu, TrendingUp, Zap, BarChart3, ShieldCheck, Clock3, Award } from 'lucide-react';
+import { Bell, Eye, EyeOff, ChevronRight, TrendingUp, Zap, BarChart3, ShieldCheck, Clock3, Award, User } from 'lucide-react';
 
 /* ── Constellation background SVG ── */
 function StarField({ className }: { className?: string }) {
@@ -70,7 +69,6 @@ function LiveGains({ snapshot, currency = 'xof', usdtRate }: {
 export default function DashboardPage() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
-  const { open: openSidebar } = useSidebar();
   const [hideBalance, setHideBalance] = useState(false);
 
   const { data: dashboard, isLoading } = useGetDashboard();
@@ -97,14 +95,7 @@ export default function DashboardPage() {
     >
       {/* ── Top bar ── */}
       <div className="flex items-center justify-between bg-background px-4 pb-3 pt-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={openSidebar}
-            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-blue-100 bg-white shadow-sm"
-            aria-label="Ouvrir le menu"
-          >
-            <Menu className="w-5 h-5 text-foreground" />
-          </button>
+          <div className="flex items-center gap-3">
           <div>
             <h1 className="text-xl font-bold text-foreground">
                Bonjour, {user.name.split(' ')[0]}
@@ -261,15 +252,15 @@ export default function DashboardPage() {
         </div>
 
          <div className="grid grid-cols-4 gap-2">
-           {[
-             { label: 'Dépôt', sub: 'Ajouter des fonds', image: '/investment-icon.png', color: 'bg-blue-50', href: '/deposit' },
-             { label: 'Retrait', sub: 'Retirer vos gains', image: '/withdrawal-icon.png', color: 'bg-rose-50', href: '/withdraw' },
-             { label: 'Parrainage', sub: 'Inviter et gagner', image: '/team-icon.png', color: 'bg-violet-50', href: '/referrals' },
-             { label: 'Historique', sub: 'Vos transactions', image: '/withdrawal-clock-icon.png', color: 'bg-amber-50', href: '/transactions' },
-           ].map(({ label, sub, image, color, href }) => (
+             {[
+             { label: 'Accueil', sub: 'Vue d’ensemble', image: '/home-icon.png', color: 'bg-blue-50', href: '/dashboard' },
+             { label: 'Communauté', sub: 'Inviter et gagner', image: '/team-icon.png', color: 'bg-violet-50', href: '/referrals' },
+             { label: 'Historique', sub: 'Vos transactions', image: '/withdrawal-clock-icon.png', color: 'bg-emerald-50', href: '/transactions' },
+             { label: 'Compte', sub: 'Gérer votre compte', icon: User, color: 'bg-slate-100', href: '/profile' },
+           ].map(({ label, sub, image, icon: Icon, color, href }) => (
              <button key={label} onClick={() => setLocation(href)} className="min-w-0 rounded-2xl border border-slate-100 bg-white px-1 py-2.5 text-center shadow-sm transition-transform active:scale-95">
                <span className={`mx-auto flex h-8 w-8 items-center justify-center rounded-xl ${color}`}>
-                 <img src={image} alt="" className="h-7 w-7 object-contain" />
+                 {image ? <img src={image} alt="" className="h-7 w-7 object-contain" /> : Icon ? <Icon className="h-5 w-5 text-slate-600" /> : null}
                </span>
                <span className="mt-2 block truncate text-[11px] font-bold text-slate-900">{label}</span>
                <span className="mt-0.5 block truncate text-[9px] text-slate-500">{sub}</span>
