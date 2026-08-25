@@ -24,10 +24,15 @@ export function PushNotifications({ showControl = true }: { showControl?: boolea
     }
     setStatus(Notification.permission === "denied" ? "blocked" : "off");
     if (Notification.permission === "granted") {
-      void syncSubscription().catch((error) => {
-        setStatus("error");
-        setErrorMessage(error instanceof Error ? error.message : "Impossible de synchroniser les notifications");
-      });
+      void syncSubscription()
+        .then(() => {
+          setStatus("on");
+          setErrorMessage("");
+        })
+        .catch((error) => {
+          setStatus("error");
+          setErrorMessage(error instanceof Error ? error.message : "Impossible de synchroniser les notifications");
+        });
     }
   }, [token]);
 
@@ -70,8 +75,6 @@ export function PushNotifications({ showControl = true }: { showControl?: boolea
     if (!subscribeResponse.ok) {
       throw new Error(`Impossible d'enregistrer l'abonnement (${subscribeResponse.status})`);
     }
-    setStatus("on");
-    setErrorMessage("");
   }
 
   async function enable() {
@@ -82,6 +85,8 @@ export function PushNotifications({ showControl = true }: { showControl?: boolea
         return;
       }
       await syncSubscription();
+      setStatus("on");
+      setErrorMessage("");
       toast({ title: "Notifications activées", description: "Vous recevrez les nouvelles commissions et annonces." });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Impossible d'activer les notifications";
@@ -95,6 +100,8 @@ export function PushNotifications({ showControl = true }: { showControl?: boolea
     try {
       setStatus("loading");
       await syncSubscription();
+      setStatus("on");
+      setErrorMessage("");
       toast({ title: "Abonnement resynchronisé", description: "Ce téléphone est maintenant enregistré pour les notifications." });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Impossible de resynchroniser les notifications";
