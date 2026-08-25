@@ -808,8 +808,8 @@ export default function DepositPage() {
       {/* Header */}
       <div className="bg-background border-b border-border py-8 px-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center">
-            <ArrowDownCircle className="w-6 h-6 text-foreground" />
+          <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center overflow-hidden">
+            <img src="/deposit-terminal-transparent.png" alt="" className="h-14 w-14 object-contain" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Dépôt</h1>
