@@ -125,6 +125,10 @@ router.post("/deposits", requireAuth, async (req, res): Promise<void> => {
     })
     .returning();
 
+  void sendTelegramNotification(
+    `💰 Nouveau dépôt USDT BEP20\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(numAmount)}\nTXID : ${txid.trim()}\nPays : ${typeof payerCountry === "string" ? payerCountry : "Non renseigné"}\n📎 Preuve de paiement jointe\nStatut : en attente de validation`,
+  );
+
   res.status(201).json(formatTx(tx));
 });
 

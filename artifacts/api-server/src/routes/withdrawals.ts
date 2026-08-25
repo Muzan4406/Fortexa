@@ -14,6 +14,9 @@ const COUNTRY_CODES: Record<string, string> = {
   BF: "Burkina Faso",
   CI: "Côte d'Ivoire",
 };
+const COUNTRY_NAME_TO_CODE: Record<string, string> = Object.fromEntries(
+  Object.entries(COUNTRY_CODES).map(([code, name]) => [name, code]),
+);
 const MOBILE_MONEY_OPERATORS: Record<string, Set<string>> = {
   TG: new Set(["Togocel", "Moov Africa"]),
   BJ: new Set(["MTN Mobile Money", "Moov Africa"]),
@@ -82,7 +85,11 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
 
   const requestedCountry = typeof country === "string" && country.trim() ? country.trim() : user.country;
   const mobileMoneyUser = MOBILE_MONEY_COUNTRIES.has(requestedCountry);
-  const operatorCountry = COUNTRY_CODES[requestedCountry] ?? requestedCountry;
+  // The frontend may submit either the ISO code (TG) or the displayed
+  // country name (Togo). Normalize both forms before checking operators.
+  const operatorCountry = COUNTRY_CODES[requestedCountry]
+    ?? COUNTRY_NAME_TO_CODE[requestedCountry]
+    ?? requestedCountry;
   if (mobileMoneyUser) {
     if (!operator || typeof operator !== "string" || !MOBILE_MONEY_OPERATORS[operatorCountry]?.has(operator)) {
       res.status(400).json({ error: "Un opérateur Mobile Money valide est requis pour votre pays" });
