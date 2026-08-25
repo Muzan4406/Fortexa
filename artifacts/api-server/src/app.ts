@@ -34,9 +34,9 @@ app.use((req, res, next) => {
       "object-src 'none'",
     ].join("; "),
   );
-  if (req.secure || process.env.NODE_ENV === "production") {
-    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-  }
+  // Fortexa is deployed behind HTTPS on Plesk. Sending HSTS from the app
+  // avoids relying on whether the reverse proxy forwards X-Forwarded-Proto.
+  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   next();
 });
 
