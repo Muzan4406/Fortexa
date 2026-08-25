@@ -74,11 +74,17 @@ SENDAVAPAY_SDK_KEY=clé SDK Sendavapay
 SENDAVAPAY_WEBHOOK_SECRET=secret du webhook Sendavapay
 TELEGRAM_BOT_TOKEN=nouveau token Telegram généré après révocation de l'ancien
 TELEGRAM_CHAT_ID=-1003997139884
+TELEGRAM_COMMANDS_ENABLED=true
 ```
 
 `TELEGRAM_BOT_TOKEN` est un secret : ne le mettez jamais dans Git ou dans un
 message. Saisissez directement dans Plesk le nouveau token généré par BotFather.
 Le `TELEGRAM_CHAT_ID` du groupe `Fortexa Alertes` n'est pas secret.
+Pour activer les commandes, ajoutez le bot au groupe et donnez-lui le droit
+de lire et d'envoyer des messages. Les commandes sont acceptées uniquement
+dans ce groupe et par un créateur ou administrateur Telegram. Si un webhook
+Telegram est déjà configuré pour ce bot, supprimez-le avant d'activer le
+polling des commandes.
 
 Le webhook Sendavapay sera :
 
