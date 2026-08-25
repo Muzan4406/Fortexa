@@ -25,16 +25,20 @@ export function getVapidPublicKey(): string {
 export async function sendPushToUsers(
   userIds: number[],
   payload: { title: string; body: string; url?: string; tag?: string },
-): Promise<void> {
+): Promise<{ targeted: number; sent: number; failed: number; removed: number }> {
+  const targeted = new Set(userIds).size;
   if (!initPush() || userIds.length === 0) {
     if (userIds.length > 0) console.warn("Push notifications are not configured");
-    return;
+    return { targeted, sent: 0, failed: targeted, removed: 0 };
   }
   const subscriptions = await db
     .select()
     .from(pushSubscriptionsTable)
     .where(inArray(pushSubscriptionsTable.userId, [...new Set(userIds)]));
 
+  let sent = 0;
+  let failed = 0;
+  let removed = 0;
   await Promise.all(subscriptions.map(async (subscription) => {
     try {
       await webpush.sendNotification(
@@ -44,14 +48,18 @@ export async function sendPushToUsers(
         },
         JSON.stringify(payload),
       );
+      sent += 1;
     } catch (error: any) {
       if (error?.statusCode === 401 || error?.statusCode === 403 || error?.statusCode === 404 || error?.statusCode === 410) {
         await db.delete(pushSubscriptionsTable).where(eq(pushSubscriptionsTable.id, subscription.id));
+        removed += 1;
       } else {
+        failed += 1;
         console.warn("Push notification failed", error?.statusCode || error?.message);
       }
     }
   }));
+  return { targeted, sent, failed, removed };
 }
 
 export async function sendPushToAdmins(

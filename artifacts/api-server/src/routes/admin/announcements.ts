@@ -26,16 +26,17 @@ router.post("/admin/announcements", requireAdmin, async (req, res): Promise<void
   if (!title || !message) { res.status(400).json({ error: "Titre et message requis" }); return; }
 
   const [item] = await db.insert(announcementsTable).values({ title, message, isActive }).returning();
+  let push;
   if (isActive) {
     const users = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.status, "active"));
-    void sendPushToUsers(users.map((user) => user.id), {
+    push = await sendPushToUsers(users.map((user) => user.id), {
       title,
       body: message,
       url: "/notifications",
       tag: `announcement-${item.id}`,
     });
   }
-  res.status(201).json(fmt(item));
+  res.status(201).json({ ...fmt(item), push });
 });
 
 router.put("/admin/announcements/:id", requireAdmin, async (req, res): Promise<void> => {

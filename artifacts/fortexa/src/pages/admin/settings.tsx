@@ -212,6 +212,7 @@ export default function AdminSettingsPage() {
   };
 
   const onAnnouncementCreate = (data: AnnouncementForm) => {
+    if (!window.confirm('Envoyer cette notification à tous les utilisateurs actifs ?')) return;
     createAnnouncementMutation.mutate(
       { data: { ...data, isActive: true } },
       {
