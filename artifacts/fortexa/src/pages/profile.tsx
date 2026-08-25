@@ -91,10 +91,10 @@ export default function ProfilePage() {
           <div className="grid grid-cols-2 gap-3">
            <button
             onClick={() => setLocation('/deposit')}
-             className="group relative rounded-2xl border border-blue-100 bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+             className="group relative rounded-2xl border border-blue-100 bg-white p-3 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
           >
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/20">
-              <img src="/investment-icon.png" alt="" className="h-8 w-8 object-contain" />
+             <div className="mb-1 flex h-24 items-center justify-center">
+               <img src="/deposit-terminal-transparent.png" alt="" className="h-24 w-24 object-contain drop-shadow-[0_6px_8px_rgba(15,23,42,.16)]" />
             </div>
             <span className="block text-sm font-bold text-slate-900">Déposer</span>
              <span className="mt-1 block text-[11px] text-slate-500">Ajouter du capital</span>
@@ -102,10 +102,10 @@ export default function ProfilePage() {
           </button>
           <button
             onClick={() => setLocation('/withdraw')}
-             className="group relative rounded-2xl border border-rose-100 bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+             className="group relative rounded-2xl border border-rose-100 bg-white p-3 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
           >
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-500/20">
-              <img src="/withdrawal-icon.png" alt="" className="h-8 w-8 object-contain" />
+             <div className="mb-1 flex h-24 items-center justify-center">
+               <img src="/withdrawal-bank-transparent.png" alt="" className="h-24 w-24 object-contain drop-shadow-[0_6px_8px_rgba(15,23,42,.16)]" />
             </div>
             <span className="block text-sm font-bold text-slate-900">Retirer</span>
              <span className="mt-1 block text-[11px] text-slate-500">Recevoir vos gains</span>
