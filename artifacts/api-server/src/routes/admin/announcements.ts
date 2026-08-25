@@ -1,8 +1,7 @@
 import { Router, type IRouter } from "express";
-import { db, announcementsTable, usersTable } from "@workspace/db";
-import { eq, desc } from "drizzle-orm";
+import { db, announcementsTable } from "@workspace/db";
+import { desc, eq } from "drizzle-orm";
 import { requireAdmin } from "../../lib/auth";
-import { sendPushToUsers } from "../../lib/push";
 
 const router: IRouter = Router();
 
@@ -26,17 +25,7 @@ router.post("/admin/announcements", requireAdmin, async (req, res): Promise<void
   if (!title || !message) { res.status(400).json({ error: "Titre et message requis" }); return; }
 
   const [item] = await db.insert(announcementsTable).values({ title, message, isActive }).returning();
-  let push;
-  if (isActive) {
-    const users = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.status, "active"));
-    push = await sendPushToUsers(users.map((user) => user.id), {
-      title,
-      body: message,
-      url: "/notifications",
-      tag: `announcement-${item.id}`,
-    });
-  }
-  res.status(201).json({ ...fmt(item), push });
+  res.status(201).json(fmt(item));
 });
 
 router.put("/admin/announcements/:id", requireAdmin, async (req, res): Promise<void> => {

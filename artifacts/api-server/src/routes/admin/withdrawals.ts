@@ -3,7 +3,6 @@ import { db, usersTable, transactionsTable } from "@workspace/db";
 import { eq, and, desc, count } from "drizzle-orm";
 import { requireAdmin } from "../../lib/auth";
 import { formatTelegramAmount, sendTelegramNotification } from "../../lib/telegram";
-import { sendPushToUsers } from "../../lib/push";
 
 const router: IRouter = Router();
 
@@ -93,14 +92,6 @@ router.put("/admin/withdrawals/:id", requireAdmin, async (req, res): Promise<voi
       `${status === "approved" ? "✅" : "❌"} Retrait ${status === "approved" ? "approuvé" : "rejeté"}\nTransaction #${tx.id}\nUtilisateur #${tx.userId}\nMontant : ${formatTelegramAmount(tx.amount)}${status === "rejected" && rejectionReason ? `\nMotif : ${rejectionReason}` : ""}`,
     );
   }
-  void sendPushToUsers([tx.userId], {
-    title: status === "approved" ? "Retrait approuvé" : "Retrait rejeté",
-    body: status === "approved"
-      ? `Votre retrait de ${formatTelegramAmount(tx.amount)} a été approuvé.`
-      : `Votre retrait de ${formatTelegramAmount(tx.amount)} a été rejeté${rejectionReason ? ` : ${rejectionReason}` : "."}`,
-    url: "/transactions",
-    tag: `withdrawal-status-${tx.id}`,
-  });
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, tx.userId));
   res.json(formatAdminTx(updated, user));
 });

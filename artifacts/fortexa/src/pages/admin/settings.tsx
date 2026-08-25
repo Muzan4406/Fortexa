@@ -212,18 +212,11 @@ export default function AdminSettingsPage() {
   };
 
   const onAnnouncementCreate = (data: AnnouncementForm) => {
-    if (!window.confirm('Envoyer cette notification à tous les utilisateurs actifs ?')) return;
     createAnnouncementMutation.mutate(
       { data: { ...data, isActive: true } },
       {
-        onSuccess: (result: any) => {
-          const push = result?.push;
-          toast({
-            title: 'Annonce créée',
-            description: push
-              ? `Push : ${push.sent} envoyée(s), ${push.failed} échec(s), ${push.removed} abonnement(s) supprimé(s).`
-              : 'Annonce enregistrée.',
-          });
+        onSuccess: () => {
+          toast({ title: 'Annonce créée' });
           announcementForm.reset();
           queryClient.invalidateQueries({ queryKey: getGetAdminAnnouncementsQueryKey() });
         },

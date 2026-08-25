@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useSidebar } from '@/lib/sidebar-context';
-import { PushNotifications } from '@/components/push-notifications';
 
 export default function ProfilePage() {
   const { clearAuth, user } = useAuth();
@@ -60,7 +59,6 @@ export default function ProfilePage() {
       </div>
 
       <div className="px-4 py-5 space-y-3">
-        <PushNotifications />
         {passwordOpen && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="w-full max-w-sm bg-card border border-white/10 rounded-3xl p-5 shadow-2xl">

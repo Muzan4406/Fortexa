@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import { AppSidebar } from './app-sidebar';
 import { SidebarProvider } from '@/lib/sidebar-context';
-import { PushNotifications } from './push-notifications';
 
 interface UserLayoutProps {
   children: ReactNode;
@@ -16,7 +15,6 @@ export function UserLayout({ children }: UserLayoutProps) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <PushNotifications showControl={false} />
       {children}
     </SidebarProvider>
   );
