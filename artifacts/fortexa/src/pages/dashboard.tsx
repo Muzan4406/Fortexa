@@ -126,9 +126,9 @@ export default function DashboardPage() {
 
       <div className="px-4 pb-6 space-y-4">
 
-        {/* ── Solde d'investissement — Nocturnal gold card ── */}
+         {/* ── Solde d'investissement ── */}
         <div
-           className="rounded-2xl p-5 relative overflow-hidden border border-blue-200 shadow-sm"
+            className="rounded-2xl p-5 relative overflow-hidden border border-blue-200 shadow-sm"
             style={{ background: 'linear-gradient(135deg, #ffffff 0%, #eff6ff 60%, #dbeafe 100%)' }}
         >
           <StarField />
@@ -165,14 +165,19 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div
-               className="text-3xl font-bold mb-0.5"
+             <div className="flex items-center justify-between gap-2">
+               <div>
+                 <div
+                   className="text-3xl font-bold mb-0.5"
                 style={{ color: '#be123c' }}
-              data-testid="text-investment-balance"
-            >
-               {isLoading ? '...' : hideBalance ? '••••••' : displayAmount(dashboard?.investmentBalance ?? 0)}
-            </div>
-             <p className="text-blue-800/70 text-xs mb-3">Capital qui travaille pour vous</p>
+                   data-testid="text-investment-balance"
+                 >
+                   {isLoading ? '...' : hideBalance ? '••••••' : displayAmount(dashboard?.investmentBalance ?? 0)}
+                 </div>
+                 <p className="text-blue-800/70 text-xs mb-3">Capital disponible</p>
+               </div>
+               <img src="/safe-transparent.png" alt="" className="h-24 w-24 shrink-0 object-contain drop-shadow-[0_8px_12px_rgba(30,64,175,.2)]" />
+             </div>
 
             <div
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
@@ -184,7 +189,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* ── Gains en direct — Nocturnal emerald card ── */}
+         {/* ── Gains en direct ── */}
         <div
             className="rounded-2xl p-5 relative overflow-hidden border border-sky-200 shadow-sm"
              style={{ background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%)' }}
@@ -202,7 +207,7 @@ export default function DashboardPage() {
           {/* Emerald border */}
             <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(14,165,233,0.16)' }} />
 
-          <div className="relative">
+           <div className="relative">
             <div className="flex items-center gap-2 mb-2">
               <div
                 className="w-7 h-7 rounded-lg flex items-center justify-center"
@@ -213,14 +218,19 @@ export default function DashboardPage() {
               <p className="text-rose-600 text-xs font-semibold tracking-widest uppercase">Gains en direct</p>
             </div>
 
-            {snapshot ? (
-               <LiveGains snapshot={snapshot} currency={isXof ? 'xof' : 'usdt'} usdtRate={usdtRate} />
-            ) : (
-                <span className="text-3xl font-bold text-rose-600" data-testid="text-gains-live">
-                {displayAmount(dashboard?.referralEarnings ?? 0, 5)}
-              </span>
-            )}
-             <p className="text-rose-700/70 text-xs mt-0.5 mb-4">Solde retirable à tout moment</p>
+             <div className="flex items-center justify-between gap-2">
+               <div>
+                 {snapshot ? (
+                    <LiveGains snapshot={snapshot} currency={isXof ? 'xof' : 'usdt'} usdtRate={usdtRate} />
+                 ) : (
+                     <span className="text-3xl font-bold text-rose-600" data-testid="text-gains-live">
+                     {displayAmount(dashboard?.referralEarnings ?? 0, 5)}
+                   </span>
+                 )}
+                 <p className="text-rose-700/70 text-xs mt-0.5 mb-4">Solde retirable à tout moment</p>
+               </div>
+               <img src="/wallet-transparent.png" alt="" className="h-24 w-24 shrink-0 object-contain drop-shadow-[0_8px_12px_rgba(190,24,93,.18)]" />
+             </div>
 
             <div className="flex items-center justify-between">
               <button
@@ -250,17 +260,22 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-[#eff6ff] via-[#f8fbff] to-[#e0e7ff] p-4 shadow-sm">
-          <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-blue-300/20 blur-2xl" />
-          <div className="relative flex items-center gap-4">
-            <img src="/dashboard-investment-icon.png" alt="" className="h-20 w-20 shrink-0 object-contain drop-shadow-[0_0_18px_rgba(244,63,95,.2)]" />
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-rose-500/80">Votre argent travaille</p>
-              <p className="mt-1 text-sm font-semibold text-slate-900">Investissez avec confiance</p>
-              <p className="mt-1 text-xs leading-relaxed text-slate-500">Suivez votre capital et vos gains en temps réel.</p>
-            </div>
-          </div>
-        </div>
+         <div className="grid grid-cols-4 gap-2">
+           {[
+             { label: 'Dépôt', sub: 'Ajouter des fonds', image: '/investment-icon.png', color: 'bg-blue-50', href: '/deposit' },
+             { label: 'Retrait', sub: 'Retirer vos gains', image: '/withdrawal-icon.png', color: 'bg-rose-50', href: '/withdraw' },
+             { label: 'Parrainage', sub: 'Inviter et gagner', image: '/team-icon.png', color: 'bg-violet-50', href: '/referrals' },
+             { label: 'Historique', sub: 'Vos transactions', image: '/withdrawal-clock-icon.png', color: 'bg-amber-50', href: '/transactions' },
+           ].map(({ label, sub, image, color, href }) => (
+             <button key={label} onClick={() => setLocation(href)} className="min-w-0 rounded-2xl border border-slate-100 bg-white px-1.5 py-3 text-center shadow-sm transition-transform active:scale-95">
+               <span className={`mx-auto flex h-10 w-10 items-center justify-center rounded-xl ${color}`}>
+                 <img src={image} alt="" className="h-8 w-8 object-contain" />
+               </span>
+               <span className="mt-2 block truncate text-[11px] font-bold text-slate-900">{label}</span>
+               <span className="mt-0.5 block truncate text-[9px] text-slate-500">{sub}</span>
+             </button>
+           ))}
+         </div>
 
       </div>
     </div>
