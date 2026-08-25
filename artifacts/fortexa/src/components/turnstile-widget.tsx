@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 declare global {
   interface Window {
@@ -12,8 +12,27 @@ declare global {
 type Props = { onToken: (token: string) => void };
 
 export function TurnstileWidget({ onToken }: Props) {
-  const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
+  const buildSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
+  const [siteKey, setSiteKey] = useState<string | null>(buildSiteKey || null);
+  const [configurationError, setConfigurationError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    const apiBase = import.meta.env.BASE_URL.replace(/\/+$/, '');
+    fetch(`${apiBase}/api/config/public`, { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : Promise.reject(new Error("Configuration indisponible"))))
+      .then((config: { turnstileSiteKey?: string | null }) => {
+        if (active && config.turnstileSiteKey) setSiteKey(config.turnstileSiteKey);
+        if (active && !config.turnstileSiteKey && !buildSiteKey) setConfigurationError(true);
+      })
+      .catch(() => {
+        if (active && !buildSiteKey) setConfigurationError(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [buildSiteKey]);
 
   useEffect(() => {
     if (!siteKey || !containerRef.current) return;
@@ -46,6 +65,10 @@ export function TurnstileWidget({ onToken }: Props) {
     return () => script.removeEventListener("load", renderWidget);
   }, [siteKey, onToken]);
 
-  if (!siteKey) return null;
+  if (!siteKey) {
+    return configurationError ? (
+      <p className="text-sm text-destructive">Vérification Cloudflare indisponible. Réessayez plus tard.</p>
+    ) : null;
+  }
   return <div ref={containerRef} className="min-h-[65px]" aria-label="Vérification de sécurité" />;
 }

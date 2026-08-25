@@ -76,7 +76,7 @@ TELEGRAM_BOT_TOKEN=nouveau token Telegram généré après révocation de l'anci
 TELEGRAM_CHAT_ID=-1003997139884
 TELEGRAM_COMMANDS_ENABLED=true
 TURNSTILE_SECRET_KEY=clé secrète Cloudflare Turnstile
-VITE_TURNSTILE_SITE_KEY=clé publique Cloudflare Turnstile
+TURNSTILE_SITE_KEY=clé publique Cloudflare Turnstile
 ```
 
 `TELEGRAM_BOT_TOKEN` est un secret : ne le mettez jamais dans Git ou dans un
@@ -90,8 +90,10 @@ polling des commandes.
 
 Cloudflare Turnstile est activé lorsque les deux clés sont configurées :
 `TURNSTILE_SECRET_KEY` reste uniquement côté API, tandis que
-`VITE_TURNSTILE_SITE_KEY` est utilisée pour afficher le widget sur les pages
-Connexion et Inscription. Ne mettez jamais la clé secrète dans Git.
+`TURNSTILE_SITE_KEY` est renvoyée uniquement comme configuration publique pour
+afficher le widget sur les pages Connexion et Inscription. Ne mettez jamais la
+clé secrète dans Git. `VITE_TURNSTILE_SITE_KEY` reste accepté comme solution
+de secours pour les builds frontend statiques.
 
 Le webhook Sendavapay sera :
 
