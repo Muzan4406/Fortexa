@@ -129,7 +129,7 @@ export default function DashboardPage() {
          {/* ── Solde d'investissement ── */}
         <div
             className="rounded-2xl p-5 relative overflow-hidden border border-blue-200 shadow-sm"
-            style={{ background: 'linear-gradient(135deg, #ffffff 0%, #eff6ff 60%, #dbeafe 100%)' }}
+             style={{ background: 'linear-gradient(135deg, #071b58 0%, #123b9b 62%, #1e4fb6 100%)' }}
         >
           <StarField />
           {/* Glowing orb top-right */}
@@ -142,7 +142,7 @@ export default function DashboardPage() {
 
           <div className="relative">
             <div className="flex items-center justify-between mb-2">
-               <p className="text-blue-700 text-xs font-semibold tracking-widest uppercase">
+                <p className="text-white/90 text-xs font-semibold tracking-widest uppercase">
                 Solde d'investissement
               </p>
               <div className="flex gap-1.5">
@@ -169,7 +169,7 @@ export default function DashboardPage() {
                <div>
                  <div
                    className="text-3xl font-bold mb-0.5"
-                style={{ color: '#be123c' }}
+                 style={{ color: '#ffffff' }}
                    data-testid="text-investment-balance"
                  >
                    {isLoading ? '...' : hideBalance ? '••••••' : displayAmount(dashboard?.investmentBalance ?? 0)}
