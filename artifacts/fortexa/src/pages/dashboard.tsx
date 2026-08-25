@@ -5,7 +5,7 @@ import { formatCurrency } from '@/lib/format';
 import { isFcfaCountry } from '@/lib/countries';
 import { useLocation } from 'wouter';
 import { useSidebar } from '@/lib/sidebar-context';
-import { Bell, Eye, EyeOff, ChevronRight, Menu, TrendingUp, Zap } from 'lucide-react';
+import { Bell, Eye, EyeOff, ChevronRight, Menu, TrendingUp, Zap, BarChart3, ShieldCheck, Clock3, Award } from 'lucide-react';
 
 /* ── Constellation background SVG ── */
 function StarField({ className }: { className?: string }) {
@@ -274,6 +274,35 @@ export default function DashboardPage() {
                <span className="mt-2 block truncate text-[11px] font-bold text-slate-900">{label}</span>
                <span className="mt-0.5 block truncate text-[9px] text-slate-500">{sub}</span>
              </button>
+           ))}
+         </div>
+
+         <div className="relative overflow-hidden rounded-2xl border border-blue-200 bg-[#071b58] p-4 shadow-sm">
+           <div className="absolute -right-12 -top-16 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl" />
+           <div className="relative flex items-center gap-3">
+             <img src="/dashboard-investment-icon.png" alt="" className="h-14 w-14 shrink-0 object-contain drop-shadow-[0_0_14px_rgba(244,63,95,.35)]" />
+             <div className="min-w-0">
+               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">Votre argent travaille</p>
+               <p className="mt-1 text-sm font-semibold text-white">Investissez avec confiance</p>
+               <p className="mt-0.5 text-xs leading-relaxed text-blue-100/75">Regardez vos gains grandir chaque jour.</p>
+             </div>
+           </div>
+         </div>
+
+         <div className="grid grid-cols-4 divide-x divide-slate-100 rounded-2xl border border-slate-100 bg-white px-1 py-4 shadow-sm">
+           {[
+             { label: '3%', text: 'Rendement\\ntoutes les 24h', icon: BarChart3, color: 'bg-blue-50 text-blue-600' },
+             { label: 'Sécurisé', text: 'Plateforme\\n100% sécurisée', icon: ShieldCheck, color: 'bg-emerald-50 text-emerald-600' },
+             { label: 'Temps réel', text: 'Gains calculés\\nen temps réel', icon: Clock3, color: 'bg-violet-50 text-violet-600' },
+             { label: 'Fiable', text: 'Transparence et\\nconfiance', icon: Award, color: 'bg-amber-50 text-amber-600' },
+           ].map(({ label, text, icon: Icon, color }) => (
+             <div key={label} className="min-w-0 px-1 text-center">
+               <span className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full ${color}`}>
+                 <Icon className="h-4 w-4" />
+               </span>
+               <p className="mt-2 truncate text-[11px] font-bold text-slate-900">{label}</p>
+               <p className="mt-0.5 whitespace-pre-line text-[9px] leading-tight text-slate-500">{text}</p>
+             </div>
            ))}
          </div>
 
