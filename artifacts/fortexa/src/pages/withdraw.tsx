@@ -295,6 +295,9 @@ export default function WithdrawPage() {
                         className="h-12 text-lg font-semibold"
                       />
                     </FormControl>
+                     <FormDescription className="text-xs">
+                       Minimum : {isMobileMoney ? formatCurrency(minimumXof) : `${minimumUsdt.toFixed(2)} USDT`}
+                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

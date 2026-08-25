@@ -8,6 +8,8 @@ function apiUrl(path: string) {
   return `${base}/api${path}`;
 }
 
+let activeSync: Promise<void> | null = null;
+
 export function PushNotifications({ showControl = true }: { showControl?: boolean }) {
   const { token } = useAuth();
   const { toast } = useToast();
@@ -29,6 +31,14 @@ export function PushNotifications({ showControl = true }: { showControl?: boolea
   }, [token]);
 
   async function syncSubscription() {
+    if (activeSync) return activeSync;
+    activeSync = syncSubscriptionOnce().finally(() => {
+      activeSync = null;
+    });
+    return activeSync;
+  }
+
+  async function syncSubscriptionOnce() {
     if (!token || !("serviceWorker" in navigator)) return;
     const registration = await navigator.serviceWorker.register(`${(import.meta.env.BASE_URL || "/").replace(/\/$/, "")}/push-sw.js`);
     await registration.update();

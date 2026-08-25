@@ -1,6 +1,10 @@
 self.addEventListener("push", (event) => {
-  if (!event.data) return;
-  const data = event.data.json();
+  let data = { title: "Fortexa", body: "Vous avez une nouvelle notification.", url: "/notifications", tag: "fortexa" };
+  try {
+    if (event.data) data = { ...data, ...event.data.json() };
+  } catch {
+    // Keep the fallback notification when a provider sends a non-JSON payload.
+  }
   event.waitUntil(
     self.registration.showNotification(data.title || "Fortexa", {
       body: data.body || "Vous avez une nouvelle notification.",
@@ -8,6 +12,7 @@ self.addEventListener("push", (event) => {
       badge: "/icon-192.png",
       tag: data.tag || "fortexa",
       data: { url: data.url || "/notifications" },
+      vibrate: [200, 100, 200],
     }),
   );
 });
