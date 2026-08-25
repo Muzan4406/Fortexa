@@ -36,9 +36,12 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-[100dvh] overflow-y-auto overscroll-y-contain bg-background pb-8">
+    <div
+      className="fixed inset-0 z-0 h-[100dvh] overflow-y-scroll overscroll-y-auto bg-background pb-24"
+      style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+    >
       {/* ── Header : logo + nom ── */}
-      <div className="relative overflow-hidden border-b border-blue-100 bg-gradient-to-br from-[#eff6ff] via-[#f8fbff] to-[#eef2ff] px-5 pb-6 pt-5">
+      <div className="relative overflow-hidden border-b border-blue-100 bg-gradient-to-br from-[#eff6ff] via-[#f8fbff] to-[#eef2ff] px-5 pb-4 pt-4">
         <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-300/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 -left-16 h-40 w-40 rounded-full bg-rose-300/15 blur-3xl" />
         {/* hamburger */}
@@ -50,15 +53,15 @@ export default function ProfilePage() {
           <Menu className="w-5 h-5 text-foreground" />
         </button>
 
-        <div className="relative flex flex-col items-center pt-2">
+        <div className="relative flex flex-col items-center pt-1">
           <img
             src="/logo.jpg"
             alt="Fortexa"
-            className="mb-3 h-20 w-20 rounded-[1.75rem] border-4 border-white object-cover shadow-xl shadow-blue-900/10"
+            className="mb-2 h-14 w-14 rounded-2xl border-4 border-white object-cover shadow-lg shadow-blue-900/10"
           />
           <h1 className="text-xl font-extrabold tracking-tight text-slate-900">{user?.name ?? '...'}</h1>
           <p className="mt-1 text-xs text-slate-500">{user?.email ?? ''}</p>
-          <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700">
+          <span className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             Compte actif
           </span>

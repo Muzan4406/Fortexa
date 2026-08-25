@@ -91,9 +91,12 @@ export default function DashboardPage() {
     isXof ? formatCurrency(amount, decimals) : `${(amount / usdtRate).toFixed(6)} USDT`;
 
   return (
-    <div className="min-h-[100dvh] overflow-y-auto overscroll-y-contain bg-background pb-8">
+    <div
+      className="fixed inset-0 z-0 h-[100dvh] overflow-y-scroll overscroll-y-auto bg-background pb-24"
+      style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+    >
       {/* ── Top bar ── */}
-      <div className="flex items-center justify-between bg-background px-4 pb-5 pt-8">
+      <div className="flex items-center justify-between bg-background px-4 pb-3 pt-4">
         <div className="flex items-center gap-3">
           <button
             onClick={openSidebar}
