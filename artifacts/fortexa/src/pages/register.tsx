@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -53,6 +53,7 @@ export default function RegisterPage() {
   const onSubmit = (data: RegisterForm) => {
     const payload = {
       ...data,
+      captchaToken,
       referralCode: data.referralCode || null,
     };
     
@@ -184,6 +185,7 @@ export default function RegisterPage() {
                     <FormControl>
                       <Input
                         type="password"
+                        autoComplete="new-password"
                         placeholder="••••••••"
                         {...field}
                         data-testid="input-password"
@@ -214,6 +216,7 @@ export default function RegisterPage() {
                 )}
               />
 
+              <TurnstileWidget onToken={setCaptchaToken} />
               <Button
                 type="submit"
                 className="w-full h-12 text-base font-semibold"
