@@ -120,8 +120,13 @@ export default function DepositPage() {
   // ── Derived ───────────────────────────────────────────────────────────────
   const minDeposit = dashboard?.settings?.minDeposit ?? 3000;
   const selectedCountry = COUNTRIES.find((c) => c.code === form.country);
+  const usdtRate = usdtInfo?.usdtRate ?? 655;
+  const isUsdtFlow = flow === 'usdt';
+  const minimumDisplayAmount = isUsdtFlow ? (minDeposit / usdtRate).toFixed(2) : String(minDeposit);
+  const enteredDisplayAmount = parseFloat(form.amount) || 0;
+  const amountInFcfa = isUsdtFlow ? enteredDisplayAmount * usdtRate : enteredDisplayAmount;
   const usdtAmount = usdtInfo && form.amount
-    ? (parseFloat(form.amount) / usdtInfo.usdtRate).toFixed(2)
+    ? (isUsdtFlow ? enteredDisplayAmount : enteredDisplayAmount / usdtRate).toFixed(2)
     : '—';
 
   // ── Polling for XOF payment status ───────────────────────────────────────
@@ -181,10 +186,11 @@ export default function DepositPage() {
 
   // Step 1 → Step 2
   async function handleContinue() {
-    const amount = parseFloat(form.amount);
+    const enteredAmount = parseFloat(form.amount);
+    const amount = isUsdtFlow ? enteredAmount * usdtRate : enteredAmount;
     if (!form.country) { toast({ title: 'Sélectionnez un pays', variant: 'destructive' }); return; }
-    if (!amount || amount < minDeposit) {
-      toast({ title: `Montant minimum : ${formatCurrency(minDeposit)}`, variant: 'destructive' }); return;
+    if (!enteredAmount || amount < minDeposit) {
+      toast({ title: `Montant minimum : ${minimumDisplayAmount} ${isUsdtFlow ? 'USDT' : 'FCFA'}`, variant: 'destructive' }); return;
     }
 
     if (flow === 'usdt') {
@@ -284,7 +290,7 @@ export default function DepositPage() {
     usdtMutation.mutate(
       {
         data: {
-          amount: parseFloat(form.amount),
+          amount: amountInFcfa,
           payerCountry: form.country,
           txid: txid.trim(),
           screenshotBase64: screenshotPreview,
@@ -385,17 +391,20 @@ export default function DepositPage() {
           )}
 
           <div className="space-y-2">
-            <Label>Montant (FCFA)</Label>
+            <Label>Montant ({isUsdtFlow ? 'USDT' : 'FCFA'})</Label>
             <Input
               type="number"
-              placeholder={`Minimum ${formatCurrency(minDeposit)}`}
+              placeholder={`Minimum ${minimumDisplayAmount} ${isUsdtFlow ? 'USDT' : 'FCFA'}`}
               value={form.amount}
               onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
               className="h-12 text-lg font-semibold"
               inputMode="numeric"
-              min={minDeposit}
+              min={isUsdtFlow ? Number(minimumDisplayAmount) : minDeposit}
+              step={isUsdtFlow ? '0.01' : '1'}
             />
-            <p className="text-xs text-muted-foreground">Minimum : {formatCurrency(minDeposit)}</p>
+            <p className="text-xs text-muted-foreground">
+              Minimum : {minimumDisplayAmount} {isUsdtFlow ? 'USDT' : 'FCFA'}
+            </p>
           </div>
 
           {flow === 'xof' && (
@@ -663,7 +672,7 @@ export default function DepositPage() {
           <div className="bg-muted/40 rounded-xl divide-y divide-border">
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-sm text-muted-foreground">Montant FCFA</span>
-              <span className="text-sm font-semibold">{formatCurrency(parseFloat(form.amount) || 0)}</span>
+              <span className="text-sm font-semibold">{formatCurrency(amountInFcfa)}</span>
             </div>
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-sm text-muted-foreground">Montant USDT</span>
@@ -671,7 +680,7 @@ export default function DepositPage() {
             </div>
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-sm text-muted-foreground">Taux indicatif</span>
-              <span className="text-sm text-muted-foreground">1 USDT ≈ {usdtInfo?.usdtRate ?? '—'} FCFA</span>
+              <span className="text-sm text-muted-foreground">1 USDT ≈ {usdtRate} FCFA</span>
             </div>
           </div>
 
@@ -813,7 +822,9 @@ export default function DepositPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-700">Minimum</p>
-            <p className="mt-1 text-sm font-bold text-blue-950">{formatCurrency(minDeposit)}</p>
+            <p className="mt-1 text-sm font-bold text-blue-950">
+              {isUsdtFlow ? `${minimumDisplayAmount} USDT` : formatCurrency(minDeposit)}
+            </p>
           </div>
           <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-rose-700">Crédit</p>

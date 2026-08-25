@@ -60,7 +60,10 @@ export default function ReferralsPage() {
   const total = (referralInfo?.level1Count ?? 0) + (referralInfo?.level2Count ?? 0) + (referralInfo?.level3Count ?? 0);
 
   return (
-    <div className="min-h-[100dvh] overflow-y-auto overscroll-y-contain bg-[#fffafb] pb-8 text-slate-900">
+    <div
+      className="fixed inset-0 z-0 h-[100dvh] overflow-y-scroll overscroll-y-auto bg-[#fffafb] pb-24 text-slate-900"
+      style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+    >
       <header className="flex items-center justify-between border-b border-rose-100 bg-white px-4 pb-3 pt-8">
         <div className="flex items-center gap-2">
           <img src="/logo.jpg" alt="Fortexa" className="h-8 w-8 rounded-full object-cover" />
