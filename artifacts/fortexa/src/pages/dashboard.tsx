@@ -95,12 +95,17 @@ export default function DashboardPage() {
     >
       {/* ── Top bar ── */}
       <div className="flex items-center justify-between bg-background px-4 pb-3 pt-4">
-          <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">
+          <div className="flex min-w-0 items-center gap-2.5">
+          <img
+            src="/fortexa-dashboard-logo.png"
+            alt="Fortexa"
+            className="h-10 w-10 shrink-0 rounded-full object-contain drop-shadow-sm"
+          />
+          <div className="min-w-0">
+            <h1 className="truncate text-xl font-bold text-foreground">
                Bonjour, {user.name.split(' ')[0]}
             </h1>
-            <p className="text-xs text-muted-foreground">Fais fructifier ton investissement</p>
+            <p className="truncate text-xs text-muted-foreground">Fais fructifier ton investissement</p>
           </div>
         </div>
         <button
