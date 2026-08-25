@@ -91,13 +91,13 @@ export default function DashboardPage() {
     isXof ? formatCurrency(amount, decimals) : `${(amount / usdtRate).toFixed(6)} USDT`;
 
   return (
-    <div className="h-[100dvh] overflow-hidden overscroll-none bg-background">
+    <div className="min-h-[100dvh] overflow-y-auto overscroll-y-contain bg-background pb-8">
       {/* ── Top bar ── */}
-      <div className="bg-background px-4 pt-10 pb-4 flex items-center justify-between">
+      <div className="flex items-center justify-between bg-background px-4 pb-5 pt-8">
         <div className="flex items-center gap-3">
           <button
             onClick={openSidebar}
-            className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-blue-100 bg-white shadow-sm"
             aria-label="Ouvrir le menu"
           >
             <Menu className="w-5 h-5 text-foreground" />
@@ -111,7 +111,7 @@ export default function DashboardPage() {
         </div>
         <button
           onClick={() => setLocation('/notifications')}
-          className="relative w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+           className="relative flex h-10 w-10 items-center justify-center rounded-2xl border border-blue-100 bg-white shadow-sm"
           aria-label="Notifications"
         >
           <Bell className="w-5 h-5 text-foreground" />
