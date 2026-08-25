@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { formatCurrency, formatDate } from '@/lib/format';
-import { CheckCircle, XCircle, Clock, ExternalLink, Smartphone, Wallet } from 'lucide-react';
+import { CheckCircle, X, XCircle, Clock, Smartphone, Wallet } from 'lucide-react';
 
 function proofUrl(path: string) {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
@@ -33,6 +33,7 @@ export default function AdminDepositsPage() {
   const [statusFilter, setStatusFilter] = useState<TransactionStatus | 'all'>('pending');
   const [rejectId, setRejectId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [proofPreview, setProofPreview] = useState<string | null>(null);
 
   const { data: result, isLoading } = useGetAdminDeposits({
     status: statusFilter === 'all' ? undefined : statusFilter,
@@ -140,9 +141,18 @@ export default function AdminDepositsPage() {
                   {dep.txid && <p className="col-span-2 break-all"><span className="text-muted-foreground">TXID :</span> <span className="font-mono font-semibold">{dep.txid}</span></p>}
                 </div>
                 {dep.screenshotPath && (
-                  <a href={proofUrl(dep.screenshotPath)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 pt-1 text-xs font-semibold text-primary">
-                    <ExternalLink className="h-3.5 w-3.5" /> Voir la preuve de paiement
-                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setProofPreview(proofUrl(dep.screenshotPath!))}
+                    className="mt-2 block overflow-hidden rounded-xl border border-blue-100 bg-white text-left shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    <img
+                      src={proofUrl(dep.screenshotPath)}
+                      alt="Preuve de paiement"
+                      className="h-28 w-full object-cover"
+                    />
+                    <span className="block px-3 py-2 text-xs font-semibold text-primary">Voir la preuve de paiement</span>
+                  </button>
                 )}
               </div>
               {dep.status === 'pending' && (
@@ -166,7 +176,25 @@ export default function AdminDepositsPage() {
                 <p className="text-xs text-red-600 mt-2 bg-red-50 rounded-lg p-2">Motif: {dep.rejectionReason}</p>
               )}
             </div>
-          ))}
+      ))}
+      {proofPreview && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
+          onClick={() => setProofPreview(null)}
+        >
+          <div className="relative max-h-[90vh] max-w-lg overflow-hidden rounded-2xl bg-white p-2 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setProofPreview(null)}
+              className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/75 text-white"
+              aria-label="Fermer la preuve"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <img src={proofPreview} alt="Preuve de paiement agrandie" className="max-h-[84vh] max-w-full rounded-xl object-contain" />
+          </div>
+        </div>
+      )}
           {deposits.length === 0 && (
             <div className="text-center py-16">
               <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
