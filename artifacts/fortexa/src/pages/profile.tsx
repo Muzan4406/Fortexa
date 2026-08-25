@@ -41,30 +41,31 @@ export default function ProfilePage() {
       style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
     >
       {/* ── Header : logo + nom ── */}
-      <div className="relative overflow-hidden border-b border-blue-100 bg-gradient-to-br from-[#eff6ff] via-[#f8fbff] to-[#eef2ff] px-5 pb-4 pt-4">
-        <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-300/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -left-16 h-40 w-40 rounded-full bg-rose-300/15 blur-3xl" />
+      <div className="relative overflow-hidden border-b border-blue-100 bg-gradient-to-br from-[#eff6ff] via-[#f8fbff] to-[#eef2ff] px-5 py-3">
+        <div className="pointer-events-none absolute -right-16 -top-20 h-40 w-40 rounded-full bg-blue-300/20 blur-3xl" />
         {/* hamburger */}
         <button
           onClick={openSidebar}
-          className="relative z-10 flex h-10 w-10 items-center justify-center rounded-2xl border border-white/80 bg-white/75 shadow-sm backdrop-blur"
+          className="absolute left-5 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-xl border border-white/80 bg-white/75 shadow-sm backdrop-blur"
           aria-label="Ouvrir le menu"
         >
-          <Menu className="w-5 h-5 text-foreground" />
+          <Menu className="h-4 w-4 text-foreground" />
         </button>
 
-        <div className="relative flex flex-col items-center pt-1">
+        <div className="relative flex items-center justify-center gap-3 pl-10">
           <img
             src="/logo.jpg"
             alt="Fortexa"
-            className="mb-2 h-14 w-14 rounded-2xl border-4 border-white object-cover shadow-lg shadow-blue-900/10"
+            className="h-12 w-12 rounded-2xl border-3 border-white object-cover shadow-md shadow-blue-900/10"
           />
-          <h1 className="text-xl font-extrabold tracking-tight text-slate-900">{user?.name ?? '...'}</h1>
-          <p className="mt-1 text-xs text-slate-500">{user?.email ?? ''}</p>
-          <span className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            Compte actif
-          </span>
+          <div className="min-w-0 text-left">
+            <h1 className="truncate text-lg font-extrabold tracking-tight text-slate-900">{user?.name ?? '...'}</h1>
+            <p className="truncate text-xs text-slate-500">{user?.email ?? ''}</p>
+            <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Compte actif
+            </span>
+          </div>
         </div>
       </div>
 
