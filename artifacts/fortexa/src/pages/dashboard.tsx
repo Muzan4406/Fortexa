@@ -220,7 +220,7 @@ export default function DashboardPage() {
                     <LiveGains snapshot={snapshot} currency={isXof ? 'xof' : 'usdt'} usdtRate={usdtRate} />
                  ) : (
                      <span className="text-3xl font-bold text-rose-600" data-testid="text-gains-live">
-                     {displayAmount(dashboard?.referralEarnings ?? 0, 5)}
+                      {displayAmount(dashboard?.gainBalance ?? 0, 5)}
                    </span>
                  )}
                  <p className="text-rose-700/70 text-xs mt-0.5 mb-2">Solde retirable à tout moment</p>
