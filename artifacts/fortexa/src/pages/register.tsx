@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { CountrySelect } from '@/components/country-select';
+import { TurnstileWidget } from '@/components/turnstile-widget';
 const registerSchema = z.object({
   name: z.string().min(2, 'Nom requis (min 2 caractères)'),
   phone: z.string().min(8, 'Numéro de téléphone invalide'),
@@ -26,6 +27,7 @@ export default function RegisterPage() {
   const { setAuth, user } = useAuth();
   const { toast } = useToast();
   const registerMutation = useRegister();
+  const [captchaToken, setCaptchaToken] = useState('');
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),

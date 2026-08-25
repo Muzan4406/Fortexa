@@ -6,6 +6,7 @@ import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 import { API_PREFIX } from "./lib/runtime-paths";
+import { sendTelegramNotification } from "./lib/telegram";
 
 const app: Express = express();
 app.disable("x-powered-by");
@@ -42,6 +43,7 @@ app.use((req, res, next) => {
 
 type RateLimitEntry = { count: number; resetAt: number };
 const authRateLimits = new Map<string, RateLimitEntry>();
+const bruteForceAlerts = new Map<string, number>();
 function authRateLimit(req: express.Request, res: express.Response, next: express.NextFunction): void {
   const requestPath = req.originalUrl.split("?")[0];
   const key = `${req.ip}:${requestPath}`;
@@ -59,6 +61,13 @@ function authRateLimit(req: express.Request, res: express.Response, next: expres
     return;
   }
   if (current.count >= (isRegister ? 5 : 10)) {
+    const lastAlert = bruteForceAlerts.get(key) ?? 0;
+    if (now - lastAlert > 15 * 60_000) {
+      bruteForceAlerts.set(key, now);
+      void sendTelegramNotification(
+        `🚨 Alerte sécurité — brute force détecté\nRoute : ${requestPath}\nIP : ${req.ip}\nSeuil dépassé : ${isRegister ? "5" : "10"} tentatives en 1 minute\nAction : requêtes bloquées temporairement`,
+      );
+    }
     res.setHeader("Retry-After", Math.ceil((current.resetAt - now) / 1000));
     res.status(429).json({ error: "Trop de tentatives. Réessayez dans une minute." });
     return;

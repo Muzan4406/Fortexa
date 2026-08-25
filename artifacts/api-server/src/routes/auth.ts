@@ -6,6 +6,7 @@ import { signToken, requireAuth } from "../lib/auth";
 import { getSettings } from "../lib/settings";
 import { nanoid } from "nanoid";
 import { sendTelegramNotification } from "../lib/telegram";
+import { verifyTurnstileToken } from "../lib/turnstile";
 import { createHash, randomInt, randomBytes } from "crypto";
 
 const adminChallenges = new Map<string, {
@@ -54,7 +55,7 @@ function formatUser(u: typeof usersTable.$inferSelect) {
 }
 
 router.post("/auth/register", async (req, res): Promise<void> => {
-  const { name, phone, country, email, password, referralCode } = req.body;
+  const { name, phone, country, email, password, referralCode, captchaToken } = req.body;
 
   if (!name || !phone || !country || !email || !password) {
     res.status(400).json({ error: "Tous les champs sont requis" });
@@ -62,6 +63,10 @@ router.post("/auth/register", async (req, res): Promise<void> => {
   }
   if (password.length < 6) {
     res.status(400).json({ error: "Le mot de passe doit avoir au moins 6 caractères" });
+    return;
+  }
+  if (!(await verifyTurnstileToken(captchaToken, req.ip))) {
+    res.status(400).json({ error: "Vérification anti-robot invalide ou expirée" });
     return;
   }
 
@@ -102,9 +107,13 @@ router.post("/auth/register", async (req, res): Promise<void> => {
 });
 
 router.post("/auth/login", async (req, res): Promise<void> => {
-  const { email, password } = req.body;
+  const { email, password, captchaToken } = req.body;
   if (!email || !password) {
     res.status(400).json({ error: "Email et mot de passe requis" });
+    return;
+  }
+  if (!(await verifyTurnstileToken(captchaToken, req.ip))) {
+    res.status(400).json({ error: "Vérification anti-robot invalide ou expirée" });
     return;
   }
 

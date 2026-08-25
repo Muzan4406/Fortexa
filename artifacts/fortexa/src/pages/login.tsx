@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
+import { TurnstileWidget } from '@/components/turnstile-widget';
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),
   password: z.string().min(6, 'Mot de passe requis (min 6 caractères)'),
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [adminChallenge, setAdminChallenge] = useState<{ challengeId: string; expiresAt: number } | null>(null);
   const [adminCode, setAdminCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -44,7 +46,7 @@ export default function LoginPage() {
       const response = await fetch(`${apiBase}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, captchaToken }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || 'Email ou mot de passe incorrect');
@@ -166,6 +168,7 @@ export default function LoginPage() {
                 )}
               />
 
+              <TurnstileWidget onToken={setCaptchaToken} />
               <Button
                 type="submit"
                 className="w-full h-12 text-base font-semibold"
