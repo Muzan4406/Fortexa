@@ -59,7 +59,9 @@ export async function sendPushToUsers(
       }
     }
   }));
-  return { targeted, sent, failed, removed };
+  const report = { targeted, sent, failed, removed };
+  console.info("Push delivery report", { ...report, subscriptions: subscriptions.length });
+  return report;
 }
 
 export async function sendPushToAdmins(

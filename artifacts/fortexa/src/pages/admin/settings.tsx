@@ -216,8 +216,14 @@ export default function AdminSettingsPage() {
     createAnnouncementMutation.mutate(
       { data: { ...data, isActive: true } },
       {
-        onSuccess: () => {
-          toast({ title: 'Annonce créée' });
+        onSuccess: (result: any) => {
+          const push = result?.push;
+          toast({
+            title: 'Annonce créée',
+            description: push
+              ? `Push : ${push.sent} envoyée(s), ${push.failed} échec(s), ${push.removed} abonnement(s) supprimé(s).`
+              : 'Annonce enregistrée.',
+          });
           announcementForm.reset();
           queryClient.invalidateQueries({ queryKey: getGetAdminAnnouncementsQueryKey() });
         },
