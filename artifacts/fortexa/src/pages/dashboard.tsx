@@ -187,21 +187,21 @@ export default function DashboardPage() {
 
          {/* ── Gains en direct ── */}
         <div
-            className="rounded-2xl p-4 relative overflow-hidden border border-sky-200 shadow-sm"
-             style={{ background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%)' }}
+            className="rounded-2xl p-4 relative overflow-hidden border border-rose-200 shadow-sm"
+             style={{ background: 'linear-gradient(135deg, #ffffff 0%, #fff5f7 52%, #ffe4ec 100%)' }}
         >
           <StarField />
           {/* Green glow orb */}
           <div
             className="absolute -bottom-8 -right-8 w-44 h-44 rounded-full pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(14,165,233,0.14) 0%, transparent 70%)' }}
+              style={{ background: 'radial-gradient(circle, rgba(244,63,94,0.15) 0%, transparent 70%)' }}
           />
           <div
             className="absolute top-0 left-0 w-32 h-32 rounded-full pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%)' }}
+              style={{ background: 'radial-gradient(circle, rgba(244,114,182,0.1) 0%, transparent 70%)' }}
           />
           {/* Emerald border */}
-            <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(14,165,233,0.16)' }} />
+            <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 1px rgba(244,63,94,0.14)' }} />
 
            <div className="relative">
             <div className="flex items-center gap-2 mb-2">
