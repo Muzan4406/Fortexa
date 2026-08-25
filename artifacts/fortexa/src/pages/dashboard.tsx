@@ -128,7 +128,7 @@ export default function DashboardPage() {
 
          {/* ── Solde d'investissement ── */}
         <div
-            className="rounded-2xl p-5 relative overflow-hidden border border-blue-200 shadow-sm"
+            className="rounded-2xl p-4 relative overflow-hidden border border-blue-200 shadow-sm"
              style={{ background: 'linear-gradient(135deg, #071b58 0%, #123b9b 62%, #1e4fb6 100%)' }}
         >
           <StarField />
@@ -152,15 +152,15 @@ export default function DashboardPage() {
                    style={{ background: 'rgba(59,130,246,0.1)' }}
                 >
                   {hideBalance
-                     ? <EyeOff className="w-3.5 h-3.5 text-blue-600" />
-                     : <Eye className="w-3.5 h-3.5 text-blue-600" />}
+                      ? <EyeOff className="w-3.5 h-3.5 text-white" />
+                      : <Eye className="w-3.5 h-3.5 text-white" />}
                 </button>
                 <button
                   onClick={() => setLocation('/transactions')}
                   className="w-7 h-7 rounded-lg flex items-center justify-center"
                     style={{ background: 'rgba(59,130,246,0.1)' }}
                 >
-                    <ChevronRight className="w-3.5 h-3.5 text-blue-600" />
+                     <ChevronRight className="w-3.5 h-3.5 text-white" />
                 </button>
               </div>
             </div>
@@ -174,24 +174,24 @@ export default function DashboardPage() {
                  >
                    {isLoading ? '...' : hideBalance ? '••••••' : displayAmount(dashboard?.investmentBalance ?? 0)}
                  </div>
-                 <p className="text-blue-800/70 text-xs mb-3">Capital disponible</p>
+                  <p className="text-blue-100/80 text-xs mb-2">Capital qui travaille pour vous</p>
                </div>
                <img src="/safe-transparent.png" alt="" className="h-24 w-24 shrink-0 object-contain drop-shadow-[0_8px_12px_rgba(30,64,175,.2)]" />
              </div>
 
             <div
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
-                style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.18)' }}
+                style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)' }}
             >
-                 <span className="text-blue-800/80 text-xs">Maximum autorisé :</span>
-                  <span className="text-blue-900 font-bold text-xs">{displayAmount(maxCapital, 0)}</span>
+                  <span className="text-blue-100/80 text-xs">Maximum autorisé :</span>
+                   <span className="text-white font-bold text-xs">{displayAmount(maxCapital, 0)}</span>
             </div>
           </div>
         </div>
 
          {/* ── Gains en direct ── */}
         <div
-            className="rounded-2xl p-5 relative overflow-hidden border border-sky-200 shadow-sm"
+            className="rounded-2xl p-4 relative overflow-hidden border border-sky-200 shadow-sm"
              style={{ background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%)' }}
         >
           <StarField />
@@ -215,7 +215,7 @@ export default function DashboardPage() {
               >
                  <TrendingUp className="w-3.5 h-3.5 text-rose-500" />
               </div>
-              <p className="text-rose-600 text-xs font-semibold tracking-widest uppercase">Gains en direct</p>
+               <p className="text-rose-600 text-xs font-semibold tracking-widest uppercase">Gains en direct</p>
             </div>
 
              <div className="flex items-center justify-between gap-2">
@@ -227,7 +227,7 @@ export default function DashboardPage() {
                      {displayAmount(dashboard?.referralEarnings ?? 0, 5)}
                    </span>
                  )}
-                 <p className="text-rose-700/70 text-xs mt-0.5 mb-4">Solde retirable à tout moment</p>
+                 <p className="text-rose-700/70 text-xs mt-0.5 mb-2">Solde retirable à tout moment</p>
                </div>
                <img src="/wallet-transparent.png" alt="" className="h-24 w-24 shrink-0 object-contain drop-shadow-[0_8px_12px_rgba(190,24,93,.18)]" />
              </div>
@@ -267,9 +267,9 @@ export default function DashboardPage() {
              { label: 'Parrainage', sub: 'Inviter et gagner', image: '/team-icon.png', color: 'bg-violet-50', href: '/referrals' },
              { label: 'Historique', sub: 'Vos transactions', image: '/withdrawal-clock-icon.png', color: 'bg-amber-50', href: '/transactions' },
            ].map(({ label, sub, image, color, href }) => (
-             <button key={label} onClick={() => setLocation(href)} className="min-w-0 rounded-2xl border border-slate-100 bg-white px-1.5 py-3 text-center shadow-sm transition-transform active:scale-95">
-               <span className={`mx-auto flex h-10 w-10 items-center justify-center rounded-xl ${color}`}>
-                 <img src={image} alt="" className="h-8 w-8 object-contain" />
+             <button key={label} onClick={() => setLocation(href)} className="min-w-0 rounded-2xl border border-slate-100 bg-white px-1 py-2.5 text-center shadow-sm transition-transform active:scale-95">
+               <span className={`mx-auto flex h-8 w-8 items-center justify-center rounded-xl ${color}`}>
+                 <img src={image} alt="" className="h-7 w-7 object-contain" />
                </span>
                <span className="mt-2 block truncate text-[11px] font-bold text-slate-900">{label}</span>
                <span className="mt-0.5 block truncate text-[9px] text-slate-500">{sub}</span>
@@ -277,10 +277,10 @@ export default function DashboardPage() {
            ))}
          </div>
 
-         <div className="relative overflow-hidden rounded-2xl border border-blue-200 bg-[#071b58] p-4 shadow-sm">
+         <div className="relative overflow-hidden rounded-2xl border border-blue-200 bg-[#071b58] p-3 shadow-sm">
            <div className="absolute -right-12 -top-16 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl" />
            <div className="relative flex items-center gap-3">
-             <img src="/dashboard-investment-icon.png" alt="" className="h-14 w-14 shrink-0 object-contain drop-shadow-[0_0_14px_rgba(244,63,95,.35)]" />
+             <img src="/dashboard-investment-icon.png" alt="" className="h-12 w-12 shrink-0 object-contain drop-shadow-[0_0_14px_rgba(244,63,95,.35)]" />
              <div className="min-w-0">
                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">Votre argent travaille</p>
                <p className="mt-1 text-sm font-semibold text-white">Investissez avec confiance</p>
@@ -289,7 +289,7 @@ export default function DashboardPage() {
            </div>
          </div>
 
-         <div className="grid grid-cols-4 divide-x divide-slate-100 rounded-2xl border border-slate-100 bg-white px-1 py-4 shadow-sm">
+         <div className="grid grid-cols-4 divide-x divide-slate-100 rounded-2xl border border-slate-100 bg-white px-1 py-3 shadow-sm">
            {[
              { label: '3%', text: 'Rendement\\ntoutes les 24h', icon: BarChart3, color: 'bg-blue-50 text-blue-600' },
              { label: 'Sécurisé', text: 'Plateforme\\n100% sécurisée', icon: ShieldCheck, color: 'bg-emerald-50 text-emerald-600' },
