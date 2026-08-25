@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { db, pushSubscriptionsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "../lib/auth";
-import { getVapidPublicKey } from "../lib/push";
+import { getVapidPublicKey, sendPushToUsers } from "../lib/push";
 
 const router: IRouter = Router();
 
@@ -48,6 +48,16 @@ router.delete("/push/subscribe", requireAuth, async (req, res): Promise<void> =>
     await db.delete(pushSubscriptionsTable).where(eq(pushSubscriptionsTable.endpoint, endpoint));
   }
   res.status(204).send();
+});
+
+router.post("/push/test", requireAuth, async (req, res): Promise<void> => {
+  const report = await sendPushToUsers([req.userId!], {
+    title: "Test Fortexa",
+    body: "Les notifications push de Fortexa fonctionnent.",
+    url: "/profile",
+    tag: `push-test-${Date.now()}`,
+  });
+  res.json(report);
 });
 
 export default router;

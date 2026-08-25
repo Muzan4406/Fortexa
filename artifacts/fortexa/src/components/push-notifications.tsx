@@ -15,6 +15,7 @@ export function PushNotifications({ showControl = true }: { showControl?: boolea
   const { toast } = useToast();
   const [status, setStatus] = useState<"unsupported" | "blocked" | "off" | "on" | "error" | "loading">("loading");
   const [errorMessage, setErrorMessage] = useState("");
+  const [testing, setTesting] = useState(false);
 
   useEffect(() => {
     if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -90,10 +91,63 @@ export function PushNotifications({ showControl = true }: { showControl?: boolea
     }
   }
 
+  async function resync() {
+    try {
+      setStatus("loading");
+      await syncSubscription();
+      toast({ title: "Abonnement resynchronisé", description: "Ce téléphone est maintenant enregistré pour les notifications." });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Impossible de resynchroniser les notifications";
+      setStatus("error");
+      setErrorMessage(message);
+      toast({ title: "Resynchronisation impossible", description: message, variant: "destructive" });
+    }
+  }
+
+  async function testPush() {
+    if (!token) return;
+    try {
+      setTesting(true);
+      const response = await fetch(apiUrl("/push/test"), {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const report = await response.json();
+      if (!response.ok) throw new Error(report?.error || `Test impossible (${response.status})`);
+      toast({
+        title: report.sent > 0 ? "Test push envoyé" : "Aucun abonnement actif",
+        description: `Envoyée(s) : ${report.sent} · Échec(s) : ${report.failed} · Supprimée(s) : ${report.removed}`,
+        variant: report.sent > 0 ? "default" : "destructive",
+      });
+    } catch (error) {
+      toast({ title: "Test push impossible", description: error instanceof Error ? error.message : "Erreur serveur", variant: "destructive" });
+    } finally {
+      setTesting(false);
+    }
+  }
+
   if (status === "loading" || status === "unsupported") return null;
   if (!showControl) return null;
   if (status === "on") {
-    return <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4"><CheckCircle2 className="h-5 w-5 text-emerald-600" /><div><p className="text-sm font-semibold text-foreground">Notifications push activées</p><p className="text-xs text-muted-foreground">Commissions, filleuls et annonces vous seront signalés.</p></div></div>;
+    return (
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+        <div className="flex items-center gap-3">
+          <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+          <div>
+            <p className="text-sm font-semibold text-foreground">Notifications push activées</p>
+            <p className="text-xs text-muted-foreground">Commissions, filleuls et annonces vous seront signalés.</p>
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <button onClick={testPush} disabled={testing} className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">
+            {testing ? "Test…" : "Tester maintenant"}
+          </button>
+          <button onClick={resync} className="rounded-lg border border-emerald-300 px-3 py-2 text-xs font-semibold text-emerald-800">
+            Resynchroniser
+          </button>
+        </div>
+      </div>
+    );
   }
   return <button onClick={enable} disabled={status === "blocked"} className="flex w-full items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left disabled:opacity-60"><BellOff className="h-5 w-5 text-primary" /><div><p className="text-sm font-semibold text-foreground">{status === "blocked" ? "Notifications bloquées par le navigateur" : status === "error" ? "Réessayer les notifications" : "Activer les notifications push"}</p><p className="text-xs text-muted-foreground">{status === "blocked" ? "Autorisez-les dans les réglages du navigateur." : status === "error" ? errorMessage : "Soyez averti de vos commissions, filleuls et annonces."}</p></div></button>;
 }
