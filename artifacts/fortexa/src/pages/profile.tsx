@@ -52,18 +52,18 @@ export default function ProfilePage() {
           <Menu className="h-4 w-4 text-foreground" />
         </button>
 
-        <div className="relative flex items-center justify-center gap-3 pl-10">
+        <div className="relative flex flex-col items-center pt-1">
           <img
             src="/logo.jpg"
             alt="Fortexa"
-            className="h-12 w-12 rounded-2xl border-3 border-white object-cover shadow-md shadow-blue-900/10"
+            className="mb-1.5 h-12 w-12 rounded-2xl border-3 border-white object-cover shadow-md shadow-blue-900/10"
           />
-          <div className="min-w-0 text-left">
-            <h1 className="truncate text-lg font-extrabold tracking-tight text-slate-900">{user?.name ?? '...'}</h1>
-            <p className="truncate text-xs text-slate-500">{user?.email ?? ''}</p>
-            <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+          <h1 className="text-lg font-extrabold leading-tight tracking-tight text-slate-900">{user?.name ?? '...'}</h1>
+          <div className="mt-0.5 flex items-center gap-2">
+            <p className="max-w-[210px] truncate text-[11px] text-slate-500">{user?.email ?? ''}</p>
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              Compte actif
+              Actif
             </span>
           </div>
         </div>
