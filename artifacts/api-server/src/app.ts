@@ -8,6 +8,64 @@ import { logger } from "./lib/logger";
 import { API_PREFIX } from "./lib/runtime-paths";
 
 const app: Express = express();
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
+
+// Security headers are set here so they also apply when Plesk proxies the
+// domain directly to Node.js. Nginx can add stricter headers too, but the
+// application must not depend on a panel-specific configuration.
+app.use((req, res, next) => {
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
+      "script-src 'self'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob:",
+      "font-src 'self' data:",
+      "connect-src 'self'",
+      "object-src 'none'",
+    ].join("; "),
+  );
+  if (req.secure || process.env.NODE_ENV === "production") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+  next();
+});
+
+type RateLimitEntry = { count: number; resetAt: number };
+const authRateLimits = new Map<string, RateLimitEntry>();
+function authRateLimit(req: express.Request, res: express.Response, next: express.NextFunction): void {
+  const requestPath = req.originalUrl.split("?")[0];
+  const key = `${req.ip}:${requestPath}`;
+  const isRegister = requestPath.endsWith("/register");
+  const now = Date.now();
+  const current = authRateLimits.get(key);
+  if (!current || current.resetAt <= now) {
+    if (authRateLimits.size > 5000) {
+      for (const [entryKey, entry] of authRateLimits) {
+        if (entry.resetAt <= now) authRateLimits.delete(entryKey);
+      }
+    }
+    authRateLimits.set(key, { count: 1, resetAt: now + 60_000 });
+    next();
+    return;
+  }
+  if (current.count >= (isRegister ? 5 : 10)) {
+    res.setHeader("Retry-After", Math.ceil((current.resetAt - now) / 1000));
+    res.status(429).json({ error: "Trop de tentatives. Réessayez dans une minute." });
+    return;
+  }
+  current.count += 1;
+  next();
+}
 
 app.use(
   pinoHttp({
@@ -47,6 +105,8 @@ app.use(cors({
   },
   credentials: true,
 }));
+app.use(`${API_PREFIX}/auth/login`, authRateLimit);
+app.use(`${API_PREFIX}/auth/register`, authRateLimit);
 
 // Store raw body buffer on the request for webhook HMAC verification
 app.use(
