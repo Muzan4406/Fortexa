@@ -55,7 +55,7 @@ function LiveGains({ snapshot, currency = 'xof', usdtRate }: {
     return () => clearInterval(interval);
   }, [snapshot]);
 
-  const displayGains = currency === 'usdt' ? `${(gains / (usdtRate || 655)).toFixed(6)} USDT` : formatCurrency(gains, 5);
+  const displayGains = currency === 'usdt' ? `${(gains / (usdtRate || 561)).toFixed(6)} USDT` : formatCurrency(gains, 5);
   return (
     <span
       className={`text-3xl font-bold text-rose-500 drop-shadow-[0_0_12px_rgba(244,63,94,0.25)] ${flipping ? 'animate-number-flip' : ''}`}
@@ -78,7 +78,7 @@ export default function DashboardPage() {
   const { data: usdtInfo } = useGetUsdtInfo({
     query: { enabled: !!user && !isXof, queryKey: getGetUsdtInfoQueryKey() },
   });
-  const usdtRate = usdtInfo?.usdtRate || 655;
+  const usdtRate = usdtInfo?.usdtRate || 561;
 
   if (!user) return null;
 

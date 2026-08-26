@@ -120,7 +120,7 @@ export default function DepositPage() {
   // ── Derived ───────────────────────────────────────────────────────────────
   const minDeposit = dashboard?.settings?.minDeposit ?? 3000;
   const selectedCountry = COUNTRIES.find((c) => c.code === form.country);
-  const usdtRate = usdtInfo?.usdtRate ?? 655;
+  const usdtRate = usdtInfo?.usdtRate ?? 561;
   const isUsdtFlow = flow === 'usdt';
   const minimumDisplayAmount = isUsdtFlow ? (minDeposit / usdtRate).toFixed(2) : String(minDeposit);
   const enteredDisplayAmount = parseFloat(form.amount) || 0;

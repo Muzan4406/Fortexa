@@ -531,7 +531,7 @@ router.get("/deposits/usdt-info", requireAuth, async (req, res): Promise<void> =
   const address = settings.usdtAddress || process.env.USDT_ADDRESS || "";
   // Fixed rate keeps balances and pending requests stable even when USDT
   // market prices fluctuate. All internal accounting remains in XOF.
-  const usdtRate = 655;
+  const usdtRate = 561;
   res.json({ address, usdtRate });
 });
 

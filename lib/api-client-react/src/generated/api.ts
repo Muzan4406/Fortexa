@@ -983,7 +983,7 @@ export const getGetUsdtInfoUrl = () => {
 }
 
 /**
- * @summary Get USDT wallet address and fixed XOF rate (1 USDT = 655 FCFA)
+ * @summary Get USDT wallet address and fixed XOF rate (1 USDT = 561 FCFA)
  */
 export const getUsdtInfo = async ( options?: Parameters<typeof customFetch>[1]): Promise<UsdtInfoResponse> => {
 
@@ -1030,7 +1030,7 @@ export type GetUsdtInfoQueryError = ErrorType<unknown>
 
 
 /**
- * @summary Get USDT wallet address and fixed XOF rate (1 USDT = 655 FCFA)
+ * @summary Get USDT wallet address and fixed XOF rate (1 USDT = 561 FCFA)
  */
 
 export function useGetUsdtInfo<TData = Awaited<ReturnType<typeof getUsdtInfo>>, TError = ErrorType<unknown>>(

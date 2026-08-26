@@ -80,7 +80,7 @@ export default function WithdrawPage() {
   const [selectedCountry, setSelectedCountry] = useState(accountCountry);
   const isMobileMoney = getCurrencyForCountry(selectedCountry) === 'FCFA (XOF)';
   const { data: usdtInfo } = useGetUsdtInfo({ query: { enabled: !!user && !isMobileMoney, queryKey: getGetUsdtInfoQueryKey() } });
-  const usdtRate = usdtInfo?.usdtRate || 655;
+  const usdtRate = usdtInfo?.usdtRate || 561;
   const minimumXof = dashboard?.settings.minWithdrawal || 3000;
   const minimumUsdt = minimumXof / usdtRate;
 
