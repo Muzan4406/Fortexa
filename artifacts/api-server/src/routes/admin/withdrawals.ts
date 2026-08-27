@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, usersTable, transactionsTable } from "@workspace/db";
-import { eq, and, desc, count } from "drizzle-orm";
+import { eq, and, desc, count, ilike, or, sql } from "drizzle-orm";
 import { requireAdmin } from "../../lib/auth";
 import { formatTelegramAmount, sendTelegramNotification } from "../../lib/telegram";
 
@@ -32,7 +32,7 @@ function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof 
 }
 
 router.get("/admin/withdrawals", requireAdmin, async (req, res): Promise<void> => {
-  const { status, limit = "50", offset = "0" } = req.query as Record<string, string>;
+  const { status, search, limit = "50", offset = "0" } = req.query as Record<string, string>;
   const limitNum = Math.min(parseInt(limit, 10) || 50, 200);
   const offsetNum = parseInt(offset, 10) || 0;
 
@@ -40,17 +40,27 @@ router.get("/admin/withdrawals", requireAdmin, async (req, res): Promise<void> =
   if (status && ["pending", "approved", "rejected"].includes(status)) {
     conditions.push(eq(transactionsTable.status, status as any));
   }
+  if (search?.trim()) {
+    const term = `%${search.trim()}%`;
+    conditions.push(or(
+      ilike(usersTable.name, term),
+      ilike(usersTable.email, term),
+      ilike(usersTable.phone, term),
+      ilike(transactionsTable.txid, term),
+      ilike(transactionsTable.sendavapayRef, term),
+      sql`${transactionsTable.id}::text ILIKE ${term}`,
+    ));
+  }
 
   const whereClause = and(...conditions);
 
-  const [totalRow] = await db.select({ count: count() }).from(transactionsTable).where(whereClause);
-  const txs = await db.select().from(transactionsTable).where(whereClause)
+  const [totalRow] = await db.select({ count: count() }).from(transactionsTable)
+    .leftJoin(usersTable, eq(usersTable.id, transactionsTable.userId)).where(whereClause);
+  const txs = await db.select({ tx: transactionsTable, user: usersTable }).from(transactionsTable)
+    .leftJoin(usersTable, eq(usersTable.id, transactionsTable.userId)).where(whereClause)
     .orderBy(desc(transactionsTable.createdAt)).limit(limitNum).offset(offsetNum);
 
-  const items = await Promise.all(txs.map(async (tx) => {
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, tx.userId));
-    return formatAdminTx(tx, user);
-  }));
+  const items = txs.map(({ tx, user }) => formatAdminTx(tx, user));
 
   res.json({ items, total: totalRow?.count ?? 0 });
 });

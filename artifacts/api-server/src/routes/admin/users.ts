@@ -5,12 +5,16 @@ import { requireAdmin } from "../../lib/auth";
 
 const router: IRouter = Router();
 
-function formatUserSummary(u: typeof usersTable.$inferSelect) {
+function formatUserSummary(
+  u: typeof usersTable.$inferSelect,
+  referrer?: typeof usersTable.$inferSelect | null,
+) {
   return {
     id: u.id,
     name: u.name,
     phone: u.phone,
     email: u.email,
+    referrerName: referrer?.name ?? null,
     country: u.country,
     investmentBalance: parseFloat(u.investmentBalance),
     gainBalance: parseFloat(u.gainBalance),
@@ -54,11 +58,16 @@ router.get("/admin/users", requireAdmin, async (req, res): Promise<void> => {
     .offset(offsetNum);
 
   const items = await Promise.all(users.map(async (user) => {
-    const [teamRow] = await db
+    const [[teamRow], [referrer]] = await Promise.all([
+      db
       .select({ count: count() })
       .from(usersTable)
-      .where(eq(usersTable.referredById, user.id));
-    return { ...formatUserSummary(user), directTeamCount: teamRow?.count ?? 0 };
+      .where(eq(usersTable.referredById, user.id)),
+      user.referredById
+        ? db.select().from(usersTable).where(eq(usersTable.id, user.referredById))
+        : Promise.resolve([]),
+    ]);
+    return { ...formatUserSummary(user, referrer), directTeamCount: teamRow?.count ?? 0 };
   }));
 
   res.json({
@@ -74,6 +83,9 @@ router.get("/admin/users/:id", requireAdmin, async (req, res): Promise<void> => 
 
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, id));
   if (!user) { res.status(404).json({ error: "Utilisateur non trouvé" }); return; }
+  const [referrer] = user.referredById
+    ? await db.select().from(usersTable).where(eq(usersTable.id, user.referredById))
+    : [];
 
   const [depositsRow] = await db
     .select({ total: sum(transactionsTable.amount) })
@@ -107,6 +119,7 @@ router.get("/admin/users/:id", requireAdmin, async (req, res): Promise<void> => 
     name: user.name,
     phone: user.phone,
     email: user.email,
+    referrerName: referrer?.name ?? null,
     country: user.country,
     investmentBalance: parseFloat(user.investmentBalance),
     gainBalance: parseFloat(user.gainBalance),
@@ -138,6 +151,7 @@ router.put("/admin/users/:id", requireAdmin, async (req, res): Promise<void> => 
   if (!user) { res.status(404).json({ error: "Utilisateur non trouvé" }); return; }
 
   res.json({ id: user.id, name: user.name, phone: user.phone, email: user.email,
+    referrerName: null,
     investmentBalance: parseFloat(user.investmentBalance), gainBalance: parseFloat(user.gainBalance),
     country: user.country, status: user.status, role: user.role, referralCode: user.referralCode,
     referredById: user.referredById || null, totalDeposited: 0, totalWithdrawn: 0,
