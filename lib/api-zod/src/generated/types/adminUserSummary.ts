@@ -13,6 +13,11 @@ export interface AdminUserSummary {
   name: string;
   phone: string;
   email: string;
+  /**
+     * Name of the user's direct referrer
+     * @nullable
+     */
+  referrerName?: string | null;
   /** ISO country code */
   country?: string;
   directTeamCount?: number;

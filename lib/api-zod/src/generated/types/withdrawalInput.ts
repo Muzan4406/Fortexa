@@ -13,4 +13,8 @@ export interface WithdrawalInput {
   usdtAddress?: string;
   /** Numéro de téléphone Mobile Money (TG, BJ, BF, CI) */
   phone?: string;
+  /** Code du pays Mobile Money du compte (TG, BJ, BF, CI) */
+  country?: string;
+  /** Opérateur Mobile Money choisi pour le retrait */
+  operator?: string;
 }

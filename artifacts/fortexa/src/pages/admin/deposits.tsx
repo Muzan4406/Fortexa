@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { formatCurrency, formatDate } from '@/lib/format';
-import { CheckCircle, X, XCircle, Clock, Smartphone, Wallet } from 'lucide-react';
+import { CheckCircle, X, XCircle, Clock, Smartphone, Wallet, Search } from 'lucide-react';
 
 function proofUrl(path: string) {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
@@ -31,12 +31,14 @@ export default function AdminDepositsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<TransactionStatus | 'all'>('pending');
+  const [search, setSearch] = useState('');
   const [rejectId, setRejectId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [proofPreview, setProofPreview] = useState<string | null>(null);
 
   const { data: result, isLoading } = useGetAdminDeposits({
     status: statusFilter === 'all' ? undefined : statusFilter,
+    search: search || undefined,
   });
   const deposits = result?.items ?? [];
 
@@ -72,6 +74,15 @@ export default function AdminDepositsPage() {
 
   return (
     <AdminLayout title="Dépôts">
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Rechercher par nom, email, téléphone, ID, référence ou TXID..."
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="h-11 pl-10"
+        />
+      </div>
       {/* Filter tabs */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
         {(['pending', 'approved', 'rejected', 'all'] as const).map((s) => (

@@ -124,8 +124,8 @@ export const GetDashboardResponse = zod.object({
   "minWithdrawal": zod.number(),
   "withdrawalFeePercent": zod.number(),
   "gainsActive": zod.boolean(),
-  "maintenanceMode": zod.boolean(),
-  "maintenanceMessage": zod.string(),
+  "maintenanceMode": zod.boolean().optional(),
+  "maintenanceMessage": zod.string().optional(),
   "level1Percent": zod.number(),
   "level2Percent": zod.number(),
   "level3Percent": zod.number(),
@@ -267,7 +267,7 @@ export const SubmitDepositOtpResponse = zod.object({
 
 
 /**
- * @summary Get USDT wallet address and current XOF rate
+ * @summary Get USDT wallet address and fixed XOF rate (1 USDT = 561 FCFA)
  */
 export const GetUsdtInfoResponse = zod.object({
   "address": zod.string().describe('BEP20 USDT wallet address'),
@@ -433,6 +433,9 @@ export const GetReferralsResponse = zod.object({
   "level1Count": zod.number(),
   "level2Count": zod.number(),
   "level3Count": zod.number(),
+  "level1Percent": zod.number(),
+  "level2Percent": zod.number(),
+  "level3Percent": zod.number(),
   "commissions": zod.array(zod.object({
   "id": zod.number(),
   "amount": zod.number(),
@@ -535,7 +538,9 @@ export const GetAdminStatsResponse = zod.object({
   "totalGainsDistributed": zod.number(),
   "pendingWithdrawalsCount": zod.number(),
   "pendingDepositsCount": zod.number(),
-  "totalFeeRevenue": zod.number()
+  "totalFeeRevenue": zod.number(),
+  "pendingDepositsAmount": zod.number().describe('Total amount of pending deposits'),
+  "pendingWithdrawalsAmount": zod.number().describe('Total amount of pending withdrawals')
 })
 
 
@@ -558,6 +563,7 @@ export const GetAdminUsersResponse = zod.object({
   "name": zod.string(),
   "phone": zod.string(),
   "email": zod.string(),
+  "referrerName": zod.string().nullish().describe('Name of the user\'s direct referrer'),
   "country": zod.string().optional().describe('ISO country code'),
   "directTeamCount": zod.number().optional(),
   "investmentBalance": zod.number(),
@@ -715,6 +721,7 @@ export const getAdminDepositsQueryOffsetDefault = 0;
 
 export const GetAdminDepositsQueryParams = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']).optional(),
+  "search": zod.coerce.string().optional().describe('Search by user identity, transaction ID, provider reference, or TXID'),
   "limit": zod.coerce.number().default(getAdminDepositsQueryLimitDefault),
   "offset": zod.coerce.number().default(getAdminDepositsQueryOffsetDefault)
 })
@@ -822,6 +829,7 @@ export const getAdminWithdrawalsQueryOffsetDefault = 0;
 
 export const GetAdminWithdrawalsQueryParams = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']).optional(),
+  "search": zod.coerce.string().optional().describe('Search by user identity, transaction ID, provider reference, or TXID'),
   "limit": zod.coerce.number().default(getAdminWithdrawalsQueryLimitDefault),
   "offset": zod.coerce.number().default(getAdminWithdrawalsQueryOffsetDefault)
 })
@@ -896,21 +904,22 @@ export const GetAdminSettingsResponse = zod.object({
   "minDeposit": zod.number(),
   "minWithdrawal": zod.number(),
   "withdrawalFeePercent": zod.number(),
-  "gainsActive": zod.boolean(),
-  "maintenanceMode": zod.boolean(),
-  "maintenanceMessage": zod.string(),
+  "gainsActive": zod.boolean().optional(),
+  "maintenanceMode": zod.boolean().optional(),
+  "maintenanceMessage": zod.string().optional(),
   "level1Percent": zod.number(),
   "level2Percent": zod.number(),
   "level3Percent": zod.number(),
   "sendavapayKeySet": zod.boolean().describe('Whether a Sendavapay SDK key has been configured'),
   "sendavapayWebhookSecretSet": zod.boolean().describe('Whether a Sendavapay webhook secret has been configured'),
   "ashtechpayKeySet": zod.boolean().describe('Whether an AshtechPay API key has been configured'),
-  "activeDepositProvider": zod.enum(["sendavapay", "ashtechpay"]),
+  "activeDepositProvider": zod.enum(['sendavapay', 'ashtechpay']),
   "usdtAddress": zod.string().describe('USDT BEP20 wallet address for deposits'),
   "telegramGroupUrl": zod.string(),
   "telegramChannelUrl": zod.string(),
   "whatsappGroupUrl": zod.string(),
-  "whatsappChannelUrl": zod.string()
+  "whatsappChannelUrl": zod.string().optional(),
+  "whatsappSupportUrl": zod.string().optional()
 })
 
 
@@ -927,9 +936,9 @@ export const UpdateAdminSettingsBody = zod.object({
   "maintenanceMode": zod.boolean().optional(),
   "maintenanceMessage": zod.string().optional(),
   "sendavapayKey": zod.string().optional().describe('Sendavapay SDK key (write-only — never returned in GET)'),
-  "sendavapayWebhookSecret": zod.string().optional().describe('Sendavapay webhook HMAC secret (write-only — never returned in GET)'),
+  "sendavapayWebhookSecret": zod.string().optional(),
   "ashtechpayKey": zod.string().optional(),
-  "activeDepositProvider": zod.enum(["sendavapay", "ashtechpay"]).optional(),
+  "activeDepositProvider": zod.enum(['sendavapay', 'ashtechpay']).optional().describe('Sendavapay webhook HMAC secret (write-only — never returned in GET)'),
   "usdtAddress": zod.string().optional().describe('USDT BEP20 wallet address for deposits'),
   "telegramGroupUrl": zod.string().optional(),
   "telegramChannelUrl": zod.string().optional(),
@@ -944,20 +953,22 @@ export const UpdateAdminSettingsResponse = zod.object({
   "minDeposit": zod.number(),
   "minWithdrawal": zod.number(),
   "withdrawalFeePercent": zod.number(),
-  "gainsActive": zod.boolean(),
+  "gainsActive": zod.boolean().optional(),
+  "maintenanceMode": zod.boolean().optional(),
+  "maintenanceMessage": zod.string().optional(),
   "level1Percent": zod.number(),
   "level2Percent": zod.number(),
   "level3Percent": zod.number(),
   "sendavapayKeySet": zod.boolean().describe('Whether a Sendavapay SDK key has been configured'),
   "sendavapayWebhookSecretSet": zod.boolean().describe('Whether a Sendavapay webhook secret has been configured'),
   "ashtechpayKeySet": zod.boolean().describe('Whether an AshtechPay API key has been configured'),
-  "activeDepositProvider": zod.enum(["sendavapay", "ashtechpay"]),
+  "activeDepositProvider": zod.enum(['sendavapay', 'ashtechpay']),
   "usdtAddress": zod.string().describe('USDT BEP20 wallet address for deposits'),
   "telegramGroupUrl": zod.string(),
   "telegramChannelUrl": zod.string(),
   "whatsappGroupUrl": zod.string(),
-  "whatsappChannelUrl": zod.string(),
-  "whatsappSupportUrl": zod.string()
+  "whatsappChannelUrl": zod.string().optional(),
+  "whatsappSupportUrl": zod.string().optional()
 })
 
 

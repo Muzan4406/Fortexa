@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { formatCurrency, formatDate } from '@/lib/format';
-import { Search, UserCheck, UserX, Ban, DollarSign, UsersRound, MapPin } from 'lucide-react';
+import { Search, UserCheck, UserX, Ban, DollarSign, UsersRound, MapPin, Phone, UserRound } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const { toast } = useToast();
@@ -109,7 +109,7 @@ export default function AdminUsersPage() {
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-          placeholder="Rechercher par nom ou email..."
+          placeholder="Rechercher par nom, email ou téléphone..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-10 h-11"
@@ -183,6 +183,10 @@ export default function AdminUsersPage() {
                 <div>
                   <p className="font-semibold text-foreground">{user.name}</p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
+                   <div className="mt-1 space-y-1 text-xs text-muted-foreground">
+                     <p className="inline-flex items-center gap-1"><Phone className="h-3 w-3" />{user.phone || 'Téléphone non renseigné'}</p>
+                     <p className="inline-flex items-center gap-1"><UserRound className="h-3 w-3" />Parrain : {(user as any).referrerName || 'Aucun'}</p>
+                   </div>
                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                      <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" />{(user as any).country || 'Pays non renseigné'}</span>
                      <span className="inline-flex items-center gap-1"><UsersRound className="w-3 h-3" />{(user as any).directTeamCount ?? 0} filleul{(user as any).directTeamCount === 1 ? '' : 's'}</span>

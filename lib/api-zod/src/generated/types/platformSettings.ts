@@ -5,6 +5,7 @@
  * Fortexa Investment Platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { PlatformSettingsActiveDepositProvider } from './platformSettingsActiveDepositProvider';
 
 export interface PlatformSettings {
   dailyRatePercent: number;
@@ -12,9 +13,9 @@ export interface PlatformSettings {
   minDeposit: number;
   minWithdrawal: number;
   withdrawalFeePercent: number;
-  gainsActive: boolean;
-  maintenanceMode: boolean;
-  maintenanceMessage: string;
+  gainsActive?: boolean;
+  maintenanceMode?: boolean;
+  maintenanceMessage?: string;
   level1Percent: number;
   level2Percent: number;
   level3Percent: number;
@@ -22,11 +23,14 @@ export interface PlatformSettings {
   sendavapayKeySet: boolean;
   /** Whether a Sendavapay webhook secret has been configured */
   sendavapayWebhookSecretSet: boolean;
+  /** Whether an AshtechPay API key has been configured */
+  ashtechpayKeySet: boolean;
+  activeDepositProvider: PlatformSettingsActiveDepositProvider;
   /** USDT BEP20 wallet address for deposits */
   usdtAddress: string;
   telegramGroupUrl: string;
   telegramChannelUrl: string;
   whatsappGroupUrl: string;
-  whatsappChannelUrl: string;
-  whatsappSupportUrl: string;
+  whatsappChannelUrl?: string;
+  whatsappSupportUrl?: string;
 }

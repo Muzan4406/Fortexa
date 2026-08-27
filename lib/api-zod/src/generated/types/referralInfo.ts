@@ -14,5 +14,8 @@ export interface ReferralInfo {
   level1Count: number;
   level2Count: number;
   level3Count: number;
+  level1Percent: number;
+  level2Percent: number;
+  level3Percent: number;
   commissions: CommissionRecord[];
 }

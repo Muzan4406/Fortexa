@@ -81,8 +81,8 @@ export interface PublicSettings {
   minWithdrawal: number;
   withdrawalFeePercent: number;
   gainsActive: boolean;
-  maintenanceMode: boolean;
-  maintenanceMessage: string;
+  maintenanceMode?: boolean;
+  maintenanceMessage?: string;
   level1Percent: number;
   level2Percent: number;
   level3Percent: number;
@@ -331,6 +331,10 @@ export interface AdminStats {
   pendingWithdrawalsCount: number;
   pendingDepositsCount: number;
   totalFeeRevenue: number;
+  /** Total amount of pending deposits */
+  pendingDepositsAmount: number;
+  /** Total amount of pending withdrawals */
+  pendingWithdrawalsAmount: number;
 }
 
 export type AdminUserSummaryStatus = typeof AdminUserSummaryStatus[keyof typeof AdminUserSummaryStatus];
@@ -355,6 +359,11 @@ export interface AdminUserSummary {
   name: string;
   phone: string;
   email: string;
+  /**
+     * Name of the user's direct referrer
+     * @nullable
+     */
+  referrerName?: string | null;
   /** ISO country code */
   country?: string;
   directTeamCount?: number;
@@ -536,15 +545,23 @@ export interface ManualDepositInput {
   description?: string | null;
 }
 
+export type PlatformSettingsActiveDepositProvider = typeof PlatformSettingsActiveDepositProvider[keyof typeof PlatformSettingsActiveDepositProvider];
+
+
+export const PlatformSettingsActiveDepositProvider = {
+  sendavapay: 'sendavapay',
+  ashtechpay: 'ashtechpay',
+} as const;
+
 export interface PlatformSettings {
   dailyRatePercent: number;
   maxCapital: number;
   minDeposit: number;
   minWithdrawal: number;
   withdrawalFeePercent: number;
-  gainsActive: boolean;
-  maintenanceMode: boolean;
-  maintenanceMessage: string;
+  gainsActive?: boolean;
+  maintenanceMode?: boolean;
+  maintenanceMessage?: string;
   level1Percent: number;
   level2Percent: number;
   level3Percent: number;
@@ -554,15 +571,26 @@ export interface PlatformSettings {
   sendavapayWebhookSecretSet: boolean;
   /** Whether an AshtechPay API key has been configured */
   ashtechpayKeySet: boolean;
-  activeDepositProvider: string;
+  activeDepositProvider: PlatformSettingsActiveDepositProvider;
   /** USDT BEP20 wallet address for deposits */
   usdtAddress: string;
   telegramGroupUrl: string;
   telegramChannelUrl: string;
   whatsappGroupUrl: string;
-  whatsappChannelUrl: string;
-  whatsappSupportUrl: string;
+  whatsappChannelUrl?: string;
+  whatsappSupportUrl?: string;
 }
+
+/**
+ * Sendavapay webhook HMAC secret (write-only — never returned in GET)
+ */
+export type PlatformSettingsUpdateActiveDepositProvider = typeof PlatformSettingsUpdateActiveDepositProvider[keyof typeof PlatformSettingsUpdateActiveDepositProvider];
+
+
+export const PlatformSettingsUpdateActiveDepositProvider = {
+  sendavapay: 'sendavapay',
+  ashtechpay: 'ashtechpay',
+} as const;
 
 export interface PlatformSettingsUpdate {
   dailyRatePercent?: number;
@@ -575,10 +603,10 @@ export interface PlatformSettingsUpdate {
   maintenanceMessage?: string;
   /** Sendavapay SDK key (write-only — never returned in GET) */
   sendavapayKey?: string;
-  /** Sendavapay webhook HMAC secret (write-only — never returned in GET) */
   sendavapayWebhookSecret?: string;
   ashtechpayKey?: string;
-  activeDepositProvider?: string;
+  /** Sendavapay webhook HMAC secret (write-only — never returned in GET) */
+  activeDepositProvider?: PlatformSettingsUpdateActiveDepositProvider;
   /** USDT BEP20 wallet address for deposits */
   usdtAddress?: string;
   telegramGroupUrl?: string;
@@ -634,6 +662,10 @@ export const GetAdminUsersStatus = {
 
 export type GetAdminDepositsParams = {
 status?: GetAdminDepositsStatus;
+/**
+ * Search by user identity, transaction ID, provider reference, or TXID
+ */
+search?: string;
 limit?: number;
 offset?: number;
 };
@@ -649,6 +681,10 @@ export const GetAdminDepositsStatus = {
 
 export type GetAdminWithdrawalsParams = {
 status?: GetAdminWithdrawalsStatus;
+/**
+ * Search by user identity, transaction ID, provider reference, or TXID
+ */
+search?: string;
 limit?: number;
 offset?: number;
 };

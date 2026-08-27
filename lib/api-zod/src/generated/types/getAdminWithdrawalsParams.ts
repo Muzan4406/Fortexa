@@ -9,6 +9,10 @@ import type { GetAdminWithdrawalsStatus } from './getAdminWithdrawalsStatus';
 
 export type GetAdminWithdrawalsParams = {
 status?: GetAdminWithdrawalsStatus;
+/**
+ * Search by user identity, transaction ID, provider reference, or TXID
+ */
+search?: string;
 limit?: number;
 offset?: number;
 };

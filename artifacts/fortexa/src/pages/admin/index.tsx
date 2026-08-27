@@ -16,6 +16,8 @@ export default function AdminDashboard() {
     { label: 'Capital investi', value: formatCurrency(stats?.totalInvestmentCapital ?? 0), icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-50' },
     { label: 'Dépôts approuvés', value: formatCurrency(stats?.totalDeposits ?? 0), icon: ArrowDownCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { label: 'Retraits approuvés', value: formatCurrency(stats?.totalWithdrawals ?? 0), icon: ArrowUpCircle, color: 'text-orange-600', bg: 'bg-orange-50' },
+    { label: 'Dépôts en attente', value: formatCurrency(stats?.pendingDepositsAmount ?? 0), icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Retraits en attente', value: formatCurrency(stats?.pendingWithdrawalsAmount ?? 0), icon: Clock, color: 'text-rose-600', bg: 'bg-rose-50' },
     { label: 'Gains distribués', value: formatCurrency(stats?.totalGainsDistributed ?? 0), icon: BarChart3, color: 'text-purple-600', bg: 'bg-purple-50' },
     { label: 'Frais collectés', value: formatCurrency(stats?.totalFeeRevenue ?? 0), icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
   ];

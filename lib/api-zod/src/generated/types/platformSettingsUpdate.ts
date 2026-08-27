@@ -5,6 +5,7 @@
  * Fortexa Investment Platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { PlatformSettingsUpdateActiveDepositProvider } from './platformSettingsUpdateActiveDepositProvider';
 
 export interface PlatformSettingsUpdate {
   dailyRatePercent?: number;
@@ -17,8 +18,10 @@ export interface PlatformSettingsUpdate {
   maintenanceMessage?: string;
   /** Sendavapay SDK key (write-only — never returned in GET) */
   sendavapayKey?: string;
-  /** Sendavapay webhook HMAC secret (write-only — never returned in GET) */
   sendavapayWebhookSecret?: string;
+  ashtechpayKey?: string;
+  /** Sendavapay webhook HMAC secret (write-only — never returned in GET) */
+  activeDepositProvider?: PlatformSettingsUpdateActiveDepositProvider;
   /** USDT BEP20 wallet address for deposits */
   usdtAddress?: string;
   telegramGroupUrl?: string;

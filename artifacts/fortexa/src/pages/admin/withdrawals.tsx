@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { formatCurrency, formatDate } from '@/lib/format';
-import { CheckCircle, XCircle, Clock, Smartphone, Wallet } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Smartphone, Wallet, Search } from 'lucide-react';
 
 const STATUS_CONFIG: Record<TransactionStatus, { label: string; color: string }> = {
   pending: { label: 'En attente', color: 'bg-amber-100 text-amber-700' },
@@ -23,11 +23,13 @@ export default function AdminWithdrawalsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<TransactionStatus | 'all'>('pending');
+  const [search, setSearch] = useState('');
   const [rejectId, setRejectId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState('');
 
   const { data: result, isLoading } = useGetAdminWithdrawals({
     status: statusFilter === 'all' ? undefined : statusFilter,
+    search: search || undefined,
   });
   const withdrawals = result?.items ?? [];
 
@@ -63,6 +65,15 @@ export default function AdminWithdrawalsPage() {
 
   return (
     <AdminLayout title="Retraits">
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Rechercher par nom, email, téléphone, ID, référence ou TXID..."
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="h-11 pl-10"
+        />
+      </div>
       {/* Filter tabs */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
         {(['pending', 'approved', 'rejected', 'all'] as const).map((s) => (

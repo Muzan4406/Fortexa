@@ -16,4 +16,8 @@ export interface AdminStats {
   pendingWithdrawalsCount: number;
   pendingDepositsCount: number;
   totalFeeRevenue: number;
+  /** Total amount of pending deposits */
+  pendingDepositsAmount: number;
+  /** Total amount of pending withdrawals */
+  pendingWithdrawalsAmount: number;
 }

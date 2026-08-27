@@ -731,6 +731,11 @@ paths:
             type: string
             enum: [pending, approved, rejected]
         - in: query
+          name: search
+          description: Search by user identity, transaction ID, provider reference, or TXID
+          schema:
+            type: string
+        - in: query
           name: limit
           schema:
             type: number
@@ -801,6 +806,11 @@ paths:
           schema:
             type: string
             enum: [pending, approved, rejected]
+        - in: query
+          name: search
+          description: Search by user identity, transaction ID, provider reference, or TXID
+          schema:
+            type: string
         - in: query
           name: limit
           schema:
@@ -1117,14 +1127,10 @@ components:
           description: ISO timestamp when this snapshot was taken, for client-side interpolation
         gainsActive:
           type: boolean
-        maintenanceMode:
-          type: boolean
-        maintenanceMessage:
-          type: string
 
     PublicSettings:
       type: object
-      required: [dailyRatePercent, maxCapital, minDeposit, minWithdrawal, withdrawalFeePercent, gainsActive, level1Percent, level2Percent, level3Percent, telegramGroupUrl, telegramChannelUrl, whatsappGroupUrl, whatsappChannelUrl]
+      required: [dailyRatePercent, maxCapital, minDeposit, minWithdrawal, withdrawalFeePercent, gainsActive, level1Percent, level2Percent, level3Percent, telegramGroupUrl, telegramChannelUrl, whatsappGroupUrl, whatsappChannelUrl, whatsappSupportUrl]
       properties:
         dailyRatePercent:
           type: number
@@ -1155,6 +1161,8 @@ components:
         whatsappGroupUrl:
           type: string
         whatsappChannelUrl:
+          type: string
+        whatsappSupportUrl:
           type: string
 
     # ── Transactions ──
@@ -1491,6 +1499,8 @@ components:
         - pendingWithdrawalsCount
         - pendingDepositsCount
         - totalFeeRevenue
+        - pendingDepositsAmount
+        - pendingWithdrawalsAmount
       properties:
         totalUsers:
           type: number
@@ -1510,6 +1520,12 @@ components:
           type: number
         totalFeeRevenue:
           type: number
+        pendingDepositsAmount:
+          type: number
+          description: Total amount of pending deposits
+        pendingWithdrawalsAmount:
+          type: number
+          description: Total amount of pending withdrawals
 
     AdminUserList:
       type: object
@@ -1534,6 +1550,9 @@ components:
           type: string
         email:
           type: string
+        referrerName:
+          type: ["string", "null"]
+          description: Name of the user's direct referrer
         country:
           type: string
           description: ISO country code
@@ -1730,6 +1749,8 @@ components:
         - minWithdrawal
         - withdrawalFeePercent
         - gainsActive
+         - maintenanceMode
+         - maintenanceMessage
         - level1Percent
         - level2Percent
         - level3Percent
@@ -1742,6 +1763,7 @@ components:
         - telegramChannelUrl
         - whatsappGroupUrl
         - whatsappChannelUrl
+         - whatsappSupportUrl
       properties:
         dailyRatePercent:
           type: number
@@ -1755,6 +1777,10 @@ components:
           type: number
         gainsActive:
           type: boolean
+        maintenanceMode:
+          type: boolean
+        maintenanceMessage:
+          type: string
         level1Percent:
           type: number
         level2Percent:
@@ -1784,6 +1810,8 @@ components:
           type: string
         whatsappChannelUrl:
           type: string
+        whatsappSupportUrl:
+          type: string
 
     PlatformSettingsUpdate:
       type: object
@@ -1800,6 +1828,10 @@ components:
           type: number
         gainsActive:
           type: boolean
+        maintenanceMode:
+          type: boolean
+        maintenanceMessage:
+          type: string
         sendavapayKey:
           type: string
           description: Sendavapay SDK key (write-only — never returned in GET)
@@ -1821,6 +1853,8 @@ components:
         whatsappGroupUrl:
           type: string
         whatsappChannelUrl:
+          type: string
+        whatsappSupportUrl:
           type: string
 
     ReferralSettings:
