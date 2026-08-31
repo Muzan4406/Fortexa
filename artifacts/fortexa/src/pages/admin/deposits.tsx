@@ -32,6 +32,7 @@ export default function AdminDepositsPage() {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<TransactionStatus | 'all'>('pending');
   const [search, setSearch] = useState('');
+  const [automaticOnly, setAutomaticOnly] = useState(false);
   const [rejectId, setRejectId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [proofPreview, setProofPreview] = useState<string | null>(null);
@@ -39,6 +40,7 @@ export default function AdminDepositsPage() {
   const { data: result, isLoading } = useGetAdminDeposits({
     status: statusFilter === 'all' ? undefined : statusFilter,
     search: search || undefined,
+    automaticOnly: automaticOnly || undefined,
   });
   const deposits = result?.items ?? [];
 
@@ -88,7 +90,7 @@ export default function AdminDepositsPage() {
         {(['pending', 'approved', 'rejected', 'all'] as const).map((s) => (
           <button
             key={s}
-            onClick={() => setStatusFilter(s)}
+            onClick={() => { setStatusFilter(s); setAutomaticOnly(false); }}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
               statusFilter === s ? 'bg-primary text-primary-foreground' : 'bg-card border border-border text-muted-foreground'
             }`}
@@ -96,6 +98,15 @@ export default function AdminDepositsPage() {
             {s === 'all' ? 'Tous' : STATUS_CONFIG[s].label}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => { setAutomaticOnly((current) => !current); setStatusFilter('pending'); }}
+          className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+            automaticOnly ? 'bg-rose-600 text-white' : 'bg-card border border-border text-muted-foreground'
+          }`}
+        >
+          À vérifier
+        </button>
       </div>
 
       {/* Reject modal */}
@@ -138,12 +149,18 @@ export default function AdminDepositsPage() {
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${(STATUS_CONFIG[dep.status as TransactionStatus] ?? STATUS_CONFIG.pending).color}`}>
                     {(STATUS_CONFIG[dep.status as TransactionStatus] ?? STATUS_CONFIG.pending).label}
                   </span>
+                  {dep.requiresManualReview && (
+                    <span className="mt-1 inline-block rounded-full bg-rose-100 px-2 py-0.5 text-xs font-semibold text-rose-700">
+                      Auto initié — confirmation non reçue
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="mt-3 space-y-1.5 rounded-xl border border-border bg-muted/30 p-3">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Informations complètes</p>
                 <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
                   <p><span className="text-muted-foreground">Méthode :</span> <span className="font-semibold">{dep.depositMethod === 'mobile_money' ? 'Mobile Money' : dep.depositMethod === 'usdt' ? 'USDT BEP20' : 'Manuel'}</span></p>
+                   {dep.automaticPayment && <p><span className="text-muted-foreground">Flux :</span> <span className="font-semibold">Automatique</span></p>}
                   <p><span className="text-muted-foreground">Pays :</span> <span className="font-semibold">{dep.payerCountry || dep.userCountry || 'Non renseigné'}</span></p>
                   <p><span className="text-muted-foreground">Montant net :</span> <span className="font-semibold">{formatCurrency(dep.netAmount)}</span></p>
                   <p><span className="text-muted-foreground">Frais :</span> <span className="font-semibold">{formatCurrency(dep.fee)}</span></p>
@@ -165,6 +182,11 @@ export default function AdminDepositsPage() {
                     <span className="block px-3 py-2 text-xs font-semibold text-primary">Voir la preuve de paiement</span>
                   </button>
                 )}
+                 {dep.requiresManualReview && (
+                   <p className="mt-2 rounded-lg bg-rose-50 p-2 text-xs text-rose-700">
+                     La demande a été initiée mais l’utilisateur n’a pas encore confirmé. Vérifiez le paiement auprès du fournisseur avant toute approbation.
+                   </p>
+                 )}
               </div>
               {dep.status === 'pending' && (
                 <div className="flex gap-2 mt-3">

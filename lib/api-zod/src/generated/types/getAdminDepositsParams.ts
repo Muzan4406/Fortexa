@@ -13,6 +13,10 @@ status?: GetAdminDepositsStatus;
  * Search by user identity, transaction ID, provider reference, or TXID
  */
 search?: string;
+/**
+ * Only automatic Mobile Money deposits awaiting user confirmation
+ */
+automaticOnly?: boolean;
 limit?: number;
 offset?: number;
 };

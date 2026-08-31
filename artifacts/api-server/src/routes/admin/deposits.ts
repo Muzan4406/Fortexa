@@ -7,7 +7,16 @@ import { formatTelegramAmount, sendTelegramNotification } from "../../lib/telegr
 
 const router: IRouter = Router();
 
+const AUTO_PAYMENT_PENDING_DESCRIPTION =
+  "Dépôt Mobile Money — initiation automatique, confirmation utilisateur en attente";
+
 function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof usersTable.$inferSelect | null) {
+  const automaticPayment = tx.depositMethod === "mobile_money" && Boolean(tx.sendavapayRef);
+  const requiresManualReview =
+    automaticPayment &&
+    tx.status === "pending" &&
+    tx.description === AUTO_PAYMENT_PENDING_DESCRIPTION;
+
   return {
     id: tx.id,
     userId: tx.userId,
@@ -27,19 +36,33 @@ function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof 
      sendavapayRef: tx.sendavapayRef ?? null,
     txid: tx.txid ?? null,
     screenshotPath: tx.screenshotPath ?? null,
+    automaticPayment,
+    requiresManualReview,
+    paymentReviewStatus: requiresManualReview
+      ? "awaiting_user_confirmation"
+      : automaticPayment
+        ? "confirmation_sent"
+        : null,
     createdAt: tx.createdAt.toISOString(),
     updatedAt: tx.updatedAt.toISOString(),
   };
 }
 
 router.get("/admin/deposits", requireAdmin, async (req, res): Promise<void> => {
-  const { status, search, limit = "50", offset = "0" } = req.query as Record<string, string>;
+  const { status, search, automaticOnly, limit = "50", offset = "0" } = req.query as Record<string, string>;
   const limitNum = Math.min(parseInt(limit, 10) || 50, 200);
   const offsetNum = parseInt(offset, 10) || 0;
 
   const conditions: any[] = [eq(transactionsTable.type, "deposit")];
   if (status && ["pending", "approved", "rejected"].includes(status)) {
     conditions.push(eq(transactionsTable.status, status as any));
+  }
+  if (automaticOnly === "true") {
+    conditions.push(
+      eq(transactionsTable.status, "pending"),
+      eq(transactionsTable.depositMethod, "mobile_money"),
+      eq(transactionsTable.description, AUTO_PAYMENT_PENDING_DESCRIPTION),
+    );
   }
   if (search?.trim()) {
     const term = `%${search.trim()}%`;

@@ -736,6 +736,11 @@ paths:
           schema:
             type: string
         - in: query
+          name: automaticOnly
+          description: Only automatic Mobile Money deposits awaiting user confirmation
+          schema:
+            type: boolean
+        - in: query
           name: limit
           schema:
             type: number
@@ -1709,6 +1714,13 @@ components:
           type: ["string", "null"]
         screenshotPath:
           type: ["string", "null"]
+        automaticPayment:
+          type: boolean
+        requiresManualReview:
+          type: boolean
+        paymentReviewStatus:
+          type: ["string", "null"]
+          enum: [awaiting_user_confirmation, confirmation_sent, null]
         createdAt:
           type: string
           format: date-time

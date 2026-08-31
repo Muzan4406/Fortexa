@@ -722,6 +722,7 @@ export const getAdminDepositsQueryOffsetDefault = 0;
 export const GetAdminDepositsQueryParams = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']).optional(),
   "search": zod.coerce.string().optional().describe('Search by user identity, transaction ID, provider reference, or TXID'),
+  "automaticOnly": zod.coerce.boolean().optional().describe('Only automatic Mobile Money deposits awaiting user confirmation'),
   "limit": zod.coerce.number().default(getAdminDepositsQueryLimitDefault),
   "offset": zod.coerce.number().default(getAdminDepositsQueryOffsetDefault)
 })
@@ -746,6 +747,9 @@ export const GetAdminDepositsResponse = zod.object({
   "sendavapayRef": zod.string().nullish(),
   "txid": zod.string().nullish(),
   "screenshotPath": zod.string().nullish(),
+  "automaticPayment": zod.boolean().optional(),
+  "requiresManualReview": zod.boolean().optional(),
+  "paymentReviewStatus": zod.union([zod.literal('awaiting_user_confirmation'),zod.literal('confirmation_sent'),zod.literal(null)]).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })),
@@ -854,6 +858,9 @@ export const GetAdminWithdrawalsResponse = zod.object({
   "sendavapayRef": zod.string().nullish(),
   "txid": zod.string().nullish(),
   "screenshotPath": zod.string().nullish(),
+  "automaticPayment": zod.boolean().optional(),
+  "requiresManualReview": zod.boolean().optional(),
+  "paymentReviewStatus": zod.union([zod.literal('awaiting_user_confirmation'),zod.literal('confirmation_sent'),zod.literal(null)]).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })),

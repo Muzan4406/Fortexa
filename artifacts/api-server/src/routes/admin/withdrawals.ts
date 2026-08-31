@@ -26,6 +26,9 @@ function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof 
      sendavapayRef: tx.sendavapayRef ?? null,
      txid: tx.txid ?? null,
      screenshotPath: tx.screenshotPath ?? null,
+    automaticPayment: false,
+    requiresManualReview: false,
+    paymentReviewStatus: null,
     createdAt: tx.createdAt.toISOString(),
     updatedAt: tx.updatedAt.toISOString(),
   };

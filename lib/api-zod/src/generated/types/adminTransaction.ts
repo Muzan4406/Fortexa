@@ -5,6 +5,7 @@
  * Fortexa Investment Platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { AdminTransactionPaymentReviewStatus } from './adminTransactionPaymentReviewStatus';
 import type { AdminTransactionStatus } from './adminTransactionStatus';
 import type { AdminTransactionType } from './adminTransactionType';
 
@@ -36,6 +37,10 @@ export interface AdminTransaction {
   txid?: string | null;
   /** @nullable */
   screenshotPath?: string | null;
+  automaticPayment?: boolean;
+  requiresManualReview?: boolean;
+  /** @nullable */
+  paymentReviewStatus?: AdminTransactionPaymentReviewStatus;
   createdAt: Date;
   updatedAt?: Date;
 }

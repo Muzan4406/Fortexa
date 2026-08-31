@@ -20,6 +20,11 @@ import { collect as ashtechCollect, getCountries as getAshtechCountries, getTran
 
 const router: IRouter = Router();
 
+const AUTO_PAYMENT_PENDING_DESCRIPTION =
+  "Dépôt Mobile Money — initiation automatique, confirmation utilisateur en attente";
+const AUTO_PAYMENT_CONFIRMATION_SENT_DESCRIPTION =
+  "Dépôt Mobile Money — confirmation envoyée, paiement en attente";
+
 /** Countries supported by Sendavapay Mobile Money (XOF) */
 const XOF_COUNTRIES = new Set(["TG", "BJ", "BF", "CI"]);
 
@@ -224,7 +229,7 @@ router.post("/deposits/initiate", requireAuth, async (req, res): Promise<void> =
         payerPhone: fullPhone,
         sendavapayRef: externalReference,
         sendavapayPaymentToken: `ashtech:${country.operators.join("|")}`,
-        description: "Dépôt Mobile Money AshtechPay — en attente",
+         description: AUTO_PAYMENT_PENDING_DESCRIPTION,
       })
       .returning();
     const operators = country.operators.map((name) => ({
@@ -402,12 +407,13 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
       notify_url: notifyUrl,
     });
     if (result.status === 202) {
-      if (result.data.transaction_id) {
-        await db
-          .update(transactionsTable)
-          .set({ ashtechTransactionId: result.data.transaction_id })
-          .where(eq(transactionsTable.id, tx.id));
-      }
+      await db
+        .update(transactionsTable)
+        .set({
+          ...(result.data.transaction_id ? { ashtechTransactionId: result.data.transaction_id } : {}),
+          description: AUTO_PAYMENT_CONFIRMATION_SENT_DESCRIPTION,
+        })
+        .where(eq(transactionsTable.id, tx.id));
       res.json({
         requiresOtp: false,
         requiresRedirect: result.data.flow === "wave",
@@ -417,12 +423,13 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
       return;
     }
     if (result.data.error === "otp_required" || result.data.code === "otp_required") {
-      if (result.data.transaction_id) {
-        await db
-          .update(transactionsTable)
-          .set({ ashtechTransactionId: result.data.transaction_id })
-          .where(eq(transactionsTable.id, tx.id));
-      }
+      await db
+        .update(transactionsTable)
+        .set({
+          ...(result.data.transaction_id ? { ashtechTransactionId: result.data.transaction_id } : {}),
+          description: AUTO_PAYMENT_CONFIRMATION_SENT_DESCRIPTION,
+        })
+        .where(eq(transactionsTable.id, tx.id));
       res.json({
         requiresOtp: true,
         otpToken: result.data.reference ?? tx.sendavapayRef,
@@ -452,6 +459,11 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
     res.status(400).json({ error: result.error ?? result.message ?? "Échec de l'initiation du paiement" });
     return;
   }
+
+  await db
+    .update(transactionsTable)
+    .set({ description: AUTO_PAYMENT_CONFIRMATION_SENT_DESCRIPTION })
+    .where(eq(transactionsTable.id, tx.id));
 
   res.json({
     requiresOtp: result.requiresOtp ?? false,

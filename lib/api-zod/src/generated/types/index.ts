@@ -9,6 +9,7 @@
 export * from './adminStats';
 export * from './adminTransaction';
 export * from './adminTransactionList';
+export * from './adminTransactionPaymentReviewStatus';
 export * from './adminTransactionStatus';
 export * from './adminTransactionType';
 export * from './adminUserDetail';

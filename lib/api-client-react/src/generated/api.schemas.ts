@@ -484,6 +484,17 @@ export const AdminTransactionStatus = {
   rejected: 'rejected',
 } as const;
 
+/**
+ * @nullable
+ */
+export type AdminTransactionPaymentReviewStatus = typeof AdminTransactionPaymentReviewStatus[keyof typeof AdminTransactionPaymentReviewStatus] | null;
+
+
+export const AdminTransactionPaymentReviewStatus = {
+  awaiting_user_confirmation: 'awaiting_user_confirmation',
+  confirmation_sent: 'confirmation_sent',
+} as const;
+
 export interface AdminTransaction {
   id: number;
   userId: number;
@@ -512,6 +523,10 @@ export interface AdminTransaction {
   txid?: string | null;
   /** @nullable */
   screenshotPath?: string | null;
+  automaticPayment?: boolean;
+  requiresManualReview?: boolean;
+  /** @nullable */
+  paymentReviewStatus?: AdminTransactionPaymentReviewStatus;
   createdAt: string;
   updatedAt?: string;
 }
@@ -666,6 +681,10 @@ status?: GetAdminDepositsStatus;
  * Search by user identity, transaction ID, provider reference, or TXID
  */
 search?: string;
+/**
+ * Only automatic Mobile Money deposits awaiting user confirmation
+ */
+automaticOnly?: boolean;
 limit?: number;
 offset?: number;
 };
