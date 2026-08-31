@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, usersTable, transactionsTable } from "@workspace/db";
-import { eq, and, desc, count, ilike, or, sql } from "drizzle-orm";
+import { eq, and, desc, count, ilike, inArray, or, sql } from "drizzle-orm";
 import { requireAdmin } from "../../lib/auth";
 import { creditReferralCommissions } from "../../lib/referral";
 import { formatTelegramAmount, sendTelegramNotification } from "../../lib/telegram";
@@ -9,13 +9,15 @@ const router: IRouter = Router();
 
 const AUTO_PAYMENT_PENDING_DESCRIPTION =
   "Dépôt Mobile Money — initiation automatique, confirmation utilisateur en attente";
+const AUTO_PAYMENT_REVIEW_DESCRIPTION =
+  "Dépôt Mobile Money — échec fournisseur, vérification manuelle requise";
 
 function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof usersTable.$inferSelect | null) {
   const automaticPayment = tx.depositMethod === "mobile_money" && Boolean(tx.sendavapayRef);
   const requiresManualReview =
     automaticPayment &&
     tx.status === "pending" &&
-    tx.description === AUTO_PAYMENT_PENDING_DESCRIPTION;
+    [AUTO_PAYMENT_PENDING_DESCRIPTION, AUTO_PAYMENT_REVIEW_DESCRIPTION].includes(tx.description ?? "");
 
   return {
     id: tx.id,
@@ -39,7 +41,9 @@ function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof 
     automaticPayment,
     requiresManualReview,
     paymentReviewStatus: requiresManualReview
-      ? "awaiting_user_confirmation"
+      ? tx.description === AUTO_PAYMENT_REVIEW_DESCRIPTION
+        ? "provider_failed_needs_review"
+        : "awaiting_user_confirmation"
       : automaticPayment
         ? "confirmation_sent"
         : null,
@@ -61,7 +65,10 @@ router.get("/admin/deposits", requireAdmin, async (req, res): Promise<void> => {
     conditions.push(
       eq(transactionsTable.status, "pending"),
       eq(transactionsTable.depositMethod, "mobile_money"),
-      eq(transactionsTable.description, AUTO_PAYMENT_PENDING_DESCRIPTION),
+      inArray(transactionsTable.description, [
+        AUTO_PAYMENT_PENDING_DESCRIPTION,
+        AUTO_PAYMENT_REVIEW_DESCRIPTION,
+      ]),
     );
   }
   if (search?.trim()) {

@@ -8,6 +8,8 @@ import { getSettings } from "../lib/settings";
 import { formatTelegramAmount, sendTelegramNotification } from "../lib/telegram";
 
 const router: IRouter = Router();
+const AUTO_PAYMENT_REVIEW_DESCRIPTION =
+  "Dépôt Mobile Money — échec fournisseur, vérification manuelle requise";
 
 router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
   const secret = process.env.ASHTECHPAY_WEBHOOK_SECRET;
@@ -89,8 +91,8 @@ router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
       const references = [payload.reference, payload.transaction_id].filter(
         (value): value is string => Boolean(value),
       );
-      const [rejectedTx] = await db.update(transactionsTable)
-        .set({ status: "rejected", rejectionReason: "Paiement AshtechPay refusé ou expiré" })
+       const [reviewTx] = await db.update(transactionsTable)
+         .set({ description: AUTO_PAYMENT_REVIEW_DESCRIPTION })
         .where(and(
           or(
             ...references.map((reference) => eq(transactionsTable.sendavapayRef, reference)),
@@ -99,9 +101,9 @@ router.post("/webhooks/ashtechpay", async (req, res): Promise<void> => {
           eq(transactionsTable.status, "pending"),
         ))
         .returning();
-      if (rejectedTx) {
+       if (reviewTx) {
         void sendTelegramNotification(
-          `❌ Dépôt AshtechPay rejeté\nTransaction #${rejectedTx.id}\nMontant : ${formatTelegramAmount(rejectedTx.amount)}`,
+           `⚠️ Dépôt AshtechPay à vérifier\nTransaction #${reviewTx.id}\nMontant : ${formatTelegramAmount(reviewTx.amount)}\nLe fournisseur a signalé un échec ; le dépôt reste en attente de décision admin.`,
         );
       }
     }
@@ -219,19 +221,15 @@ router.post("/webhooks/sendavapay", async (req, res): Promise<void> => {
         .from(transactionsTable)
         .where(or(...references.map((reference) => eq(transactionsTable.sendavapayRef, reference))));
 
-      if (tx && tx.status === "pending") {
+       if (tx && tx.status === "pending") {
         await db
           .update(transactionsTable)
           .set({
-            status: "rejected",
-            rejectionReason:
-              payload.event === "payment.expired"
-                ? "Paiement expiré — le client n'a pas confirmé à temps"
-                : "Paiement refusé ou erreur opérateur",
+             description: AUTO_PAYMENT_REVIEW_DESCRIPTION,
           })
           .where(eq(transactionsTable.id, tx.id));
 
-        logger.info({ txId: tx.id, event: payload.event }, "Deposit rejected via webhook");
+         logger.info({ txId: tx.id, event: payload.event }, "Deposit held for manual review after provider failure");
       }
     }
   } catch (err) {

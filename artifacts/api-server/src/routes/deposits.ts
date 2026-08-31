@@ -24,6 +24,8 @@ const AUTO_PAYMENT_PENDING_DESCRIPTION =
   "Dépôt Mobile Money — initiation automatique, confirmation utilisateur en attente";
 const AUTO_PAYMENT_CONFIRMATION_SENT_DESCRIPTION =
   "Dépôt Mobile Money — confirmation envoyée, paiement en attente";
+const AUTO_PAYMENT_REVIEW_DESCRIPTION =
+  "Dépôt Mobile Money — échec fournisseur, vérification manuelle requise";
 
 /** Countries supported by Sendavapay Mobile Money (XOF) */
 const XOF_COUNTRIES = new Set(["TG", "BJ", "BF", "CI"]);
@@ -294,7 +296,7 @@ router.post("/deposits/initiate", requireAuth, async (req, res): Promise<void> =
       payerPhone: fullPhone,
       sendavapayRef: reference,
       sendavapayPaymentToken: paymentToken,
-      description: "Dépôt Mobile Money — en attente",
+       description: AUTO_PAYMENT_PENDING_DESCRIPTION,
     })
     .returning();
 
@@ -615,9 +617,9 @@ router.get("/deposits/:id/status", requireAuth, async (req, res): Promise<void> 
         } else if (providerStatus.status < 400 && ["failed", "rejected", "expired"].includes(providerState)) {
           await db
             .update(transactionsTable)
-            .set({ status: "rejected", rejectionReason: "Paiement AshtechPay refusé ou expiré" })
+            .set({ description: AUTO_PAYMENT_REVIEW_DESCRIPTION })
             .where(and(eq(transactionsTable.id, tx.id), eq(transactionsTable.status, "pending")));
-          tx.status = "rejected";
+          tx.status = "pending";
         }
       } catch (error) {
         logger.warn({ transactionId: tx.id, error }, "AshtechPay status sync failed; keeping deposit pending");

@@ -151,7 +151,9 @@ export default function AdminDepositsPage() {
                   </span>
                   {dep.requiresManualReview && (
                     <span className="mt-1 inline-block rounded-full bg-rose-100 px-2 py-0.5 text-xs font-semibold text-rose-700">
-                      Auto initié — confirmation non reçue
+                      {dep.paymentReviewStatus === 'provider_failed_needs_review'
+                        ? 'Échec fournisseur — vérification requise'
+                        : 'Auto initié — confirmation non reçue'}
                     </span>
                   )}
                 </div>
@@ -184,7 +186,7 @@ export default function AdminDepositsPage() {
                 )}
                  {dep.requiresManualReview && (
                    <p className="mt-2 rounded-lg bg-rose-50 p-2 text-xs text-rose-700">
-                     La demande a été initiée mais l’utilisateur n’a pas encore confirmé. Vérifiez le paiement auprès du fournisseur avant toute approbation.
+                     Le paiement automatique n’est pas confirmé. Vérifiez le paiement auprès du fournisseur avant toute approbation ; l’admin garde la décision finale.
                    </p>
                  )}
               </div>

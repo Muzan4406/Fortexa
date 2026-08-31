@@ -1720,7 +1720,7 @@ components:
           type: boolean
         paymentReviewStatus:
           type: ["string", "null"]
-          enum: [awaiting_user_confirmation, confirmation_sent, null]
+          enum: [awaiting_user_confirmation, provider_failed_needs_review, confirmation_sent, null]
         createdAt:
           type: string
           format: date-time
