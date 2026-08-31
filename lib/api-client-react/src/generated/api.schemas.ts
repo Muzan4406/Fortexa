@@ -492,6 +492,7 @@ export type AdminTransactionPaymentReviewStatus = typeof AdminTransactionPayment
 
 export const AdminTransactionPaymentReviewStatus = {
   awaiting_user_confirmation: 'awaiting_user_confirmation',
+  provider_failed_needs_review: 'provider_failed_needs_review',
   confirmation_sent: 'confirmation_sent',
 } as const;
 

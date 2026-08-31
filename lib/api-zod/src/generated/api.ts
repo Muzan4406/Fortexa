@@ -749,7 +749,7 @@ export const GetAdminDepositsResponse = zod.object({
   "screenshotPath": zod.string().nullish(),
   "automaticPayment": zod.boolean().optional(),
   "requiresManualReview": zod.boolean().optional(),
-  "paymentReviewStatus": zod.union([zod.literal('awaiting_user_confirmation'),zod.literal('confirmation_sent'),zod.literal(null)]).nullish(),
+  "paymentReviewStatus": zod.union([zod.literal('awaiting_user_confirmation'),zod.literal('provider_failed_needs_review'),zod.literal('confirmation_sent'),zod.literal(null)]).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })),
@@ -860,7 +860,7 @@ export const GetAdminWithdrawalsResponse = zod.object({
   "screenshotPath": zod.string().nullish(),
   "automaticPayment": zod.boolean().optional(),
   "requiresManualReview": zod.boolean().optional(),
-  "paymentReviewStatus": zod.union([zod.literal('awaiting_user_confirmation'),zod.literal('confirmation_sent'),zod.literal(null)]).nullish(),
+  "paymentReviewStatus": zod.union([zod.literal('awaiting_user_confirmation'),zod.literal('provider_failed_needs_review'),zod.literal('confirmation_sent'),zod.literal(null)]).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date().optional()
 })),
