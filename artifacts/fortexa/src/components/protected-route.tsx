@@ -11,7 +11,13 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
   const { user, isLoading, token } = useAuth();
-  const { data: dashboard, isLoading: settingsLoading } = useGetDashboard({ query: { enabled: !!token, queryKey: getGetDashboardQueryKey() } });
+  const { data: dashboard } = useGetDashboard({
+    query: {
+      enabled: !!token,
+      retry: false,
+      queryKey: getGetDashboardQueryKey(),
+    },
+  });
   const [, setLocation] = useLocation();
 
   useEffect(() => {
@@ -24,7 +30,7 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
     }
   }, [user, isLoading, token, requireAdmin, setLocation]);
 
-  if (isLoading || (token && settingsLoading)) {
+  if (token && isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
