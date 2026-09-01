@@ -724,11 +724,11 @@ router.post("/deposits/usdt", requireAuth, async (req, res): Promise<void> => {
  */
 router.post("/deposits/manual", requireAuth, async (req, res): Promise<void> => {
   const userId = req.userId!;
-  const { amount, payerCountry, txid, screenshotBase64 } = req.body as {
+  const { amount, payerCountry, payerPhone, operator } = req.body as {
     amount: unknown;
     payerCountry: unknown;
-    txid: unknown;
-    screenshotBase64: unknown;
+    payerPhone: unknown;
+    operator: unknown;
   };
 
   if (!payerCountry || typeof payerCountry !== "string") {
@@ -759,45 +759,46 @@ router.post("/deposits/manual", requireAuth, async (req, res): Promise<void> => 
     res.status(400).json({ error: `Montant minimum : ${settings.minDeposit} FCFA` });
     return;
   }
-  if (!txid || typeof txid !== "string" || txid.trim().length < 3) {
-    res.status(400).json({ error: "Référence de paiement invalide" });
+  if (!payerPhone || typeof payerPhone !== "string" || !/^\d{6,15}$/.test(payerPhone.trim())) {
+    res.status(400).json({ error: "Numéro de téléphone invalide" });
     return;
   }
-  if (!screenshotBase64 || typeof screenshotBase64 !== "string") {
-    res.status(400).json({ error: "Capture d'écran requise" });
+  if (!operator || typeof operator !== "string" || operator.trim().length < 2 || operator.trim().length > 80) {
+    res.status(400).json({ error: "Opérateur de paiement invalide" });
     return;
   }
 
-  let screenshotPath: string;
   try {
-    screenshotPath = await saveScreenshot(screenshotBase64, userId);
+    const paymentUrl = new URL(settings.manualDepositUrl);
+    paymentUrl.searchParams.set("amount", String(numAmount));
+    paymentUrl.searchParams.set("country", payerCountry.trim().toUpperCase());
+    paymentUrl.searchParams.set("phone", payerPhone.trim());
+    paymentUrl.searchParams.set("operator", operator.trim());
+
+    const [tx] = await db
+      .insert(transactionsTable)
+      .values({
+        userId,
+        type: "deposit",
+        amount: numAmount.toFixed(8),
+        fee: "0",
+        netAmount: numAmount.toFixed(8),
+        status: "pending",
+        depositMethod: "mobile_money",
+        payerCountry: payerCountry.trim().toUpperCase(),
+        payerPhone: payerPhone.trim(),
+        description: `Dépôt manuel par lien de paiement — opérateur : ${operator.trim()} — en attente d'approbation admin`,
+      })
+      .returning();
+
+    void sendTelegramNotification(
+      `💰 Nouveau dépôt manuel par lien\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(numAmount)}\nPays : ${payerCountry}\nTéléphone : ${payerPhone.trim()}\nOpérateur : ${operator.trim()}\nStatut : en attente d'approbation admin`,
+    );
+
+    res.status(201).json({ paymentUrl: paymentUrl.toString(), status: tx.status });
   } catch {
-    res.status(400).json({ error: "Impossible de traiter la capture d'écran" });
-    return;
+    res.status(500).json({ error: "Impossible de préparer le lien de paiement manuel" });
   }
-
-  const [tx] = await db
-    .insert(transactionsTable)
-    .values({
-      userId,
-      type: "deposit",
-      amount: numAmount.toFixed(8),
-      fee: "0",
-      netAmount: numAmount.toFixed(8),
-      status: "pending",
-      depositMethod: "mobile_money",
-      payerCountry: payerCountry.trim().toUpperCase(),
-      txid: txid.trim(),
-      screenshotPath,
-      description: "Dépôt manuel par lien de paiement — en attente de vérification",
-    })
-    .returning();
-
-  void sendTelegramNotification(
-    `💰 Nouveau dépôt manuel par lien\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(numAmount)}\nPays : ${payerCountry}\nRéférence : ${txid.trim()}\n📎 Preuve de paiement jointe\nStatut : en attente de validation`,
-  );
-
-  res.status(201).json(formatTx(tx));
 });
 
 export { formatTx };

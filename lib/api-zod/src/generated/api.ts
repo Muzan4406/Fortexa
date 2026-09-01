@@ -322,28 +322,13 @@ export const createManualDepositBodyAmountMin = 3000;
 export const CreateManualDepositBody = zod.object({
   "amount": zod.number().min(createManualDepositBodyAmountMin),
   "payerCountry": zod.string(),
-  "txid": zod.string().describe('Payment provider reference'),
-  "screenshotBase64": zod.string().describe('Base64-encoded payment proof image')
+  "payerPhone": zod.string().describe('Payment phone number'),
+  "operator": zod.string().describe('Mobile Money operator selected by the user')
 })
 
 export const CreateManualDepositResponse = zod.object({
-  "id": zod.number(),
-  "userId": zod.number(),
-  "type": zod.enum(['deposit', 'withdrawal', 'commission', 'gain']),
-  "amount": zod.number(),
-  "fee": zod.number(),
-  "netAmount": zod.number(),
-  "status": zod.enum(['pending', 'approved', 'rejected']),
-  "description": zod.string().nullish(),
-  "rejectionReason": zod.string().nullish(),
-  "depositMethod": zod.string().nullish(),
-  "payerCountry": zod.string().nullish(),
-  "payerPhone": zod.string().nullish(),
-  "sendavapayRef": zod.string().nullish(),
-  "txid": zod.string().nullish(),
-  "screenshotPath": zod.string().nullish(),
-  "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date().optional()
+  "paymentUrl": zod.string(),
+  "status": zod.enum(['pending'])
 })
 
 
@@ -805,8 +790,8 @@ export const createAdminDepositBodyAmountMin = 3000;
 export const CreateAdminDepositBody = zod.object({
   "amount": zod.number().min(createAdminDepositBodyAmountMin),
   "payerCountry": zod.string(),
-  "txid": zod.string().describe('Payment provider reference'),
-  "screenshotBase64": zod.string().describe('Base64-encoded payment proof image')
+  "payerPhone": zod.string().describe('Payment phone number'),
+  "operator": zod.string().describe('Mobile Money operator selected by the user')
 })
 
 export const CreateAdminDepositResponse = zod.object({

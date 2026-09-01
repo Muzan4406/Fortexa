@@ -51,6 +51,8 @@ export * from './initiateDepositInput';
 export * from './initiateDepositPayload';
 export * from './loginInput';
 export * from './manualDepositInput';
+export * from './manualDepositResponse';
+export * from './manualDepositResponseStatus';
 export * from './operatorInfo';
 export * from './passwordUpdate';
 export * from './platformSettings';

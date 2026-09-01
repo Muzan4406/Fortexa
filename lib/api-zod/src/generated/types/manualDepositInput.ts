@@ -10,8 +10,8 @@ export interface ManualDepositInput {
   /** @minimum 3000 */
   amount: number;
   payerCountry: string;
-  /** Payment provider reference */
-  txid: string;
-  /** Base64-encoded payment proof image */
-  screenshotBase64: string;
+  /** Payment phone number */
+  payerPhone: string;
+  /** Mobile Money operator selected by the user */
+  operator: string;
 }

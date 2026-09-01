@@ -45,6 +45,7 @@ import type {
   InitiateDepositPayload,
   LoginInput,
   ManualDepositInput,
+  ManualDepositResponse,
   PasswordUpdate,
   PlatformSettings,
   PlatformSettingsUpdate,
@@ -1133,9 +1134,9 @@ export const getCreateManualDepositUrl = () => {
 /**
  * @summary Submit a payment-link deposit request for admin review
  */
-export const createManualDeposit = async (manualDepositInput: ManualDepositInput, options?: Parameters<typeof customFetch>[1]): Promise<Transaction> => {
+export const createManualDeposit = async (manualDepositInput: ManualDepositInput, options?: Parameters<typeof customFetch>[1]): Promise<ManualDepositResponse> => {
 
-  return customFetch<Transaction>(getCreateManualDepositUrl(),
+  return customFetch<ManualDepositResponse>(getCreateManualDepositUrl(),
   {
     ...options,
     method: 'POST',

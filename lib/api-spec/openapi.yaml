@@ -339,11 +339,11 @@ paths:
               $ref: "#/components/schemas/ManualDepositInput"
       responses:
         "201":
-          description: Manual deposit created
+          description: Manual deposit created and payment link returned
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Transaction"
+                $ref: "#/components/schemas/ManualDepositResponse"
         "400":
           description: Validation error
           content:
@@ -1371,19 +1371,29 @@ components:
 
     ManualDepositInput:
       type: object
-      required: [amount, payerCountry, txid, screenshotBase64]
+      required: [amount, payerCountry, payerPhone, operator]
       properties:
         amount:
           type: number
           minimum: 3000
         payerCountry:
           type: string
-        txid:
+        payerPhone:
           type: string
-          description: Payment provider reference
-        screenshotBase64:
+          description: Payment phone number
+        operator:
           type: string
-          description: Base64-encoded payment proof image
+          description: Mobile Money operator selected by the user
+
+    ManualDepositResponse:
+      type: object
+      required: [paymentUrl, status]
+      properties:
+        paymentUrl:
+          type: string
+        status:
+          type: string
+          enum: [pending]
 
     UsdtInfoResponse:
       type: object

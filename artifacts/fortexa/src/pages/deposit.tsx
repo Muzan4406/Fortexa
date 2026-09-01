@@ -58,6 +58,36 @@ const COUNTRIES = [
   { code: 'OTHER', name: 'Autre pays', flag: '🌍', method: 'usdt' as const },
 ];
 
+const MANUAL_OPERATORS: Record<string, string[]> = {
+  TG: ['Togocel TMoney', 'Moov Africa Flooz'],
+  BJ: ['MTN Mobile Money', 'Moov Africa'],
+  BF: ['Orange Money', 'Moov Money'],
+  CI: ['Orange Money', 'MTN Mobile Money', 'Moov Africa', 'Wave'],
+  SN: ['Orange Money', 'Wave', 'Free Money'],
+  CM: ['MTN Mobile Money', 'Orange Money'],
+  ML: ['Orange Money', 'Moov Money'],
+  GN: ['Orange Money', 'MTN Mobile Money'],
+  CD: ['Airtel Money', 'Orange Money', 'Vodacom Mpesa'],
+  CG: ['MTN Mobile Money', 'Airtel Money'],
+  NG: ['OPay', 'PalmPay', 'Paga'],
+  GH: ['MTN Mobile Money', 'Telecel Cash', 'AirtelTigo Money'],
+};
+
+const COUNTRY_PHONE_PREFIXES: Record<string, string> = {
+  TG: '+228',
+  BJ: '+229',
+  BF: '+226',
+  CI: '+225',
+  SN: '+221',
+  CM: '+237',
+  ML: '+223',
+  GN: '+224',
+  CD: '+243',
+  CG: '+242',
+  NG: '+234',
+  GH: '+233',
+};
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Flow = 'xof' | 'usdt' | 'manual';
@@ -71,10 +101,7 @@ type Step =
   | 'failed'
   | 'usdt-address'
   | 'usdt-submit'
-  | 'usdt-pending'
-  | 'manual-link'
-  | 'manual-submit'
-  | 'manual-pending';
+  | 'usdt-pending';
 
 interface FormState {
   country: string;
@@ -103,6 +130,7 @@ export default function DepositPage() {
   const [step, setStep] = useState<Step>('form');
   const [flow, setFlow] = useState<Flow>('xof');
   const [form, setForm] = useState<FormState>({ country: '', phone: '', amount: '' });
+  const [manualOperator, setManualOperator] = useState('');
   const [xofSession, setXofSession] = useState<XofSession | null>(null);
   const [otp, setOtp] = useState('');
   const [txid, setTxid] = useState('');
@@ -184,6 +212,7 @@ export default function DepositPage() {
     const newFlow = hasManualPayment ? 'manual' : country?.method ?? 'usdt';
     setForm((f) => ({ ...f, country: code }));
     setFlow(newFlow);
+    setManualOperator(hasManualPayment ? (MANUAL_OPERATORS[code]?.[0] ?? '') : '');
   }
 
   function handleScreenshotChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -209,7 +238,33 @@ export default function DepositPage() {
       return;
     }
     if (flow === 'manual') {
-      setStep('manual-link');
+      if (!form.phone || !/^\d{6,15}$/.test(form.phone.trim())) {
+        toast({ title: 'Numéro invalide', description: 'Entrez votre numéro sans indicatif (chiffres uniquement)', variant: 'destructive' });
+        return;
+      }
+      if (!manualOperator) {
+        toast({ title: 'Sélectionnez un opérateur', variant: 'destructive' });
+        return;
+      }
+
+      manualMutation.mutate(
+        {
+          data: {
+            amount,
+            payerCountry: form.country,
+            payerPhone: form.phone.trim(),
+            operator: manualOperator,
+          },
+        },
+        {
+          onSuccess: (res) => {
+            window.location.assign(res.paymentUrl);
+          },
+          onError: (e: any) => {
+            toast({ title: 'Erreur', description: e.data?.error || 'Impossible de préparer le paiement', variant: 'destructive' });
+          },
+        },
+      );
       return;
     }
 
@@ -322,50 +377,12 @@ export default function DepositPage() {
     );
   }
 
-  function handleManualSubmit() {
-    if (!txid.trim() || txid.trim().length < 3) {
-      toast({ title: 'Référence invalide', description: 'Entrez la référence fournie par le prestataire de paiement', variant: 'destructive' }); return;
-    }
-    if (!screenshot || !screenshotPreview) {
-      toast({ title: 'Capture d\'écran requise', variant: 'destructive' }); return;
-    }
-
-    manualMutation.mutate(
-      {
-        data: {
-          amount: amountInFcfa,
-          payerCountry: form.country,
-          txid: txid.trim(),
-          screenshotBase64: screenshotPreview,
-        },
-      },
-      {
-        onSuccess: () => setStep('manual-pending'),
-        onError: (e: any) => {
-          toast({ title: 'Erreur', description: e.data?.error || 'Impossible d\'envoyer la demande', variant: 'destructive' });
-        },
-      },
-    );
-  }
-
-  function getManualPaymentUrl() {
-    const configuredUrl = dashboard?.settings?.manualDepositUrl;
-    if (!configuredUrl) return '';
-    try {
-      const url = new URL(configuredUrl);
-      url.searchParams.set('amount', String(amountInFcfa));
-      url.searchParams.set('country', form.country);
-      return url.toString();
-    } catch {
-      return configuredUrl;
-    }
-  }
-
   function reset() {
     stopPolling();
     setStep('form');
     setFlow('xof');
     setForm({ country: '', phone: '', amount: '' });
+    setManualOperator('');
     setXofSession(null);
     setOtp('');
     setTxid('');
@@ -424,12 +441,12 @@ export default function DepositPage() {
             )}
           </div>
 
-          {flow === 'xof' && (
+          {(flow === 'xof' || flow === 'manual') && (
             <div className="space-y-2">
-              <Label>Numéro Mobile Money</Label>
+              <Label>{flow === 'manual' ? 'Numéro de téléphone' : 'Numéro Mobile Money'}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">
-                  {form.country === 'TG' ? '+228' : form.country === 'BJ' ? '+229' : form.country === 'BF' ? '+226' : form.country === 'CI' ? '+225' : ''}
+                  {COUNTRY_PHONE_PREFIXES[form.country] ?? ''}
                 </span>
                 <Input
                   type="tel"
@@ -441,6 +458,22 @@ export default function DepositPage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground">Sans l'indicatif du pays</p>
+            </div>
+          )}
+
+          {flow === 'manual' && (
+            <div className="space-y-2">
+              <Label>Opérateur de paiement</Label>
+              <Select value={manualOperator} onValueChange={setManualOperator}>
+                <SelectTrigger className="h-12">
+                  <SelectValue placeholder="Sélectionnez votre opérateur" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(MANUAL_OPERATORS[form.country] ?? ['Mobile Money']).map((operator) => (
+                    <SelectItem key={operator} value={operator}>{operator}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 
@@ -470,114 +503,14 @@ export default function DepositPage() {
           <Button
             className="w-full h-12 text-base font-semibold bg-accent hover:bg-accent/90"
             onClick={handleContinue}
-            disabled={initiateMutation.isPending}
+            disabled={initiateMutation.isPending || manualMutation.isPending}
           >
-            {initiateMutation.isPending ? (
+            {initiateMutation.isPending || manualMutation.isPending ? (
               <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Traitement...</>
             ) : (
-              'Continuer ➡'
+              flow === 'manual' ? 'Déposer et payer' : 'Continuer ➡'
             )}
           </Button>
-        </div>
-      );
-    }
-
-    // ── Manual payment link ───────────────────────────────────────────────────
-    if (step === 'manual-link') {
-      const paymentUrl = getManualPaymentUrl();
-      return (
-        <div className="bg-card rounded-2xl p-6 shadow-lg border border-border space-y-5">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setStep('form')} className="text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h2 className="font-semibold text-foreground">Paiement manuel</h2>
-          </div>
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-            <p className="text-sm leading-relaxed text-amber-800">
-              Utilisez le lien sécurisé ci-dessous pour payer {formatCurrency(amountInFcfa)}. Après le paiement, revenez ici avec la référence reçue et une capture de confirmation.
-            </p>
-          </div>
-          <div className="rounded-xl border border-border bg-muted/40 p-4 text-center">
-            <p className="mb-3 text-xs text-muted-foreground">Pays : <strong>{selectedCountry?.name ?? form.country}</strong></p>
-            <Button
-              className="h-12 w-full bg-amber-600 font-semibold text-white hover:bg-amber-700"
-              onClick={() => window.open(paymentUrl, '_blank', 'noopener,noreferrer')}
-              disabled={!paymentUrl}
-            >
-              <ExternalLink className="mr-2 h-4 w-4" /> Ouvrir le lien de paiement
-            </Button>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-12" onClick={() => setStep('form')}>Retour</Button>
-            <Button className="h-12 bg-accent font-semibold hover:bg-accent/90" onClick={() => setStep('manual-submit')}>
-              J'ai payé
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    // ── Manual payment proof ──────────────────────────────────────────────────
-    if (step === 'manual-submit') {
-      return (
-        <div className="bg-card rounded-2xl p-6 shadow-lg border border-border space-y-5">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setStep('manual-link')} className="text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h2 className="font-semibold text-foreground">Confirmer votre paiement</h2>
-          </div>
-          <div className="space-y-2">
-            <Label>Référence de paiement <span className="text-red-500">*</span></Label>
-            <Input
-              type="text"
-              placeholder="Référence affichée après le paiement"
-              value={txid}
-              onChange={(e) => setTxid(e.target.value)}
-              className="h-12 font-mono text-sm"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Preuve de paiement <span className="text-red-500">*</span></Label>
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
-            {screenshotPreview ? (
-              <div className="relative overflow-hidden rounded-xl border border-border">
-                <img src={screenshotPreview} alt="Preuve de paiement" className="h-48 w-full object-cover" />
-                <button type="button" onClick={() => { setScreenshot(null); setScreenshotPreview(null); }} className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white">
-                  <XCircle className="h-4 w-4" />
-                </button>
-              </div>
-            ) : (
-              <button type="button" onClick={() => fileInputRef.current?.click()} className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-accent hover:text-accent">
-                <Upload className="h-8 w-8" />
-                <span className="text-sm">Ajouter une capture</span>
-              </button>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-12" onClick={() => setStep('manual-link')}>Retour</Button>
-            <Button className="h-12 bg-accent font-semibold hover:bg-accent/90" onClick={handleManualSubmit} disabled={manualMutation.isPending}>
-              {manualMutation.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Envoi...</> : 'Envoyer la preuve'}
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    if (step === 'manual-pending') {
-      return (
-        <div className="bg-card rounded-2xl p-8 shadow-lg border border-border text-center space-y-6">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-amber-100">
-            <Clock className="h-10 w-10 text-amber-600" />
-          </div>
-          <div>
-            <h2 className="mb-2 text-xl font-bold text-foreground">Demande reçue</h2>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Votre dépôt manuel est en attente de vérification par l’administrateur. Votre solde sera crédité après approbation.
-            </p>
-          </div>
-          <Button className="h-12 w-full bg-accent font-semibold hover:bg-accent/90" onClick={reset}>Terminer</Button>
         </div>
       );
     }
