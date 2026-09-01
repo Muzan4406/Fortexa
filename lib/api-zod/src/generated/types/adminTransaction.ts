@@ -38,6 +38,7 @@ export interface AdminTransaction {
   /** @nullable */
   screenshotPath?: string | null;
   automaticPayment?: boolean;
+  manualPayment?: boolean;
   requiresManualReview?: boolean;
   /** @nullable */
   paymentReviewStatus?: AdminTransactionPaymentReviewStatus;

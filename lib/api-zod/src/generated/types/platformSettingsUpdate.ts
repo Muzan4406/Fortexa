@@ -29,4 +29,6 @@ export interface PlatformSettingsUpdate {
   whatsappGroupUrl?: string;
   whatsappChannelUrl?: string;
   whatsappSupportUrl?: string;
+  manualDepositUrl?: string;
+  manualDepositCountries?: string[];
 }

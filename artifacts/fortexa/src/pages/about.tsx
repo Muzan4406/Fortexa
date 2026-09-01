@@ -1,5 +1,6 @@
 import { ChevronLeft, TrendingUp, Shield, Users, Star } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { useGetDashboard } from '@workspace/api-client-react';
 
 const VALUES = [
   {
@@ -30,6 +31,8 @@ const VALUES = [
 
 export default function AboutPage() {
   const [, setLocation] = useLocation();
+  const { data: dashboard } = useGetDashboard();
+  const dailyRate = dashboard?.settings?.dailyRatePercent;
 
   return (
     <>
@@ -86,7 +89,7 @@ export default function AboutPage() {
           <h3 className="font-bold text-foreground mb-4 text-center">Fortexa en chiffres</h3>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-2xl font-bold text-primary">3%</p>
+              <p className="text-2xl font-bold text-primary">{dailyRate !== undefined ? `${dailyRate}%` : '—'}</p>
               <p className="text-xs text-muted-foreground mt-0.5">Rendement/jour</p>
             </div>
             <div>

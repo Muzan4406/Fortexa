@@ -91,6 +91,8 @@ export interface PublicSettings {
   whatsappGroupUrl: string;
   whatsappChannelUrl: string;
   whatsappSupportUrl: string;
+  manualDepositUrl: string;
+  manualDepositCountries: string[];
 }
 
 export interface Dashboard {
@@ -237,6 +239,16 @@ export interface UsdtDepositInput {
   /** Blockchain transaction hash */
   txid: string;
   /** Base64-encoded screenshot image */
+  screenshotBase64: string;
+}
+
+export interface ManualDepositInput {
+  /** @minimum 3000 */
+  amount: number;
+  payerCountry: string;
+  /** Payment provider reference */
+  txid: string;
+  /** Base64-encoded payment proof image */
   screenshotBase64: string;
 }
 
@@ -525,6 +537,7 @@ export interface AdminTransaction {
   /** @nullable */
   screenshotPath?: string | null;
   automaticPayment?: boolean;
+  manualPayment?: boolean;
   requiresManualReview?: boolean;
   /** @nullable */
   paymentReviewStatus?: AdminTransactionPaymentReviewStatus;
@@ -553,7 +566,7 @@ export interface TransactionStatusUpdate {
   rejectionReason?: string | null;
 }
 
-export interface ManualDepositInput {
+export interface AdminManualDepositInput {
   userId: number;
   /** @minimum 0 */
   amount: number;
@@ -595,6 +608,10 @@ export interface PlatformSettings {
   whatsappGroupUrl: string;
   whatsappChannelUrl?: string;
   whatsappSupportUrl?: string;
+  /** HTTPS payment link for manually configured countries */
+  manualDepositUrl?: string;
+  /** ISO country codes that use the manual payment link */
+  manualDepositCountries?: string[];
 }
 
 /**
@@ -630,6 +647,8 @@ export interface PlatformSettingsUpdate {
   whatsappGroupUrl?: string;
   whatsappChannelUrl?: string;
   whatsappSupportUrl?: string;
+  manualDepositUrl?: string;
+  manualDepositCountries?: string[];
 }
 
 export interface ReferralSettings {

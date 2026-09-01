@@ -27,6 +27,7 @@ function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof 
      txid: tx.txid ?? null,
      screenshotPath: tx.screenshotPath ?? null,
     automaticPayment: false,
+    manualPayment: false,
     requiresManualReview: false,
     paymentReviewStatus: null,
     createdAt: tx.createdAt.toISOString(),

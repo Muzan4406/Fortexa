@@ -416,6 +416,9 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
           description: AUTO_PAYMENT_CONFIRMATION_SENT_DESCRIPTION,
         })
         .where(eq(transactionsTable.id, tx.id));
+      void sendTelegramNotification(
+        `📲 Confirmation Mobile Money envoyée\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(tx.amount)}\nPays : ${tx.payerCountry ?? "Non renseigné"}\nStatut : confirmation utilisateur attendue`,
+      );
       res.json({
         requiresOtp: false,
         requiresRedirect: result.data.flow === "wave",
@@ -432,6 +435,9 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
           description: AUTO_PAYMENT_CONFIRMATION_SENT_DESCRIPTION,
         })
         .where(eq(transactionsTable.id, tx.id));
+      void sendTelegramNotification(
+        `🔐 OTP requis pour un dépôt Mobile Money\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(tx.amount)}\nPays : ${tx.payerCountry ?? "Non renseigné"}\nStatut : OTP attendu`,
+      );
       res.json({
         requiresOtp: true,
         otpToken: result.data.reference ?? tx.sendavapayRef,
@@ -466,6 +472,9 @@ router.post("/deposits/confirm", requireAuth, async (req, res): Promise<void> =>
     .update(transactionsTable)
     .set({ description: AUTO_PAYMENT_CONFIRMATION_SENT_DESCRIPTION })
     .where(eq(transactionsTable.id, tx.id));
+  void sendTelegramNotification(
+    `📲 Confirmation Mobile Money envoyée\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(tx.amount)}\nPays : ${tx.payerCountry ?? "Non renseigné"}\nStatut : confirmation utilisateur attendue`,
+  );
 
   res.json({
     requiresOtp: result.requiresOtp ?? false,
@@ -612,7 +621,12 @@ router.get("/deposits/:id/status", requireAuth, async (req, res): Promise<void> 
               .where(eq(usersTable.id, approvedTx.userId));
             return { userId: approvedTx.userId, txId: approvedTx.id, amount };
           });
-          if (credited) await creditReferralCommissions(credited.amount, credited.userId, credited.txId);
+           if (credited) {
+             await creditReferralCommissions(credited.amount, credited.userId, credited.txId);
+             void sendTelegramNotification(
+               `✅ Dépôt approuvé automatiquement\nTransaction #${credited.txId}\nUtilisateur #${credited.userId}\nMontant : ${formatTelegramAmount(credited.amount)}\nCapital crédité et commissions distribuées`,
+             );
+           }
           tx.status = "approved";
         } else if (providerStatus.status < 400 && ["failed", "rejected", "expired"].includes(providerState)) {
           await db
@@ -699,6 +713,88 @@ router.post("/deposits/usdt", requireAuth, async (req, res): Promise<void> => {
 
   void sendTelegramNotification(
     `💰 Nouveau dépôt USDT BEP20\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(numAmount)}\nTXID : ${txid.trim()}\nPays : ${typeof payerCountry === "string" ? payerCountry : "Non renseigné"}\n📎 Preuve de paiement jointe\nStatut : en attente de validation`,
+  );
+
+  res.status(201).json(formatTx(tx));
+});
+
+/**
+ * POST /deposits/manual
+ * Submits a payment-link deposit request for admin review.
+ */
+router.post("/deposits/manual", requireAuth, async (req, res): Promise<void> => {
+  const userId = req.userId!;
+  const { amount, payerCountry, txid, screenshotBase64 } = req.body as {
+    amount: unknown;
+    payerCountry: unknown;
+    txid: unknown;
+    screenshotBase64: unknown;
+  };
+
+  if (!payerCountry || typeof payerCountry !== "string") {
+    res.status(400).json({ error: "Pays requis" });
+    return;
+  }
+
+  const settings = await getSettings();
+  const manualCountries = settings.manualDepositCountries
+    .split(",")
+    .map((country) => country.trim().toUpperCase())
+    .filter(Boolean);
+  if (!manualCountries.includes(payerCountry.trim().toUpperCase())) {
+    res.status(400).json({ error: "Le dépôt manuel n'est pas activé pour ce pays" });
+    return;
+  }
+  if (!settings.manualDepositUrl) {
+    res.status(503).json({ error: "Le paiement manuel n'est pas configuré" });
+    return;
+  }
+
+  const numAmount = parseFloat(String(amount));
+  if (!numAmount || isNaN(numAmount) || numAmount <= 0) {
+    res.status(400).json({ error: "Montant invalide" });
+    return;
+  }
+  if (numAmount < parseFloat(settings.minDeposit)) {
+    res.status(400).json({ error: `Montant minimum : ${settings.minDeposit} FCFA` });
+    return;
+  }
+  if (!txid || typeof txid !== "string" || txid.trim().length < 3) {
+    res.status(400).json({ error: "Référence de paiement invalide" });
+    return;
+  }
+  if (!screenshotBase64 || typeof screenshotBase64 !== "string") {
+    res.status(400).json({ error: "Capture d'écran requise" });
+    return;
+  }
+
+  let screenshotPath: string;
+  try {
+    screenshotPath = await saveScreenshot(screenshotBase64, userId);
+  } catch {
+    res.status(400).json({ error: "Impossible de traiter la capture d'écran" });
+    return;
+  }
+
+  const [tx] = await db
+    .insert(transactionsTable)
+    .values({
+      userId,
+      type: "deposit",
+      amount: numAmount.toFixed(8),
+      fee: "0",
+      netAmount: numAmount.toFixed(8),
+      status: "pending",
+      depositMethod: "mobile_money",
+      payerCountry: payerCountry.trim().toUpperCase(),
+      txid: txid.trim(),
+      screenshotPath,
+      description: "Dépôt manuel par lien de paiement — en attente de vérification",
+    })
+    .returning();
+
+  void sendTelegramNotification(
+    `💰 Nouveau dépôt manuel par lien\nTransaction #${tx.id}\nUtilisateur #${userId}\nMontant : ${formatTelegramAmount(numAmount)}\nPays : ${payerCountry}\nRéférence : ${txid.trim()}\n📎 Preuve de paiement jointe\nStatut : en attente de validation`,
   );
 
   res.status(201).json(formatTx(tx));

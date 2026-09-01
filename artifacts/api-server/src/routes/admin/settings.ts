@@ -36,6 +36,8 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     ashtechpayKey,
     activeDepositProvider,
     usdtAddress,
+    manualDepositUrl,
+    manualDepositCountries,
     whatsappGroupUrl,
     whatsappChannelUrl,
     whatsappSupportUrl,
@@ -43,7 +45,14 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
 
   const updates: any = {};
 
-  if (dailyRatePercent !== undefined) updates.dailyRatePercent = String(dailyRatePercent);
+  if (dailyRatePercent !== undefined) {
+    const rate = Number(dailyRatePercent);
+    if (!Number.isFinite(rate) || rate < 0 || rate > 100) {
+      res.status(400).json({ error: "Le rendement journalier doit être compris entre 0 et 100 %" });
+      return;
+    }
+    updates.dailyRatePercent = rate.toString();
+  }
   if (maxCapital !== undefined) updates.maxCapital = String(maxCapital);
   if (minDeposit !== undefined) updates.minDeposit = String(minDeposit);
   if (minWithdrawal !== undefined) updates.minWithdrawal = String(minWithdrawal);
@@ -79,6 +88,29 @@ router.put("/admin/settings", requireAdmin, async (req, res): Promise<void> => {
     updates.activeDepositProvider = String(activeDepositProvider);
   }
   if (usdtAddress !== undefined) updates.usdtAddress = String(usdtAddress).trim();
+  if (manualDepositUrl !== undefined) {
+    const normalized = String(manualDepositUrl).trim();
+    if (normalized) {
+      try {
+        const parsed = new URL(normalized);
+        if (parsed.protocol !== "https:") throw new Error("invalid protocol");
+      } catch {
+        res.status(400).json({ error: "Le lien de paiement manuel doit être une URL HTTPS valide" });
+        return;
+      }
+    }
+    updates.manualDepositUrl = normalized;
+  }
+  if (manualDepositCountries !== undefined) {
+    if (!Array.isArray(manualDepositCountries)) {
+      res.status(400).json({ error: "La liste des pays du paiement manuel est invalide" });
+      return;
+    }
+    updates.manualDepositCountries = manualDepositCountries
+      .map((country: unknown) => String(country).trim().toUpperCase())
+      .filter(Boolean)
+      .join(",");
+  }
   for (const [key, value] of Object.entries({
     whatsappGroupUrl,
     whatsappChannelUrl,

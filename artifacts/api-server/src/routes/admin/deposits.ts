@@ -11,9 +11,11 @@ const AUTO_PAYMENT_PENDING_DESCRIPTION =
   "Dépôt Mobile Money — initiation automatique, confirmation utilisateur en attente";
 const AUTO_PAYMENT_REVIEW_DESCRIPTION =
   "Dépôt Mobile Money — échec fournisseur, vérification manuelle requise";
+const MANUAL_LINK_DESCRIPTION_PREFIX = "Dépôt manuel par lien de paiement";
 
 function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof usersTable.$inferSelect | null) {
   const automaticPayment = tx.depositMethod === "mobile_money" && Boolean(tx.sendavapayRef);
+  const manualPayment = tx.description?.startsWith(MANUAL_LINK_DESCRIPTION_PREFIX) ?? false;
   const requiresManualReview =
     automaticPayment &&
     tx.status === "pending" &&
@@ -39,6 +41,7 @@ function formatAdminTx(tx: typeof transactionsTable.$inferSelect, user?: typeof 
     txid: tx.txid ?? null,
     screenshotPath: tx.screenshotPath ?? null,
     automaticPayment,
+    manualPayment,
     requiresManualReview,
     paymentReviewStatus: requiresManualReview
       ? tx.description === AUTO_PAYMENT_REVIEW_DESCRIPTION

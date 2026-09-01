@@ -22,6 +22,8 @@ export const platformSettingsTable = pgTable("platform_settings", {
   ashtechpayKey: text("ashtechpay_key").notNull().default(""),
   activeDepositProvider: text("active_deposit_provider").notNull().default("sendavapay"),
   usdtAddress: text("usdt_address").notNull().default(""),
+  manualDepositUrl: text("manual_deposit_url").notNull().default(""),
+  manualDepositCountries: text("manual_deposit_countries").notNull().default(""),
   telegramGroupUrl: text("telegram_group_url").notNull().default(""),
   telegramChannelUrl: text("telegram_channel_url").notNull().default(""),
   whatsappGroupUrl: text("whatsapp_group_url").notNull().default(""),

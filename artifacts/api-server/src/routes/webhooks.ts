@@ -205,6 +205,9 @@ router.post("/webhooks/sendavapay", async (req, res): Promise<void> => {
       if (credited) {
         // Distribute referral commissions once the balance transaction commits.
         await creditReferralCommissions(credited.amount, credited.userId, credited.txId);
+        void sendTelegramNotification(
+          `✅ Dépôt approuvé automatiquement\nTransaction #${credited.txId}\nUtilisateur #${credited.userId}\nMontant : ${formatTelegramAmount(credited.amount)}\nCapital crédité et commissions distribuées`,
+        );
         logger.info(credited, "Deposit auto-approved via Sendavapay webhook");
       } else {
         logger.info({ txId: tx.id, status: tx.status }, "Webhook: transaction already processed");

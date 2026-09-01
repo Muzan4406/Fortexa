@@ -326,6 +326,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /deposits/manual:
+    post:
+      operationId: createManualDeposit
+      tags: [deposits]
+      summary: Submit a payment-link deposit request for admin review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManualDepositInput"
+      responses:
+        "201":
+          description: Manual deposit created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /deposits/{id}/status:
     get:
       operationId: getDepositStatus
@@ -1135,7 +1160,7 @@ components:
 
     PublicSettings:
       type: object
-      required: [dailyRatePercent, maxCapital, minDeposit, minWithdrawal, withdrawalFeePercent, gainsActive, level1Percent, level2Percent, level3Percent, telegramGroupUrl, telegramChannelUrl, whatsappGroupUrl, whatsappChannelUrl, whatsappSupportUrl]
+      required: [dailyRatePercent, maxCapital, minDeposit, minWithdrawal, withdrawalFeePercent, gainsActive, level1Percent, level2Percent, level3Percent, telegramGroupUrl, telegramChannelUrl, whatsappGroupUrl, whatsappChannelUrl, whatsappSupportUrl, manualDepositUrl, manualDepositCountries]
       properties:
         dailyRatePercent:
           type: number
@@ -1169,6 +1194,12 @@ components:
           type: string
         whatsappSupportUrl:
           type: string
+        manualDepositUrl:
+          type: string
+        manualDepositCountries:
+          type: array
+          items:
+            type: string
 
     # ── Transactions ──
 
@@ -1337,6 +1368,22 @@ components:
         screenshotBase64:
           type: string
           description: Base64-encoded screenshot image
+
+    ManualDepositInput:
+      type: object
+      required: [amount, payerCountry, txid, screenshotBase64]
+      properties:
+        amount:
+          type: number
+          minimum: 3000
+        payerCountry:
+          type: string
+        txid:
+          type: string
+          description: Payment provider reference
+        screenshotBase64:
+          type: string
+          description: Base64-encoded payment proof image
 
     UsdtInfoResponse:
       type: object
@@ -1716,6 +1763,8 @@ components:
           type: ["string", "null"]
         automaticPayment:
           type: boolean
+        manualPayment:
+          type: boolean
         requiresManualReview:
           type: boolean
         paymentReviewStatus:
@@ -1740,7 +1789,7 @@ components:
         rejectionReason:
           type: ["string", "null"]
 
-    ManualDepositInput:
+    AdminManualDepositInput:
       type: object
       required: [userId, amount]
       properties:
@@ -1776,6 +1825,8 @@ components:
         - whatsappGroupUrl
         - whatsappChannelUrl
          - whatsappSupportUrl
+         - manualDepositUrl
+         - manualDepositCountries
       properties:
         dailyRatePercent:
           type: number
@@ -1824,6 +1875,14 @@ components:
           type: string
         whatsappSupportUrl:
           type: string
+        manualDepositUrl:
+          type: string
+          description: HTTPS payment link for manually configured countries
+        manualDepositCountries:
+          type: array
+          items:
+            type: string
+          description: ISO country codes that use the manual payment link
 
     PlatformSettingsUpdate:
       type: object
@@ -1868,6 +1927,12 @@ components:
           type: string
         whatsappSupportUrl:
           type: string
+        manualDepositUrl:
+          type: string
+        manualDepositCountries:
+          type: array
+          items:
+            type: string
 
     ReferralSettings:
       type: object

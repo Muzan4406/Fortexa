@@ -161,7 +161,7 @@ export default function AdminDepositsPage() {
               <div className="mt-3 space-y-1.5 rounded-xl border border-border bg-muted/30 p-3">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Informations complètes</p>
                 <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
-                  <p><span className="text-muted-foreground">Méthode :</span> <span className="font-semibold">{dep.depositMethod === 'mobile_money' ? 'Mobile Money' : dep.depositMethod === 'usdt' ? 'USDT BEP20' : 'Manuel'}</span></p>
+                   <p><span className="text-muted-foreground">Méthode :</span> <span className="font-semibold">{dep.manualPayment ? 'Lien de paiement' : dep.depositMethod === 'mobile_money' ? 'Mobile Money' : dep.depositMethod === 'usdt' ? 'USDT BEP20' : 'Manuel'}</span></p>
                    {dep.automaticPayment && <p><span className="text-muted-foreground">Flux :</span> <span className="font-semibold">Automatique</span></p>}
                   <p><span className="text-muted-foreground">Pays :</span> <span className="font-semibold">{dep.payerCountry || dep.userCountry || 'Non renseigné'}</span></p>
                   <p><span className="text-muted-foreground">Montant net :</span> <span className="font-semibold">{formatCurrency(dep.netAmount)}</span></p>

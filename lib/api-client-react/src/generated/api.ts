@@ -1122,6 +1122,77 @@ export const useCreateUsdtDeposit = <TError = ErrorType<ErrorResponse>,
       return useMutation(getCreateUsdtDepositMutationOptions(options));
     }
 
+export const getCreateManualDepositUrl = () => {
+
+
+
+
+  return `/api/deposits/manual`
+}
+
+/**
+ * @summary Submit a payment-link deposit request for admin review
+ */
+export const createManualDeposit = async (manualDepositInput: ManualDepositInput, options?: Parameters<typeof customFetch>[1]): Promise<Transaction> => {
+
+  return customFetch<Transaction>(getCreateManualDepositUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(manualDepositInput)
+  }
+);}
+
+
+
+
+
+export const getCreateManualDepositMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createManualDeposit>>, TError,{data: BodyType<ManualDepositInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createManualDeposit>>, TError,{data: BodyType<ManualDepositInput>}, TContext> => {
+
+const mutationKey = ['createManualDeposit'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createManualDeposit>>, {data: BodyType<ManualDepositInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createManualDeposit(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateManualDepositMutationResult = NonNullable<Awaited<ReturnType<typeof createManualDeposit>>>
+    export type CreateManualDepositMutationBody = BodyType<ManualDepositInput>
+    export type CreateManualDepositMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Submit a payment-link deposit request for admin review
+ */
+export const useCreateManualDeposit = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createManualDeposit>>, TError,{data: BodyType<ManualDepositInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createManualDeposit>>,
+        TError,
+        {data: BodyType<ManualDepositInput>},
+        TContext
+      > => {
+      return useMutation(getCreateManualDepositMutationOptions(options));
+    }
+
 export const getGetDepositStatusUrl = (id: number,) => {
 
 

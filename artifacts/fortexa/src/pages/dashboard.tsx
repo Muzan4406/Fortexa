@@ -4,7 +4,7 @@ import { useGetDashboard, useGetGainsSnapshot, useGetAnnouncements, useGetUsdtIn
 import { formatCurrency } from '@/lib/format';
 import { isFcfaCountry } from '@/lib/countries';
 import { useLocation } from 'wouter';
-import { Bell, Eye, EyeOff, ChevronRight, TrendingUp, Zap, BarChart3, ShieldCheck, Clock3, Award, User } from 'lucide-react';
+import { Bell, Eye, EyeOff, ChevronRight, TrendingUp, Zap, BarChart3, ShieldCheck, Clock3, Award, User, MessageCircle, X } from 'lucide-react';
 
 /* ── Constellation background SVG ── */
 function StarField({ className }: { className?: string }) {
@@ -70,6 +70,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [hideBalance, setHideBalance] = useState(false);
+  const [showWhatsAppInvite, setShowWhatsAppInvite] = useState(false);
 
   const { data: dashboard, isLoading } = useGetDashboard();
   const { data: snapshot } = useGetGainsSnapshot();
@@ -79,6 +80,11 @@ export default function DashboardPage() {
     query: { enabled: !!user && !isXof, queryKey: getGetUsdtInfoQueryKey() },
   });
   const usdtRate = usdtInfo?.usdtRate || 561;
+
+  useEffect(() => {
+    const groupUrl = dashboard?.settings?.whatsappGroupUrl;
+    setShowWhatsAppInvite(Boolean(groupUrl));
+  }, [dashboard?.settings?.whatsappGroupUrl]);
 
   if (!user) return null;
 
@@ -287,7 +293,7 @@ export default function DashboardPage() {
 
          <div className="grid grid-cols-4 divide-x divide-slate-100 rounded-2xl border border-slate-100 bg-white px-1 py-3 shadow-sm">
            {[
-             { label: '3%', text: 'Rendement\\ntoutes les 24h', icon: BarChart3, color: 'bg-blue-50 text-blue-600' },
+              { label: `${dailyRate}%`, text: 'Rendement\\ntoutes les 24h', icon: BarChart3, color: 'bg-blue-50 text-blue-600' },
              { label: 'Sécurisé', text: 'Plateforme\\n100% sécurisée', icon: ShieldCheck, color: 'bg-emerald-50 text-emerald-600' },
              { label: 'Temps réel', text: 'Gains calculés\\nen temps réel', icon: Clock3, color: 'bg-violet-50 text-violet-600' },
              { label: 'Fiable', text: 'Transparence et\\nconfiance', icon: Award, color: 'bg-amber-50 text-amber-600' },
@@ -301,6 +307,46 @@ export default function DashboardPage() {
              </div>
            ))}
          </div>
+
+          {showWhatsAppInvite && dashboard?.settings?.whatsappGroupUrl && (
+            <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/45 p-4 backdrop-blur-sm sm:items-center">
+              <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-emerald-100 bg-white p-6 shadow-2xl">
+                <button
+                  type="button"
+                  onClick={() => setShowWhatsAppInvite(false)}
+                  className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500"
+                  aria-label="Fermer l'invitation WhatsApp"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100">
+                  <MessageCircle className="h-7 w-7 text-emerald-600" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900">Rejoignez notre groupe WhatsApp</h2>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  Intégrez la communauté Fortexa pour recevoir les informations importantes et échanger avec les autres membres.
+                </p>
+                <div className="mt-5 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowWhatsAppInvite(false)}
+                    className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600"
+                  >
+                    Plus tard
+                  </button>
+                  <a
+                    href={dashboard.settings.whatsappGroupUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setShowWhatsAppInvite(false)}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white"
+                  >
+                    Rejoindre
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
 
       </div>
     </div>

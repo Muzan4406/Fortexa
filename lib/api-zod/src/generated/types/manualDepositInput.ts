@@ -7,9 +7,11 @@
  */
 
 export interface ManualDepositInput {
-  userId: number;
-  /** @minimum 0 */
+  /** @minimum 3000 */
   amount: number;
-  /** @nullable */
-  description?: string | null;
+  payerCountry: string;
+  /** Payment provider reference */
+  txid: string;
+  /** Base64-encoded payment proof image */
+  screenshotBase64: string;
 }

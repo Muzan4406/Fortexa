@@ -1,5 +1,12 @@
 import { db, platformSettingsTable } from "@workspace/db";
 
+function parseCountryList(value: string): string[] {
+  return value
+    .split(",")
+    .map((country) => country.trim().toUpperCase())
+    .filter(Boolean);
+}
+
 export async function getSettings() {
   const [settings] = await db.select().from(platformSettingsTable).limit(1);
   if (!settings) {
@@ -30,6 +37,8 @@ export function formatSettings(s: Awaited<ReturnType<typeof getSettings>>) {
     whatsappChannelUrl: s.whatsappChannelUrl,
     whatsappSupportUrl: s.whatsappSupportUrl,
     activeDepositProvider: s.activeDepositProvider,
+    manualDepositUrl: s.manualDepositUrl,
+    manualDepositCountries: parseCountryList(s.manualDepositCountries),
   };
 }
 
@@ -43,6 +52,8 @@ export function formatAdminSettings(s: Awaited<ReturnType<typeof getSettings>>) 
     sendavapayKeySet: s.sendavapayKey.length > 0,
     sendavapayWebhookSecretSet: s.sendavapayWebhookSecret.length > 0,
     usdtAddress: s.usdtAddress,
+    manualDepositUrl: s.manualDepositUrl,
+    manualDepositCountries: parseCountryList(s.manualDepositCountries),
     telegramGroupUrl: s.telegramGroupUrl,
     telegramChannelUrl: s.telegramChannelUrl,
     whatsappGroupUrl: s.whatsappGroupUrl,

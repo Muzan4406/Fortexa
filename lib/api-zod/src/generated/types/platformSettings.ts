@@ -33,4 +33,8 @@ export interface PlatformSettings {
   whatsappGroupUrl: string;
   whatsappChannelUrl?: string;
   whatsappSupportUrl?: string;
+  /** HTTPS payment link for manually configured countries */
+  manualDepositUrl?: string;
+  /** ISO country codes that use the manual payment link */
+  manualDepositCountries?: string[];
 }

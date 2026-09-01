@@ -24,6 +24,7 @@ description: Key architectural decisions for the Fortexa investment platform
 - `lib/db/src/schema/` — users, transactions, platform_settings, announcements, referral_commissions
 - `phone` column on users is NOT NULL (pass empty string `''` for admin seed)
 - Run `pnpm run typecheck:libs` after schema changes to rebuild declarations
+- Development schema changes belong to the post-merge setup; production schema changes belong to Publish, never to deploy-time or startup DDL.
 
 ## Country values
 - User country selections are stored as localized country names (for example `Togo` and `Bénin`), not ISO codes; payment rules should accept or normalize both forms.

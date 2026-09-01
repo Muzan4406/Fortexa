@@ -23,4 +23,6 @@ export interface PublicSettings {
   whatsappGroupUrl: string;
   whatsappChannelUrl: string;
   whatsappSupportUrl: string;
+  manualDepositUrl: string;
+  manualDepositCountries: string[];
 }

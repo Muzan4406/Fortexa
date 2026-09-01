@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './adminManualDepositInput';
 export * from './adminStats';
 export * from './adminTransaction';
 export * from './adminTransactionList';

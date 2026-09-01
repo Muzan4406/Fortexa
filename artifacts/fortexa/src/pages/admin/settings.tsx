@@ -36,6 +36,8 @@ const paymentSchema = z.object({
   ashtechpayKey: z.string(),
   activeDepositProvider: z.enum(['sendavapay', 'ashtechpay']),
   usdtAddress: z.string(),
+  manualDepositUrl: z.string(),
+  manualDepositCountries: z.array(z.string()),
 });
 
 const socialSchema = z.object({
@@ -53,6 +55,21 @@ type SettingsForm = z.infer<typeof settingsSchema>;
 type PaymentForm = z.infer<typeof paymentSchema>;
 type SocialForm = z.infer<typeof socialSchema>;
 type AnnouncementForm = z.infer<typeof announcementSchema>;
+
+const MANUAL_DEPOSIT_COUNTRIES = [
+  ['TG', 'Togo'],
+  ['BJ', 'Bénin'],
+  ['BF', 'Burkina Faso'],
+  ['CI', "Côte d'Ivoire"],
+  ['SN', 'Sénégal'],
+  ['CM', 'Cameroun'],
+  ['ML', 'Mali'],
+  ['GN', 'Guinée'],
+  ['CD', 'RD Congo'],
+  ['CG', 'Congo'],
+  ['NG', 'Nigéria'],
+  ['GH', 'Ghana'],
+] as const;
 
 function getSettingsErrorMessage(error: any, fallback = 'Impossible de sauvegarder les paramètres') {
   return error?.data?.error || error?.message || fallback;
@@ -118,6 +135,8 @@ export default function AdminSettingsPage() {
       ashtechpayKey: '',
       activeDepositProvider: 'sendavapay',
       usdtAddress: '',
+      manualDepositUrl: '',
+      manualDepositCountries: [],
     },
   });
   const socialForm = useForm<SocialForm>({
@@ -146,6 +165,8 @@ export default function AdminSettingsPage() {
         ashtechpayKey: '',
         activeDepositProvider: settings.activeDepositProvider === 'ashtechpay' ? 'ashtechpay' : 'sendavapay',
         usdtAddress: settings.usdtAddress ?? '',
+        manualDepositUrl: settings.manualDepositUrl ?? '',
+        manualDepositCountries: settings.manualDepositCountries ?? [],
       });
       socialForm.reset({
         whatsappGroupUrl: settings.whatsappGroupUrl ?? '',
@@ -175,12 +196,14 @@ export default function AdminSettingsPage() {
 
   const onPaymentSubmit = (data: PaymentForm) => {
     // Only send fields that have values — prevents accidental clearing
-    const payload: Record<string, string> = {};
+    const payload: Record<string, unknown> = {};
     if (data.sendavapayKey.trim()) payload.sendavapayKey = data.sendavapayKey.trim();
     if (data.sendavapayWebhookSecret.trim()) payload.sendavapayWebhookSecret = data.sendavapayWebhookSecret.trim();
     if (data.ashtechpayKey.trim()) payload.ashtechpayKey = data.ashtechpayKey.trim();
     payload.activeDepositProvider = data.activeDepositProvider;
     payload.usdtAddress = data.usdtAddress.trim();
+    payload.manualDepositUrl = data.manualDepositUrl.trim();
+    payload.manualDepositCountries = data.manualDepositCountries;
 
     updateSettingsMutation.mutate(
       { data: payload },
@@ -447,6 +470,51 @@ export default function AdminSettingsPage() {
                       </select>
                     </FormControl>
                     <p className="text-xs text-muted-foreground">Le changement s’applique aux nouveaux dépôts Mobile Money.</p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <FormField control={paymentForm.control} name="manualDepositUrl" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Lien de paiement manuel</FormLabel>
+                    <FormControl>
+                      <Input type="url" placeholder="https://exemple.com/paiement" {...field} />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      Laissez vide pour désactiver le paiement manuel. Le lien sera ouvert avec le montant, le pays et une référence Fortexa.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <FormField control={paymentForm.control} name="manualDepositCountries" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pays utilisant le paiement manuel</FormLabel>
+                    <FormControl>
+                      <div className="grid grid-cols-2 gap-2 rounded-xl border border-border bg-muted/30 p-3 sm:grid-cols-3">
+                        {MANUAL_DEPOSIT_COUNTRIES.map(([code, name]) => {
+                          const checked = field.value.includes(code);
+                          return (
+                            <label key={code} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm hover:bg-background">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={(event) => field.onChange(
+                                  event.target.checked
+                                    ? [...field.value, code]
+                                    : field.value.filter((country) => country !== code),
+                                )}
+                                className="h-4 w-4 accent-primary"
+                              />
+                              <span>{name}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      Ces pays verront le lien manuel en priorité. Les autres pays XOF utiliseront Mobile Money automatique et les autres pays USDT.
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )} />

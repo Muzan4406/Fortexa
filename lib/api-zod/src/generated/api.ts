@@ -133,7 +133,9 @@ export const GetDashboardResponse = zod.object({
   "telegramChannelUrl": zod.string(),
   "whatsappGroupUrl": zod.string(),
   "whatsappChannelUrl": zod.string(),
-  "whatsappSupportUrl": zod.string()
+  "whatsappSupportUrl": zod.string(),
+  "manualDepositUrl": zod.string(),
+  "manualDepositCountries": zod.array(zod.string())
 })
 })
 
@@ -290,6 +292,41 @@ export const CreateUsdtDepositBody = zod.object({
 })
 
 export const CreateUsdtDepositResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "type": zod.enum(['deposit', 'withdrawal', 'commission', 'gain']),
+  "amount": zod.number(),
+  "fee": zod.number(),
+  "netAmount": zod.number(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
+  "description": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "depositMethod": zod.string().nullish(),
+  "payerCountry": zod.string().nullish(),
+  "payerPhone": zod.string().nullish(),
+  "sendavapayRef": zod.string().nullish(),
+  "txid": zod.string().nullish(),
+  "screenshotPath": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
+})
+
+
+/**
+ * @summary Submit a payment-link deposit request for admin review
+ */
+export const createManualDepositBodyAmountMin = 3000;
+
+
+
+export const CreateManualDepositBody = zod.object({
+  "amount": zod.number().min(createManualDepositBodyAmountMin),
+  "payerCountry": zod.string(),
+  "txid": zod.string().describe('Payment provider reference'),
+  "screenshotBase64": zod.string().describe('Base64-encoded payment proof image')
+})
+
+export const CreateManualDepositResponse = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "type": zod.enum(['deposit', 'withdrawal', 'commission', 'gain']),
@@ -748,6 +785,7 @@ export const GetAdminDepositsResponse = zod.object({
   "txid": zod.string().nullish(),
   "screenshotPath": zod.string().nullish(),
   "automaticPayment": zod.boolean().optional(),
+  "manualPayment": zod.boolean().optional(),
   "requiresManualReview": zod.boolean().optional(),
   "paymentReviewStatus": zod.union([zod.literal('awaiting_user_confirmation'),zod.literal('provider_failed_needs_review'),zod.literal('confirmation_sent'),zod.literal(null)]).nullish(),
   "createdAt": zod.coerce.date(),
@@ -760,14 +798,15 @@ export const GetAdminDepositsResponse = zod.object({
 /**
  * @summary Manually add a deposit for a user
  */
-export const createAdminDepositBodyAmountMin = 0;
+export const createAdminDepositBodyAmountMin = 3000;
 
 
 
 export const CreateAdminDepositBody = zod.object({
-  "userId": zod.number(),
   "amount": zod.number().min(createAdminDepositBodyAmountMin),
-  "description": zod.string().nullish()
+  "payerCountry": zod.string(),
+  "txid": zod.string().describe('Payment provider reference'),
+  "screenshotBase64": zod.string().describe('Base64-encoded payment proof image')
 })
 
 export const CreateAdminDepositResponse = zod.object({
@@ -859,6 +898,7 @@ export const GetAdminWithdrawalsResponse = zod.object({
   "txid": zod.string().nullish(),
   "screenshotPath": zod.string().nullish(),
   "automaticPayment": zod.boolean().optional(),
+  "manualPayment": zod.boolean().optional(),
   "requiresManualReview": zod.boolean().optional(),
   "paymentReviewStatus": zod.union([zod.literal('awaiting_user_confirmation'),zod.literal('provider_failed_needs_review'),zod.literal('confirmation_sent'),zod.literal(null)]).nullish(),
   "createdAt": zod.coerce.date(),
@@ -926,7 +966,9 @@ export const GetAdminSettingsResponse = zod.object({
   "telegramChannelUrl": zod.string(),
   "whatsappGroupUrl": zod.string(),
   "whatsappChannelUrl": zod.string().optional(),
-  "whatsappSupportUrl": zod.string().optional()
+  "whatsappSupportUrl": zod.string().optional(),
+  "manualDepositUrl": zod.string().optional().describe('HTTPS payment link for manually configured countries'),
+  "manualDepositCountries": zod.array(zod.string()).optional().describe('ISO country codes that use the manual payment link')
 })
 
 
@@ -951,7 +993,9 @@ export const UpdateAdminSettingsBody = zod.object({
   "telegramChannelUrl": zod.string().optional(),
   "whatsappGroupUrl": zod.string().optional(),
   "whatsappChannelUrl": zod.string().optional(),
-  "whatsappSupportUrl": zod.string().optional()
+  "whatsappSupportUrl": zod.string().optional(),
+  "manualDepositUrl": zod.string().optional(),
+  "manualDepositCountries": zod.array(zod.string()).optional()
 })
 
 export const UpdateAdminSettingsResponse = zod.object({
@@ -975,7 +1019,9 @@ export const UpdateAdminSettingsResponse = zod.object({
   "telegramChannelUrl": zod.string(),
   "whatsappGroupUrl": zod.string(),
   "whatsappChannelUrl": zod.string().optional(),
-  "whatsappSupportUrl": zod.string().optional()
+  "whatsappSupportUrl": zod.string().optional(),
+  "manualDepositUrl": zod.string().optional().describe('HTTPS payment link for manually configured countries'),
+  "manualDepositCountries": zod.array(zod.string()).optional().describe('ISO country codes that use the manual payment link')
 })
 
 
